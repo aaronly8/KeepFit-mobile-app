@@ -1,0 +1,12 @@
+{
+  "name": "KeepFit",
+  "displayName": "KeepFit",
+  "expo": {
+    "name": "KeepFit",
+    "slug": "KeepFit",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
