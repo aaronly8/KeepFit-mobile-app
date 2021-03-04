@@ -10,6 +10,8 @@ function Text(p) {
     return (
         <RNText
             style={{
+                fontSize: 12,
+                margin: 10,
                 color:
                     colorScheme === 'light'
                         ? Color.light.textColor
@@ -50,6 +52,7 @@ function Header(p) {
     return (
         <Text
             style={{
+              fontSize: 26,
                 color:
                     colorScheme === 'light'
                         ? Color.light.textColor
