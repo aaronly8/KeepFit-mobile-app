@@ -18,13 +18,21 @@ const Tab = createBottomTabNavigator();
 
 
 const MainScreen = props => {
+    const setLoggedIn = props.setLoggedIn
+
+    // TODO: fix this props passing up, it behaves a bit weirdly with react navigation
+
     return (
         <Tab.Navigator>
             <Tab.Screen name="Home" component={HomeScreen} />
             <Tab.Screen name="Explore" component={ExploreScreen} />
             <Tab.Screen name="Create" component={CreateScreen} />
             <Tab.Screen name="Track" component={TrackScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
+            <Tab.Screen name='Profile'>
+                {(props) => <ProfileScreen
+                    setLoggedIn={setLoggedIn}
+                />}
+            </Tab.Screen>
         </Tab.Navigator>
     );
 }
