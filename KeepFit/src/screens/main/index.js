@@ -4,28 +4,29 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import Container from '@app/components/container.js'
 import Text, { Header, Subheader } from '@app/components/text.js'
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+import HomeScreen from '@app/screens/home'
+import ExploreScreen from '@app/screens/explore';
+import CreateScreen from '@app/screens/create';
+import TrackScreen from '@app/screens/track';
+import ProfileScreen from '@app/screens/profile';
+
+
+const Tab = createBottomTabNavigator();
 
 
 const MainScreen = props => {
     return (
-        <SafeAreaView>
-            <Container>
-                <Header style={styles.mainHeader} >
-                    KeepFit
-                </Header>
-                <Subheader style={styles.subHeader}>
-                    An exercise application
-                </Subheader>
-                <FontAwesome5.Button
-                    style={styles.googleButton}
-                    name="google"
-                    onPress={props.setLoggedIn.bind(this, false)}
-                >
-                    <Text style={styles.googleText}>Log Out With Google</Text>
-                </FontAwesome5.Button>
-            </Container>
-        </SafeAreaView>
-    )
+        <Tab.Navigator>
+            <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Explore" component={ExploreScreen} />
+            <Tab.Screen name="Create" component={CreateScreen} />
+            <Tab.Screen name="Track" component={TrackScreen} />
+            <Tab.Screen name="Profile" component={ProfileScreen} />
+        </Tab.Navigator>
+    );
 }
 
 const styles = StyleSheet.create({
