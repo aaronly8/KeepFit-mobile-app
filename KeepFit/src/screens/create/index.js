@@ -3,12 +3,12 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
 
-const HomeScreen = props => {
+const CreateScreen = props => {
     return (
         <SafeAreaView>
             <Container>
                 <Header style={styles.mainHeader}>
-                    Welcome to the Home Screen!
+                    Welcome to the Create Screen!
                 </Header>
             </Container>
         </SafeAreaView>
@@ -23,4 +23,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default HomeScreen;
+export default CreateScreen;

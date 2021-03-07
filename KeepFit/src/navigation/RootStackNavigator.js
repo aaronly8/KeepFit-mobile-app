@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useColorScheme } from 'react-native'
 
 import {
@@ -8,9 +8,11 @@ import {
 } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
-import Home from '@app/screens/home'
+import LandingScreen from '@app/screens/landing'
+import MainScreen from '@app/screens/main';
 
 import Color from '@app/theme/color'
+import { log } from 'react-native-reanimated'
 
 const Stack = createStackNavigator()
 
@@ -33,12 +35,33 @@ const darkTheme = {
 function RootStackNavigator() {
     const colorScheme = useColorScheme()
 
+    const [isLoggedIn, setLoggedIn] = useState(false);
+
+    let initialScreen = "Landing"
+    if (isLoggedIn) {
+        initialScreen = "Main"
+    }
+
     return (
         <NavigationContainer
             theme={colorScheme === 'light' ? lightTheme : darkTheme}
         >
-            <Stack.Navigator headerMode="none">
-                <Stack.Screen name="Home" component={Home} />
+            <Stack.Navigator headerMode="none" initialRouteName={initialScreen}>
+                {!isLoggedIn ? (
+                    <Stack.Screen name='Landing'>
+                    {(props) => <LandingScreen
+                        setLoggedIn={setLoggedIn}
+                        loggedIn={isLoggedIn}
+                    />}
+                </Stack.Screen>
+                ) : (
+                    <Stack.Screen name='Main'>
+                    {(props) => <MainScreen
+                        setLoggedIn={setLoggedIn}
+                        loggedIn={isLoggedIn}
+                    />}
+                </Stack.Screen>
+                )}
             </Stack.Navigator>
         </NavigationContainer>
     )
