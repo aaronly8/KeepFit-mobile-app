@@ -8,7 +8,7 @@ import {
 } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
-import Home from '@app/screens/home'
+import LandingScreen from '@app/screens/landing'
 
 import Color from '@app/theme/color'
 
@@ -38,7 +38,7 @@ function RootStackNavigator() {
             theme={colorScheme === 'light' ? lightTheme : darkTheme}
         >
             <Stack.Navigator headerMode="none">
-                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="Home" component={LandingScreen} />
             </Stack.Navigator>
         </NavigationContainer>
     )
