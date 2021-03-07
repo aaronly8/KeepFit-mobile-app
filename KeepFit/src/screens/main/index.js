@@ -12,6 +12,7 @@ import ExploreScreen from '@app/screens/explore';
 import CreateScreen from '@app/screens/create';
 import TrackScreen from '@app/screens/track';
 import ProfileScreen from '@app/screens/profile';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 
 const Tab = createBottomTabNavigator();
@@ -23,7 +24,34 @@ const MainScreen = props => {
     // TODO: fix this props passing up, it behaves a bit weirdly with react navigation
 
     return (
-        <Tab.Navigator>
+        <Tab.Navigator
+            screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
+                let iconName;
+    
+                if (route.name === 'Home') {
+                    iconName = focused
+                    ? 'home'
+                    : 'home';
+                } else if (route.name === 'Explore') {
+                    iconName = focused ? 'search' : 'search';
+                } else if (route.name === 'Create') {
+                    iconName = focused ? 'add-circle' : 'add-circle-outline';
+                } else if (route.name === 'Track') {
+                    iconName = focused ? 'timer' : 'timer';
+                } else if (route.name === 'Profile') {
+                    iconName = focused ? 'person' : 'person';
+                }
+    
+                // You can return any component that you like here!
+                return <Ionicons name={iconName} size={size} color={color} />;
+                },
+            })}
+            tabBarOptions={{
+                activeTintColor: 'blue',
+                inactiveTintColor: 'gray',
+            }}
+        >
             <Tab.Screen name="Home" component={HomeScreen} />
             <Tab.Screen name="Explore" component={ExploreScreen} />
             <Tab.Screen name="Create" component={CreateScreen} />
