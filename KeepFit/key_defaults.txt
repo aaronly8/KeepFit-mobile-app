@@ -1,0 +1,3 @@
+const FIREBASE_KEY = "INSERT_KEY_HERE";
+
+export default FIREBASE_KEY;
