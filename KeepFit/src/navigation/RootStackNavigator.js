@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useColorScheme } from 'react-native'
+import { googleiosClientId, googleandroidClientId } from '../keys.js';
 
 import {
     NavigationContainer,
@@ -7,8 +8,9 @@ import {
     DarkTheme,
 } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
+import * as Google from 'expo-google-app-auth';
 
-import LandingScreen from '@app/screens/landing'
+import LoginScreen from '@app/screens/login'
 import MainScreen from '@app/screens/main';
 
 import Color from '@app/theme/color'
@@ -37,9 +39,27 @@ function RootStackNavigator() {
 
     const [isLoggedIn, setLoggedIn] = useState(false);
 
-    let initialScreen = "Landing"
+    let initialScreen = "Login"
     if (isLoggedIn) {
         initialScreen = "Main"
+    }
+
+    async function signInWithGoogleAsync() {
+        try {
+            const result = await Google.logInAsync({
+                androidClientId: googleandroidClientId,
+                iosClientId: googleiosClientId,
+                scopes: ['profile', 'email'],
+            });
+
+            if (result.type === 'success') {
+                return result.accessToken;
+            } else {
+                return { cancelled: true };
+            }
+        } catch (e) {
+            return { error: true };
+        }
     }
 
     return (
@@ -48,20 +68,20 @@ function RootStackNavigator() {
         >
             <Stack.Navigator headerMode="none" initialRouteName={initialScreen}>
                 {!isLoggedIn ? (
-                    <Stack.Screen name='Landing'>
-                    {(props) => <LandingScreen
-                        setLoggedIn={setLoggedIn}
-                        loggedIn={isLoggedIn}
-                    />}
-                </Stack.Screen>
+                    <Stack.Screen name='Login'>
+                        {(props) => <LoginScreen
+                            loginUser={signInWithGoogleAsync}
+                            loggedIn={isLoggedIn}
+                        />}
+                    </Stack.Screen>
                 ) : (
-                    <Stack.Screen name='Main'>
-                    {(props) => <MainScreen
-                        setLoggedIn={setLoggedIn}
-                        loggedIn={isLoggedIn}
-                    />}
-                </Stack.Screen>
-                )}
+                        <Stack.Screen name='Main'>
+                            {(props) => <MainScreen
+                                setLoggedIn={setLoggedIn}
+                                loggedIn={isLoggedIn}
+                            />}
+                        </Stack.Screen>
+                    )}
             </Stack.Navigator>
         </NavigationContainer>
     )

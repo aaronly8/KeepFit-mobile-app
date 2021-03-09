@@ -6,7 +6,7 @@ import Container from '@app/components/container.js'
 import Text, { Header, Subheader } from '@app/components/text.js'
 
 
-const LandingScreen = props => {
+const LoginScreen = props => {
     return (
         <SafeAreaView>
             <Container>
@@ -19,7 +19,7 @@ const LandingScreen = props => {
                 <FontAwesome5.Button
                     style={styles.googleButton}
                     name="google"
-                    onPress={() => props.setLoggedIn(true)}
+                    onPress={() => props.loginUser()}
                 >
                     <Text style={styles.googleText}>Log In With Google</Text>
                 </FontAwesome5.Button>
@@ -50,4 +50,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default LandingScreen;
+export default LoginScreen;
