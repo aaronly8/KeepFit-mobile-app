@@ -13,9 +13,11 @@ import * as Google from 'expo-google-app-auth';
 import LoginScreen from '@app/screens/login'
 import MainScreen from '@app/screens/main';
 
+import User from "../models/user"
+
 import Color from '@app/theme/color'
 import { log } from 'react-native-reanimated'
-import { db, firebase } from "../firebase/firebase.js"
+import firebase from "firebase";
 
 const Stack = createStackNavigator()
 
@@ -52,7 +54,7 @@ function RootStackNavigator() {
                 if (
                     providerData[i].providerId ===
                     firebase.auth.GoogleAuthProvider.PROVIDER_ID &&
-                    providerData[i].uid === googleUser.getBasicProfile().getId()
+                    providerData[i].uid === googleUser.user.id
                 ) {
                     // We don't need to reauth the Firebase connection.
                     return true;
@@ -63,8 +65,6 @@ function RootStackNavigator() {
     };
 
     const onSignIn = googleUser => {
-        console.log("called on signin");
-        console.log('Google Auth Response', googleUser);
         // We need to register an Observer on Firebase Auth to make sure auth is initialized.
         var unsubscribe = firebase.auth().onAuthStateChanged(
             function (firebaseUser) {
@@ -79,32 +79,23 @@ function RootStackNavigator() {
                     console.log("built credential");
                     // Sign in with credential from the Google user.
                     firebase
-                        .auth()
-                        .signInAndRetrieveDataWithCredential(credential)
+                        .auth().signInWithCredential(credential)
                         .then(function (result) {
                             console.log('user signed in ');
                             if (result.additionalUserInfo.isNewUser) {
-                                console.log("trying database create");
-                                firebase
-                                    .database()
-                                    .ref('/users/' + result.user.uid)
-                                    .set({
-                                        gmail: result.user.email,
-                                        profile_picture: result.additionalUserInfo.profile.picture,
-                                        first_name: result.additionalUserInfo.profile.given_name,
-                                        last_name: result.additionalUserInfo.profile.family_name,
-                                        created_at: Date.now()
-                                    })
+                                User.create_initial_user(
+                                    result.user.uid,
+                                    result.additionalUserInfo.profile.given_name + " " + result.additionalUserInfo.profile.family_name,
+                                    result.user.email,
+                                    result.additionalUserInfo.profile.picture,
+                                    Date.now()
+                                )
                                     .then(function (snapshot) {
+                                        console.log("hello");
                                         // console.log('Snapshot', snapshot);
                                     });
                             } else {
-                                firebase
-                                    .database()
-                                    .ref('/users/' + result.user.uid)
-                                    .update({
-                                        last_logged_in: Date.now()
-                                    });
+                                console.log("not new user");
                             }
                         })
                         .catch(function (error) {

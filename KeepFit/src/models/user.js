@@ -1,14 +1,15 @@
 import BaseModel from "../models/base";
+import db, { firebase } from "../firebase/firebase";
 
 class User extends BaseModel {
-    constructor (id, full_name, email, photo_url, username, birthday, gender, weight, height, fitness_level, created_at) {
-        // initialize base model with firebase collection name
-        super("users");
-        
+    static collection_name = "test"
+
+    constructor (id, full_name, email, profile_picture, username, birthday, gender, weight, height, fitness_level, created_at) {
+        // initialize base model with firebase collection name        
         self.id = id
         self.full_name = full_name
         self.email = email
-        self.photo_url = photo_url
+        self.profile_picture = profile_picture
         self.username = username
         self.birthday = birthday
         self.gender = gender
@@ -16,6 +17,18 @@ class User extends BaseModel {
         self.height = height
         self.fitness_level = fitness_level
         self.created_at = created_at
+    }
+
+    static create_initial_user(id, full_name, email, profile_picture, created_at) {
+        db.collection(this.collection_name).doc(id).set({
+            email: email,
+            profile_picture: profile_picture,
+            full_name: full_name,
+            created_at: created_at
+        }).then(function (snapshot) {
+            console.log("created");
+            // console.log('Snapshot', snapshot);
+        });
     }
 }
 
