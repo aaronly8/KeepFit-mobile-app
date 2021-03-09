@@ -1,3 +1,6 @@
 const FIREBASE_KEY = "INSERT_KEY_HERE";
+const googleiosClientId = "INSERT_HERE";
+const googleandroidClientId = "INSERT_HERE";
 
 export default FIREBASE_KEY;
+export { googleiosClientId, googleandroidClientId };
