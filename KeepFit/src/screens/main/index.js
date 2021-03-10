@@ -57,9 +57,7 @@ const MainScreen = props => {
             <Tab.Screen name="Create" component={CreateScreen} />
             <Tab.Screen name="Track" component={TrackScreen} />
             <Tab.Screen name='Profile'>
-                {(props) => <ProfileScreen
-                    setLoggedIn={setLoggedIn}
-                />}
+                {(props) => <ProfileScreen navigation={props.navigation} />}
             </Tab.Screen>
         </Tab.Navigator>
     );
