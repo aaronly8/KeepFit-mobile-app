@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { SafeAreaView, Image, StyleSheet } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import Text, { Header, SubHeader } from '@app/components/text.js';
@@ -25,10 +25,14 @@ const ProfileScreen = (props) => {
                 <Container>
                     <Header style={styles.mainHeader}>
                         Welcome to the Profile Screen!
-                </Header>
-                    <Text>
+                    </Header>
+                    <Text style={styles.centeredText}>
                         You are logged in as {user_profile.full_name}!
-                </Text>
+                    </Text>
+                    <Image
+                        style={styles.profilePic}
+                        source={{uri: user_profile.profile_picture}}
+                    />
                     <FontAwesome5.Button
                         style={styles.googleButton}
                         name="google"
@@ -59,6 +63,16 @@ const styles = StyleSheet.create({
         height: 60,
         paddingLeft: 50,
         paddingRight: 50
+    },
+    centeredText: {
+        textAlign: 'center'
+    },
+    profilePic: {
+        alignSelf: 'center',
+        marginBottom: 15,
+        width: 60,
+        height: 60,
+        borderRadius: 5
     },
     googleText: {
         color: 'white',
