@@ -3,30 +3,56 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import Text, { Header, SubHeader } from '@app/components/text.js';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser } from "../../redux/actions/auth.js";
+import { current } from '@reduxjs/toolkit';
 
-const ProfileScreen = props => {
+const ProfileScreen = (props) => {
+    const isLoggedIn = useSelector(state => state.auth.loggedIn);
+
+    const user_profile = useSelector(state => state.auth.currentUser);
+
+    const dispatch = useDispatch();
+
+    const logoutHandler = () => {
+        dispatch(logoutUser());
+        console.log("logged out");
+    }
+
     return (
         <SafeAreaView>
-            <Container>
-                <Header style={styles.mainHeader}>
-                    Welcome to the Profile Screen!
+            {isLoggedIn ? (
+                <Container>
+                    <Header style={styles.mainHeader}>
+                        Welcome to the Profile Screen!
                 </Header>
-                <FontAwesome5.Button
-                    style={styles.googleButton}
-                    name="google"
-                    onPress={() => props.setLoggedIn(false)}
-                >
-                    <Text style={styles.googleText}>Log Out With Google</Text>
-                </FontAwesome5.Button>
-            </Container>
+                    <Text>
+                        You are logged in as {user_profile.full_name}!
+                </Text>
+                    <FontAwesome5.Button
+                        style={styles.googleButton}
+                        name="google"
+                        onPress={() => logoutHandler()}
+                    >
+                        <Text style={styles.googleText}>Log Out With Google</Text>
+                    </FontAwesome5.Button>
+                </Container>
+            ) : (
+                    <Text>Logging Out.</Text>
+                )}
         </SafeAreaView>
-    )
+    );
 };
 
 const styles = StyleSheet.create({
     mainHeader: {
         fontSize: 50,
         marginTop: "55%",
+        textAlign: "center"
+    },
+    subHeader: {
+        fontSize: 18,
+        marginTop: 0,
         textAlign: "center"
     },
     googleButton: {

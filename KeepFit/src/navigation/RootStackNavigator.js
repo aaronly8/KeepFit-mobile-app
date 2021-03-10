@@ -19,6 +19,11 @@ import Color from '@app/theme/color'
 import { log } from 'react-native-reanimated'
 import firebase from "firebase";
 
+import { useSelector, useDispatch } from 'react-redux';
+import { loginUser } from "../redux/actions/auth.js";
+import db from "../firebase/firebase";
+
+
 const Stack = createStackNavigator()
 
 const lightTheme = {
@@ -40,11 +45,15 @@ const darkTheme = {
 function RootStackNavigator() {
     const colorScheme = useColorScheme()
 
-    const [isLoggedIn, setLoggedIn] = useState(false);
+    const isLoggedIn = useSelector(state => state.auth.loggedIn);
 
-    let initialScreen = "Login"
-    if (isLoggedIn) {
-        initialScreen = "Main"
+    const dispatch = useDispatch();
+
+    const loginStateHandler = (user_id, user_object) => {
+        console.log("called handler");
+        console.log(user_id);
+        console.log(user_object);
+        dispatch(loginUser(user_id, user_object));
     }
 
     const isUserEqual = (googleUser, firebaseUser) => {
@@ -83,18 +92,22 @@ function RootStackNavigator() {
                         .then(function (result) {
                             console.log('user signed in ');
                             if (result.additionalUserInfo.isNewUser) {
-                                User.create_initial_user(
-                                    result.user.uid,
-                                    result.additionalUserInfo.profile.given_name + " " + result.additionalUserInfo.profile.family_name,
-                                    result.user.email,
-                                    result.additionalUserInfo.profile.picture,
-                                    Date.now()
-                                )
-                                    .then(function (snapshot) {
-                                        console.log("hello");
-                                        // console.log('Snapshot', snapshot);
+                                console.log("creating a user")
+                                db.collection(User.collection_name).doc(result.user.uid).set({
+                                    full_name: result.additionalUserInfo.profile.given_name + " " + result.additionalUserInfo.profile.family_name,
+                                    email: result.user.email,
+                                    profile_picture: result.additionalUserInfo.profile.picture,
+                                    created_at: Date.now()
+                                }).then(function () {
+                                    console.log("created");
+                                    db.collection(User.collection_name).doc(result.user.uid).get().then(function(user) {
+                                        loginStateHandler(user.id, user.data());
                                     });
+                                });
                             } else {
+                                db.collection(User.collection_name).doc(result.user.uid).get().then(function(user) {
+                                    loginStateHandler(user.id, user.data());
+                                });
                                 console.log("not new user");
                             }
                         })
@@ -109,6 +122,9 @@ function RootStackNavigator() {
                             // ...
                         });
                 } else {
+                    db.collection(User.collection_name).doc(firebaseUser.uid).get().then(function(user)  {
+                        loginStateHandler(user.id, user.data());
+                    });
                     console.log('User already signed-in Firebase.');
                 }
             }.bind(this)
@@ -139,7 +155,7 @@ function RootStackNavigator() {
         <NavigationContainer
             theme={colorScheme === 'light' ? lightTheme : darkTheme}
         >
-            <Stack.Navigator headerMode="none" initialRouteName={initialScreen}>
+            <Stack.Navigator headerMode="none" initialRouteName="Login">
                 {!isLoggedIn ? (
                     <Stack.Screen name='Login'>
                         {(props) => <LoginScreen
@@ -149,10 +165,7 @@ function RootStackNavigator() {
                     </Stack.Screen>
                 ) : (
                         <Stack.Screen name='Main'>
-                            {(props) => <MainScreen
-                                setLoggedIn={setLoggedIn}
-                                loggedIn={isLoggedIn}
-                            />}
+                            {(props) => <MainScreen />}
                         </Stack.Screen>
                     )}
             </Stack.Navigator>

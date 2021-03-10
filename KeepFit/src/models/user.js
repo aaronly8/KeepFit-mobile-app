@@ -20,14 +20,17 @@ class User extends BaseModel {
     }
 
     static create_initial_user(id, full_name, email, profile_picture, created_at) {
-        db.collection(this.collection_name).doc(id).set({
+        db.collection(this.collection_name).add({
+            id: id,
             email: email,
             profile_picture: profile_picture,
             full_name: full_name,
             created_at: created_at
-        }).then(function (snapshot) {
+        }).then(function (docRef) {
             console.log("created");
-            // console.log('Snapshot', snapshot);
+            docRef.get().then(function(doc) {
+                return doc.data();
+            })
         });
     }
 }
