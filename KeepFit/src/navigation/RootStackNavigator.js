@@ -12,6 +12,7 @@ import * as Google from 'expo-google-app-auth';
 
 import LoginScreen from '@app/screens/login'
 import MainScreen from '@app/screens/main';
+import CreateUserScreen from '@app/screens/createUser';
 
 import User from "../models/user"
 
@@ -20,7 +21,7 @@ import { log } from 'react-native-reanimated'
 import firebase from "firebase";
 
 import { useSelector, useDispatch } from 'react-redux';
-import { loginUser } from "../redux/actions/auth.js";
+import { loginUser, createUser } from "../redux/actions/auth.js";
 import db from "../firebase/firebase";
 
 
@@ -47,13 +48,19 @@ function RootStackNavigator() {
 
     const isLoggedIn = useSelector(state => state.auth.loggedIn);
 
+    const creatingUser = useSelector(state => state.auth.creatingUser);
+
     const dispatch = useDispatch();
 
     const loginStateHandler = (user_id, user_object) => {
         console.log("called handler");
         console.log(user_id);
         console.log(user_object);
-        dispatch(loginUser(user_id, user_object));
+        if(user_object.isNew) {
+            dispatch(createUser(user_id, user_object));
+        } else {
+            dispatch(loginUser(user_id, user_object));
+        }
     }
 
     const isUserEqual = (googleUser, firebaseUser) => {
@@ -97,15 +104,16 @@ function RootStackNavigator() {
                                     full_name: result.additionalUserInfo.profile.given_name + " " + result.additionalUserInfo.profile.family_name,
                                     email: result.user.email,
                                     profile_picture: result.additionalUserInfo.profile.picture,
+                                    isNew: true,
                                     created_at: Date.now()
                                 }).then(function () {
                                     console.log("created");
-                                    db.collection(User.collection_name).doc(result.user.uid).get().then(function(user) {
+                                    db.collection(User.collection_name).doc(result.user.uid).get().then(function (user) {
                                         loginStateHandler(user.id, user.data());
                                     });
                                 });
                             } else {
-                                db.collection(User.collection_name).doc(result.user.uid).get().then(function(user) {
+                                db.collection(User.collection_name).doc(result.user.uid).get().then(function (user) {
                                     loginStateHandler(user.id, user.data());
                                 });
                                 console.log("not new user");
@@ -122,7 +130,7 @@ function RootStackNavigator() {
                             // ...
                         });
                 } else {
-                    db.collection(User.collection_name).doc(firebaseUser.uid).get().then(function(user)  {
+                    db.collection(User.collection_name).doc(firebaseUser.uid).get().then(function (user) {
                         loginStateHandler(user.id, user.data());
                     });
                     console.log('User already signed-in Firebase.');
@@ -151,23 +159,33 @@ function RootStackNavigator() {
         }
     };
 
+    let visibleScreen;
+    if (creatingUser) {
+        visibleScreen = <Stack.Screen name='CreateUser'>
+            {(props) => <CreateUserScreen
+                loginUser={signInWithGoogleAsync}
+                loggedIn={isLoggedIn}
+            />}
+        </Stack.Screen>;
+    } else if (!isLoggedIn) {
+        visibleScreen = <Stack.Screen name='Login'>
+            {(props) => <LoginScreen
+                loginUser={signInWithGoogleAsync}
+                loggedIn={isLoggedIn}
+            />}
+        </Stack.Screen>;
+    } else {
+        visibleScreen = <Stack.Screen name='Main'>
+            {(props) => <MainScreen />}
+        </Stack.Screen>;
+    }
+
     return (
         <NavigationContainer
             theme={colorScheme === 'light' ? lightTheme : darkTheme}
         >
             <Stack.Navigator headerMode="none" initialRouteName="Login">
-                {!isLoggedIn ? (
-                    <Stack.Screen name='Login'>
-                        {(props) => <LoginScreen
-                            loginUser={signInWithGoogleAsync}
-                            loggedIn={isLoggedIn}
-                        />}
-                    </Stack.Screen>
-                ) : (
-                        <Stack.Screen name='Main'>
-                            {(props) => <MainScreen />}
-                        </Stack.Screen>
-                    )}
+                {visibleScreen}
             </Stack.Navigator>
         </NavigationContainer>
     )

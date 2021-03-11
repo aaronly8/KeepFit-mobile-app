@@ -15,3 +15,13 @@ export const logoutUser = () => {
         type: LOGOUT_USER
     }
 };
+
+export const CREATE_USER = "CREATE_USER";
+
+export const createUser = (user_id, user_object) => {
+    return {
+        type: CREATE_USER,
+        userId: user_id,
+        userObject: user_object
+    }
+}

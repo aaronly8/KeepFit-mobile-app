@@ -1,7 +1,8 @@
-import { LOGIN_USER, LOGOUT_USER } from '../actions/auth.js';
+import { LOGIN_USER, LOGOUT_USER, CREATE_USER } from '../actions/auth.js';
 
 const initialState = {
     loggedIn: false,
+    creatingUser: false,
     currentUserId: null,
     currentUser: null
 }
@@ -12,6 +13,15 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 loggedIn: true,
+                creatingUser: false,
+                currentUserId: action.userId,
+                currentUser: action.userObject
+            }
+        case CREATE_USER:
+            return {
+                ...state,
+                loggedIn: false,
+                creatingUser: true,
                 currentUserId: action.userId,
                 currentUser: action.userObject
             }
@@ -19,6 +29,7 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 loggedIn: false,
+                creatingUser: false,
                 currentUserId: null,
                 currentUser: null
             }
