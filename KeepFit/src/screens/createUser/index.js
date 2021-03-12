@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Text, Alert, View, 
-    Button, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+    SafeAreaView, Text, Alert, View,
+    Button, StyleSheet, TouchableWithoutFeedback, Keyboard
+} from 'react-native';
 import Input from '../../components/input';
 import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
@@ -8,7 +10,7 @@ import { Header } from '@app/components/text.js';
 import { createUser, loginUser } from "../../redux/actions/auth.js";
 import { useSelector, useDispatch } from 'react-redux';
 import { GenderPicker, FitnessLevelPicker } from '../../components/pickers';
-
+import DateTimePicker from '@react-native-community/datetimepicker';
 import User from '../../models/user.js';
 import db from "../../firebase/firebase";
 import * as firebase from 'firebase';
@@ -17,6 +19,7 @@ import * as firebase from 'firebase';
 
 const CreateUserScreen = props => {
     const [enteredUsername, setUsername] = useState('');
+    const [enteredBirthday, setBirthday] = useState(new Date());
     const [enteredHeight, setHeight] = useState('');
     const [enteredWeight, setWeight] = useState('');
     const [enteredGender, setGender] = useState('');
@@ -24,6 +27,10 @@ const CreateUserScreen = props => {
 
     const usernameInputHandler = inputText => {
         setUsername(inputText);
+    };
+
+    const birthdayInputHandler = (event, selectedDate) => {
+        setBirthday(selectedDate);
     };
 
     const heightInputHandler = inputText => {
@@ -48,29 +55,31 @@ const CreateUserScreen = props => {
     const currentUser = useSelector(state => state.auth.currentUser);
 
     const finishCreateHandler = (user_id, user_object) => {
-        if (!enteredUsername || !enteredWeight || !enteredHeight || ! enteredGender || !enteredFitnessLevel) {
+        let birthday = enteredBirthday.toLocaleDateString();
+        if (!enteredUsername || !enteredWeight || !enteredHeight || !enteredGender || !enteredFitnessLevel) {
             Alert.alert('Error', 'You must fill out all fields', [
-                {text: 'Dismiss', style: 'cancel'}
+                { text: 'Dismiss', style: 'cancel' }
             ]);
             return;
         }
         let username = enteredUsername.toLowerCase();
-        db.collection(User.collection_name).where("username", "==", username).get().then(function(snapshot) {
+        db.collection(User.collection_name).where("username", "==", username).get().then(function (snapshot) {
             console.log("complete")
-            if(!snapshot.empty) {
+            if (!snapshot.empty) {
                 Alert.alert('Error', 'A user already exists with that username!', [
-                    {text: 'Dismiss', style: 'cancel'}
+                    { text: 'Dismiss', style: 'cancel' }
                 ])
             } else {
                 db.collection(User.collection_name).doc(user_id).update({
                     isNew: firebase.firestore.FieldValue.delete(),
                     username: username,
+                    birthday: birthday,
                     weight: parseInt(enteredWeight),
                     height: parseInt(enteredHeight),
                     gender: enteredGender,
                     fitness_level: enteredFitnessLevel
                 }).then(function (result) {
-                    db.collection(User.collection_name).doc(user_id).get().then(function(user) {
+                    db.collection(User.collection_name).doc(user_id).get().then(function (user) {
                         dispatch(loginUser(user.id, user.data()));
                     })
                 });
@@ -83,53 +92,63 @@ const CreateUserScreen = props => {
             Keyboard.dismiss();
         }}>
             <SafeAreaView style={styles.container}>
-                    <Header style={styles.mainHeader}>
-                        Welcome to KeepFit!
+                <Header style={styles.mainHeader}>
+                    Welcome to KeepFit!
                     </Header>
-                    <Text style={styles.inputHeader}>Username:</Text>
-                    <Input style={styles.input}
-                        blurOnSubmit
-                        autoCapitalize='none'
-                        autoCorrect={false}
-                        keyboardType="default"
-                        onChangeText={usernameInputHandler}
-                        value={enteredUsername}
+                <Text style={styles.inputHeader}>Username:</Text>
+                <Input style={styles.input}
+                    blurOnSubmit
+                    autoCapitalize='none'
+                    autoCorrect={false}
+                    keyboardType="default"
+                    onChangeText={usernameInputHandler}
+                    value={enteredUsername}
+                />
+                <Text style={styles.inputHeader}>Birthday:</Text>
+                    <DateTimePicker
+                        testID="dateTimePicker"
+                        value={enteredBirthday}
+                        maximumDate={Date.parse(new Date())}
+                        mode="date"
+                        display="default"
+                        onChange={birthdayInputHandler}
+                        style={styles.dateTimePicker}
                     />
-                    <Text style={styles.inputHeader}>Height (Inches):</Text>
-                    <Input style={styles.input}
-                        blurOnSubmit
-                        autoCapitalize='none'
-                        autoCorrect={false}
-                        keyboardType="number-pad"
-                        maxLength={2}
-                        onChangeText={heightInputHandler}
-                        value={enteredHeight}
+                <Text style={styles.inputHeader}>Height (Inches):</Text>
+                <Input style={styles.input}
+                    blurOnSubmit
+                    autoCapitalize='none'
+                    autoCorrect={false}
+                    keyboardType="number-pad"
+                    maxLength={2}
+                    onChangeText={heightInputHandler}
+                    value={enteredHeight}
+                />
+                <Text style={styles.inputHeader}>Weight (pounds):</Text>
+                <Input style={styles.input}
+                    blurOnSubmit
+                    autoCapitalize='none'
+                    autoCorrect={false}
+                    keyboardType="number-pad"
+                    maxLength={3}
+                    onChangeText={weightInputHandler}
+                    value={enteredWeight}
+                />
+                <View>
+                    <Text style={styles.inputHeader}>Gender:</Text>
+                    <GenderPicker
+                        selectedValue={enteredGender}
+                        onValueChange={genderInputHandler}
+                        style={styles.picker}
                     />
-                    <Text style={styles.inputHeader}>Weight (pounds):</Text>
-                    <Input style={styles.input}
-                        blurOnSubmit
-                        autoCapitalize='none'
-                        autoCorrect={false}
-                        keyboardType="number-pad"
-                        maxLength={3}
-                        onChangeText={weightInputHandler}
-                        value={enteredWeight}
+                    <Text style={styles.inputHeader}>Fitness Level:</Text>
+                    <FitnessLevelPicker
+                        selectedValue={enteredFitnessLevel}
+                        onValueChange={fitnessLevelInputHandler}
+                        style={styles.picker}
                     />
-                    <View>
-                        <Text style={styles.inputHeader}>Gender:</Text>
-                        <GenderPicker
-                            selectedValue={enteredGender}
-                            onValueChange={genderInputHandler}
-                            style={styles.picker}
-                        />
-                        <Text style={styles.inputHeader}>Fitness Level:</Text>
-                        <FitnessLevelPicker
-                            selectedValue={enteredFitnessLevel}
-                            onValueChange={fitnessLevelInputHandler}
-                            style={styles.picker}
-                        />
-                    </View>
-                    <Button title="Create" onPress={() => { finishCreateHandler(currentUserId, currentUser) }} />
+                </View>
+                <Button title="Create" onPress={() => { finishCreateHandler(currentUserId, currentUser) }} />
             </SafeAreaView>
         </TouchableWithoutFeedback>
     );
@@ -159,6 +178,12 @@ const styles = StyleSheet.create({
     },
     picker: {
         height: 30
+    },
+    dateTimePicker: {
+        marginTop: 10,
+        marginHorizontal: '25%',
+        width: '30%',
+        marginBottom: 10
     }
 });
 
