@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Text, Button, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { SafeAreaView, Text, Alert, View, 
+    Button, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import Input from '../../components/input';
 import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
 
 import { createUser, loginUser } from "../../redux/actions/auth.js";
 import { useSelector, useDispatch } from 'react-redux';
+import { GenderPicker, FitnessLevelPicker } from '../../components/pickers';
 
 import User from '../../models/user.js';
 import db from "../../firebase/firebase";
@@ -46,58 +48,88 @@ const CreateUserScreen = props => {
     const currentUser = useSelector(state => state.auth.currentUser);
 
     const finishCreateHandler = (user_id, user_object) => {
-        console.log(enteredWeight);
-        console.log(enteredHeight);
-        db.collection(User.collection_name).doc(user_id).update({
-            isNew: firebase.firestore.FieldValue.delete(),
-        }).then(function (result) {
-            dispatch(loginUser(user_id, user_object));
-        });
+        if (!enteredUsername || !enteredWeight || !enteredHeight || ! enteredGender || !enteredFitnessLevel) {
+            Alert.alert('Error', 'You must fill out all fields', [
+                {text: 'Dismiss', style: 'cancel'}
+            ]);
+            return;
+        }
+        let username = enteredUsername.toLowerCase();
+        db.collection(User.collection_name).where("username", "==", username).get().then(function(snapshot) {
+            console.log("complete")
+            if(!snapshot.empty) {
+                Alert.alert('Error', 'A user already exists with that username!', [
+                    {text: 'Dismiss', style: 'cancel'}
+                ])
+            } else {
+                db.collection(User.collection_name).doc(user_id).update({
+                    isNew: firebase.firestore.FieldValue.delete(),
+                    username: username,
+                    weight: parseInt(enteredWeight),
+                    height: parseInt(enteredHeight),
+                    gender: enteredGender,
+                    fitness_level: enteredFitnessLevel
+                }).then(function (result) {
+                    db.collection(User.collection_name).doc(user_id).get().then(function(user) {
+                        dispatch(loginUser(user.id, user.data()));
+                    })
+                });
+            }
+        })
     }
 
     return (
         <TouchableWithoutFeedback onPress={() => {
             Keyboard.dismiss();
         }}>
-            <SafeAreaView>
-                <Container>
+            <SafeAreaView style={styles.container}>
                     <Header style={styles.mainHeader}>
                         Welcome to KeepFit!
                     </Header>
-                    <Text>Username:</Text>
+                    <Text style={styles.inputHeader}>Username:</Text>
                     <Input style={styles.input}
                         blurOnSubmit
-                        autoCapitlize='none'
+                        autoCapitalize='none'
                         autoCorrect={false}
                         keyboardType="default"
-                        maxLength={2}
                         onChangeText={usernameInputHandler}
                         value={enteredUsername}
                     />
-                    <Text>Height (Inches):</Text>
+                    <Text style={styles.inputHeader}>Height (Inches):</Text>
                     <Input style={styles.input}
                         blurOnSubmit
-                        autoCapitlize='none'
+                        autoCapitalize='none'
                         autoCorrect={false}
                         keyboardType="number-pad"
                         maxLength={2}
                         onChangeText={heightInputHandler}
                         value={enteredHeight}
                     />
-                    <Text>Weight (pounds):</Text>
+                    <Text style={styles.inputHeader}>Weight (pounds):</Text>
                     <Input style={styles.input}
                         blurOnSubmit
-                        autoCapitlize='none'
+                        autoCapitalize='none'
                         autoCorrect={false}
                         keyboardType="number-pad"
                         maxLength={3}
                         onChangeText={weightInputHandler}
                         value={enteredWeight}
                     />
-                    <Text>Gender:</Text>
-
+                    <View>
+                        <Text style={styles.inputHeader}>Gender:</Text>
+                        <GenderPicker
+                            selectedValue={enteredGender}
+                            onValueChange={genderInputHandler}
+                            style={styles.picker}
+                        />
+                        <Text style={styles.inputHeader}>Fitness Level:</Text>
+                        <FitnessLevelPicker
+                            selectedValue={enteredFitnessLevel}
+                            onValueChange={fitnessLevelInputHandler}
+                            style={styles.picker}
+                        />
+                    </View>
                     <Button title="Create" onPress={() => { finishCreateHandler(currentUserId, currentUser) }} />
-                </Container>
             </SafeAreaView>
         </TouchableWithoutFeedback>
     );
@@ -106,12 +138,27 @@ const CreateUserScreen = props => {
 const styles = StyleSheet.create({
     mainHeader: {
         fontSize: 40,
-        marginTop: "55%",
-        textAlign: "center"
+        textAlign: "center",
+        marginBottom: 40
     },
     input: {
         width: 50,
+        textAlign: 'center',
+        marginBottom: 15,
+        width: 100
+    },
+    inputHeader: {
+        fontWeight: 'bold',
+        fontSize: 15,
         textAlign: 'center'
+    },
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    picker: {
+        height: 30
     }
 });
 

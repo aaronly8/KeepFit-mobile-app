@@ -27,7 +27,7 @@ const ProfileScreen = (props) => {
                         Welcome to the Profile Screen!
                     </Header>
                     <Text style={styles.centeredText}>
-                        You are logged in as {user_profile.full_name}!
+                        You are logged in as {user_profile.username}!
                     </Text>
                     <Image
                         style={styles.profilePic}
