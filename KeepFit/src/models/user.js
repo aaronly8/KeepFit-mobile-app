@@ -2,7 +2,7 @@ import BaseModel from "../models/base";
 import db, { firebase } from "../firebase/firebase";
 
 class User extends BaseModel {
-    static collection_name = "test"
+    static collection_name = "users"
 
     constructor (id, full_name, email, profile_picture, username, birthday, gender, weight, height, fitness_level, created_at) {
         // initialize base model with firebase collection name        
