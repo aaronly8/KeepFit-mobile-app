@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, TouchableHighlight, TouchableOpacity, View, Text } from 'react-native';
+import { SafeAreaView, StyleSheet, TouchableHighlight, TouchableOpacity, 
+    View, Text, Alert } from 'react-native';
 import Container from '@app/components/container.js'
 import { Stopwatch } from 'react-native-stopwatch-timer';
 import { Header } from '@app/components/text.js';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
+import { useSelector } from 'react-redux';
 
 const TrackScreen = props => {
+    const user_profile = useSelector(state => state.auth.currentUser);
+
     const [isStopwatchStart, setIsStopwatchStart] = useState(false);
     const [resetStopwatch, setResetStopwatch] = useState(false);
     const [enteredWorkoutCategory, setWorkoutCategory] = useState('');
@@ -17,6 +21,7 @@ const TrackScreen = props => {
 
     const workoutCategoryHandler = inputText => {
         setWorkoutCategory(inputText);
+        caloriesHandler(inputText);
     };
 
     const muscleGroupHandler = inputText => {
@@ -27,10 +32,25 @@ const TrackScreen = props => {
         setSecondaryMuscleGroup(inputText);
     };
 
-    const caloriesHandler = () => {
-        if(isStopwatchStart) {
-            console.log("recalculating calories");
+    const caloriesHandler = (category) => {
+        var MET;
+        if (!enteredWorkoutCategory) {
+            setCaloriesBurned("N/A");
+            return;
+        } else if (category == "CARDIO") {
+            MET = 7;
+        } else if (category == "BODYWEIGHT") {
+            MET = 6;
+        } else if (category == "WEIGHTLIFTING") {
+            MET = 3;
+        } else if (category == "HIIT") {
+            MET = 9;
+        } else if (category == "HYBRID") {
+            MET = 5;
         }
+        var minutes = elapsedTime / 60;
+        var calories = (minutes*(MET*3.5*user_profile.weight*0.453592))/200;
+        setCaloriesBurned(Math.floor(calories));
     };
 
     const lastStartHandler = () => {
@@ -40,6 +60,15 @@ const TrackScreen = props => {
             var current_time = new Date();
             var new_seconds = (current_time.getTime() - lastStartTime.getTime()) / 1000;
             setElapsedTime(elapsedTime + new_seconds);
+        }
+    };
+
+    const saveHandler = () => {
+        if (!enteredMuscleGroup || !enteredWorkoutCategory) {
+            Alert.alert('Error', 'You must fill out all fields except secondary muscle group.', [
+                { text: 'Dismiss', style: 'cancel' }
+            ]);
+            return;
         }
     };
 
@@ -63,7 +92,9 @@ const TrackScreen = props => {
                     onPress={() => {
                         setIsStopwatchStart(!isStopwatchStart);
                         lastStartHandler();
-                        caloriesHandler();
+                        if(isStopwatchStart) {
+                            caloriesHandler("");
+                        }
                         setResetStopwatch(false);
                     }}>
                     <Text style={styles.buttonText}>
@@ -108,9 +139,9 @@ const TrackScreen = props => {
                         onValueChange={secondayMuscleGroupHandler}
                         style={styles.picker}
                     />
-                    <Text style={styles.caloriesHeader}>Calories Burned: {Math.round(elapsedTime)}</Text>
+                    <Text style={styles.caloriesHeader}>Calories Burned: {caloriesBurned}</Text>
                 </View>
-                <TouchableOpacity onPress={() => {console.log("Saved");}}>
+                <TouchableOpacity onPress={() => saveHandler() }>
                     <Text style={styles.saveButton}>SAVE</Text>
                 </TouchableOpacity>
             </View>
