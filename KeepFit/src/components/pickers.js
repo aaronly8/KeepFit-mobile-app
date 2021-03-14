@@ -3,6 +3,8 @@ import { StyleSheet } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import Gender from '../models/gender';
 import FitnessLevel from '../models/fitness_level';
+import MuscleGroup from '../models/muscle_group';
+import WorkoutCategory from '../models/workout_category';
 
 
 const getItemsFromEnum = (object) => {
@@ -37,6 +39,34 @@ export const FitnessLevelPicker = props => {
             {...props}
             style={{ ...pickerSelectStyles, ...props.style }}
             items={getItemsFromEnum(FitnessLevel)}
+        />
+    );
+};
+
+export const MuscleGroupPicker = props => {
+    return (
+        <RNPickerSelect
+            placeholder={{
+                label: "Select a Muscle Group...",
+                value: null
+            }}
+            {...props}
+            style={{ ...pickerSelectStyles, ...props.style }}
+            items={getItemsFromEnum(MuscleGroup)}
+        />
+    );
+};
+
+export const WorkoutCategoryPicker = props => {
+    return (
+        <RNPickerSelect
+            placeholder={{
+                label: "Select a Workout Category...",
+                value: null
+            }}
+            {...props}
+            style={{ ...pickerSelectStyles, ...props.style }}
+            items={getItemsFromEnum(WorkoutCategory)}
         />
     );
 };
