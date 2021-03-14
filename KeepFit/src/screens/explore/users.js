@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Button } from 'react-native';
 import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
+import db from "../../firebase/firebase";
 
 const SearchUsersScreen = props => {
+    const [filteredUsers, setFilteredUsers] = useState({});
+
     return (
         <SafeAreaView>
             <Container>
