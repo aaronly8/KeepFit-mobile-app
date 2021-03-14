@@ -11,8 +11,6 @@ const SearchExercisesScreen = props => {
     const [muscleGroupFilter2, setMuscleGroupFilter2] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
 
-
-
     useEffect(() => {
         var exerciseDictionary = {};
         db.collection(Exercise.collection_name).get().then(snapshot => {

@@ -15,11 +15,6 @@ const ExploreScreen = props => {
         setDisplayedScreen(new_screen);
     };
 
-    let exersises = db.collection("exersises");
-    let users = db.collection("users");
-    let workouts = db.collection("workouts");
-    let livestreams = db.collection("livestreams");
-
     let visibleContent;
     if (displayedScreen == "exercises") {
         visibleContent = <SearchExercisesScreen changeScreenHandler={changeScreenHandler} />
