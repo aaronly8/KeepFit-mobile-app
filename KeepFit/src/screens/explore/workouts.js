@@ -1,27 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Button } from 'react-native';
 import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
-import db from "../../firebase/firebase";
-import Exercise from "../../models/exercise"
 
-const SearchExercisesScreen = props => {
-    var exersizeDictionary = {};
-    useEffect(() => {
-        db.collection(Exercise.collection_name).get().then(snapshot => {
-            snapshot.forEach(doc => {
-                exersizeDictionary[doc.id] = doc.data();
-            });
-        });
-    });
-    
-
+const SearchWorkoutsScreen = props => {
     return (
         <SafeAreaView>
             <Container>
                 <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
                 <Header style={styles.mainHeader}>
-                    Welcome to the Search Exercises Screen!
+                    Welcome to the Workouts Screen!
                 </Header>
             </Container>
         </SafeAreaView>
@@ -36,4 +24,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SearchExercisesScreen;
+export default SearchWorkoutsScreen;
