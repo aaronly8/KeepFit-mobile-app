@@ -1,12 +1,47 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, TouchableHighlight, View, Text } from 'react-native';
+import { SafeAreaView, StyleSheet, TouchableHighlight, TouchableOpacity, View, Text } from 'react-native';
 import Container from '@app/components/container.js'
 import { Stopwatch } from 'react-native-stopwatch-timer';
 import { Header } from '@app/components/text.js';
+import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
 
 const TrackScreen = props => {
     const [isStopwatchStart, setIsStopwatchStart] = useState(false);
     const [resetStopwatch, setResetStopwatch] = useState(false);
+    const [enteredWorkoutCategory, setWorkoutCategory] = useState('');
+    const [enteredMuscleGroup, setMuscleGroup] = useState('');
+    const [enteredSecondaryMuscleGroup, setSecondaryMuscleGroup] = useState('');
+    const [caloriesBurned, setCaloriesBurned] = useState(0);
+    const [lastStartTime, setLastStartTime] = useState(new Date());
+    const [elapsedTime, setElapsedTime] = useState(0);
+
+    const workoutCategoryHandler = inputText => {
+        setWorkoutCategory(inputText);
+    };
+
+    const muscleGroupHandler = inputText => {
+        setMuscleGroup(inputText);
+    };
+
+    const secondayMuscleGroupHandler = inputText => {
+        setSecondaryMuscleGroup(inputText);
+    };
+
+    const caloriesHandler = () => {
+        if(isStopwatchStart) {
+            console.log("recalculating calories");
+        }
+    };
+
+    const lastStartHandler = () => {
+        if(!isStopwatchStart) {
+            setLastStartTime(new Date());
+        } else if (isStopwatchStart) {
+            var current_time = new Date();
+            var new_seconds = (current_time.getTime() - lastStartTime.getTime()) / 1000;
+            setElapsedTime(elapsedTime + new_seconds);
+        }
+    };
 
     return (
         <SafeAreaView>
@@ -27,6 +62,8 @@ const TrackScreen = props => {
                 <TouchableHighlight
                     onPress={() => {
                         setIsStopwatchStart(!isStopwatchStart);
+                        lastStartHandler();
+                        caloriesHandler();
                         setResetStopwatch(false);
                     }}>
                     <Text style={styles.buttonText}>
@@ -37,6 +74,7 @@ const TrackScreen = props => {
                     onPress={() => {
                         setIsStopwatchStart(false);
                         setResetStopwatch(true);
+                        setElapsedTime(0);
                     }}>
                     <Text style={styles.buttonText}>RESET</Text>
                 </TouchableHighlight>
@@ -51,6 +89,30 @@ const TrackScreen = props => {
                 <Header style={styles.mainHeader}>
                     Save Your Workout
                 </Header>
+                <View>
+                    <Text style={styles.inputHeader}>Workout Category:</Text>
+                    <WorkoutCategoryPicker
+                        selectedValue={enteredWorkoutCategory}
+                        onValueChange={workoutCategoryHandler}
+                        style={styles.picker}
+                    />
+                    <Text style={styles.inputHeader}>Muscle Group (Primary):</Text>
+                    <MuscleGroupPicker
+                        selectedValue={enteredMuscleGroup}
+                        onValueChange={muscleGroupHandler}
+                        style={styles.picker}
+                    />
+                    <Text style={styles.inputHeader}>Muscle Group (Secondary):</Text>
+                    <MuscleGroupPicker
+                        selectedValue={enteredSecondaryMuscleGroup}
+                        onValueChange={secondayMuscleGroupHandler}
+                        style={styles.picker}
+                    />
+                    <Text style={styles.caloriesHeader}>Calories Burned: {Math.round(elapsedTime)}</Text>
+                </View>
+                <TouchableOpacity onPress={() => {console.log("Saved");}}>
+                    <Text style={styles.saveButton}>SAVE</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     )
@@ -64,9 +126,25 @@ const styles = StyleSheet.create({
         fontSize: 30,
         textAlign: "center"
     },
+    inputHeader: {
+        fontWeight: 'bold',
+        fontSize: 15,
+        textAlign: 'center'
+    },
     buttonText: {
         fontSize: 30,
         marginTop: 10,
+    },
+    caloriesHeader: {
+        marginTop: 30,
+        textAlign: 'center',
+        fontSize: 30,
+        color: 'blue'
+    },
+    saveButton: {
+        fontSize: 30,
+        marginTop: 35,
+        color: 'blue'
     }
 });
 
