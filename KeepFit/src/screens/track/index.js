@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, TouchableHighlight, TouchableOpacity, 
-    View, Text, Alert } from 'react-native';
+import {
+    SafeAreaView, StyleSheet, TouchableHighlight, TouchableOpacity,
+    View, Text, Alert
+} from 'react-native';
 import Container from '@app/components/container.js'
 import { Stopwatch } from 'react-native-stopwatch-timer';
 import { Header } from '@app/components/text.js';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
 import { useSelector } from 'react-redux';
+import db from '../../firebase/firebase';
+import SavedExercise from '../../models/saved_exercise';
 
 const TrackScreen = props => {
+    const current_user_id = useSelector(state => state.auth.currentUserId);
     const user_profile = useSelector(state => state.auth.currentUser);
 
     const [isStopwatchStart, setIsStopwatchStart] = useState(false);
     const [resetStopwatch, setResetStopwatch] = useState(false);
-    const [enteredWorkoutCategory, setWorkoutCategory] = useState('');
-    const [enteredMuscleGroup, setMuscleGroup] = useState('');
-    const [enteredSecondaryMuscleGroup, setSecondaryMuscleGroup] = useState('');
+    const [enteredWorkoutCategory, setWorkoutCategory] = useState(null);
+    const [enteredMuscleGroup, setMuscleGroup] = useState(null);
+    const [enteredSecondaryMuscleGroup, setSecondaryMuscleGroup] = useState(null);
     const [caloriesBurned, setCaloriesBurned] = useState(0);
     const [lastStartTime, setLastStartTime] = useState(new Date());
     const [elapsedTime, setElapsedTime] = useState(0);
@@ -34,7 +39,7 @@ const TrackScreen = props => {
 
     const caloriesHandler = (category) => {
         var MET;
-        if (!enteredWorkoutCategory) {
+        if (!category) {
             setCaloriesBurned("N/A");
             return;
         } else if (category == "CARDIO") {
@@ -49,12 +54,12 @@ const TrackScreen = props => {
             MET = 5;
         }
         var minutes = elapsedTime / 60;
-        var calories = (minutes*(MET*3.5*user_profile.weight*0.453592))/200;
+        var calories = (minutes * (MET * 3.5 * user_profile.weight * 0.453592)) / 200;
         setCaloriesBurned(Math.floor(calories));
     };
 
     const lastStartHandler = () => {
-        if(!isStopwatchStart) {
+        if (!isStopwatchStart) {
             setLastStartTime(new Date());
         } else if (isStopwatchStart) {
             var current_time = new Date();
@@ -70,6 +75,29 @@ const TrackScreen = props => {
             ]);
             return;
         }
+        if (Math.round(elapsedTime) == 0) {
+            Alert.alert('Error', 'No time has elapsed.', [
+                { text: 'Dismiss', style: 'cancel' }
+            ]);
+            return;
+        }
+        db.collection(SavedExercise.collection_name).doc().set({
+            user_id: current_user_id,
+            total_time: Math.round(elapsedTime),
+            caloriesBurned: caloriesBurned,
+            category: enteredWorkoutCategory,
+            muscle_group: enteredMuscleGroup,
+            secondary_muscle_group: enteredSecondaryMuscleGroup || null,
+            completed_on: new Date().toLocaleDateString()
+        }).then(function () {
+            setIsStopwatchStart(false);
+            setResetStopwatch(true);
+            setElapsedTime(0);
+            setCaloriesBurned(0);
+            Alert.alert('Success', 'Workout Successfully Saved!', [
+                { text: 'Dismiss', style: 'cancel' }
+            ]);
+        });
     };
 
     return (
@@ -85,15 +113,15 @@ const TrackScreen = props => {
                     options={options}
                     //options for the styling
                     getTime={(time) => {
-                        console.log(time);
+                        //console.log(time);
                     }}
                 />
                 <TouchableHighlight
                     onPress={() => {
                         setIsStopwatchStart(!isStopwatchStart);
                         lastStartHandler();
-                        if(isStopwatchStart) {
-                            caloriesHandler("");
+                        if (isStopwatchStart) {
+                            caloriesHandler(enteredWorkoutCategory);
                         }
                         setResetStopwatch(false);
                     }}>
@@ -141,7 +169,7 @@ const TrackScreen = props => {
                     />
                     <Text style={styles.caloriesHeader}>Calories Burned: {caloriesBurned}</Text>
                 </View>
-                <TouchableOpacity onPress={() => saveHandler() }>
+                <TouchableOpacity onPress={() => saveHandler()}>
                     <Text style={styles.saveButton}>SAVE</Text>
                 </TouchableOpacity>
             </View>
