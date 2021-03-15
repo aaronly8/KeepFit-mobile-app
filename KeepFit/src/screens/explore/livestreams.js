@@ -5,9 +5,6 @@ import { Header } from '@app/components/text.js';
 import db from "../../firebase/firebase";
 
 const SearchLivestreamsScreen = props => {
-    const [muscleGroupFilter1, setMuscleGroupFilter1] = useState("");
-    const [muscleGroupFilter2, setMuscleGroupFilter2] = useState("");
-    const [categoryFilter, setCategoryFilter] = useState("");
     
     return (
         <SafeAreaView>

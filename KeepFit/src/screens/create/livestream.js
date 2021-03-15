@@ -4,14 +4,13 @@ import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
 import db from "../../firebase/firebase";
 
-const SearchWorkoutsScreen = props => {
-
+const CreateLivestreamsScreen = props => {    
     return (
         <SafeAreaView>
             <Container>
                 <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
                 <Header style={styles.mainHeader}>
-                    Welcome to the Workouts Screen!
+                    Welcome to the Create Livestreams Screen!
                 </Header>
             </Container>
         </SafeAreaView>
@@ -26,4 +25,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SearchWorkoutsScreen;
+export default CreateLivestreamsScreen;
