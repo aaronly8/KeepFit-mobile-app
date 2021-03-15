@@ -9,7 +9,7 @@ class Exercise extends BaseModel {
         self.name = data.name
         self.description = data.description
         self.video_link = data.video_link
-        self.workout_category = data.workout_category
+        self.category = data.category;
         self.muscle_group = data.muscle_group
     }
 }
