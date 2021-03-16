@@ -5,7 +5,8 @@ import { Header } from '@app/components/text.js';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
 import { useSelector } from 'react-redux';
 import * as ImagePicker from 'expo-image-picker';
-import db from "../../firebase/firebase";
+import Video from '../../models/video'
+import db, { firebase } from "../../firebase/firebase";
 
 const CreateVideosScreen = props => {
     const current_user_id = useSelector(state => state.auth.currentUserId);
@@ -38,7 +39,7 @@ const CreateVideosScreen = props => {
         setSecondaryMuscleGroup(inputText);
     };
 
-    const uploadHandler = () => {
+    const uploadHandler = async () => {
         if (!selectedVideo) {
             Alert.alert('Error', 'You must select a video', [
                 { text: 'Dismiss', style: 'cancel' }
@@ -51,31 +52,59 @@ const CreateVideosScreen = props => {
             ]);
             return;
         }
+        const response = await fetch(selectedVideo);
+        const blob = await response.blob();
+        console.log(blob.size);
+
+        var ref = firebase.storage().ref().child(enteredTitle);
+        ref.put(blob).then((snapshot) => {
+            console.log("uploaded!");
+            ref.getDownloadURL().then((url) => {
+                db.collection(Video.collection_name).doc().set({
+                    video_link: url,
+                    user_id: current_user_id,
+                    title: enteredTitle,
+                    description: enteredDescription,
+                    category: enteredWorkoutCategory,
+                    muscle_group: enteredMuscleGroup,
+                    secondary_muscle_group: enteredSecondaryMuscleGroup || null,
+                    created_on: new Date().toLocaleDateString()
+                }).then(function () {
+                    setSelectedVideo(null);
+                    setTitle('');
+                    setDescription('');
+                    props.changeScreenHandler("index")
+                    Alert.alert('Success!', 'Your video was uploaded!', [
+                        { text: 'Dismiss', style: 'cancel' }
+                    ]);
+                });
+            });
+        });
     }
 
     const selectVideoHandler = () => {
         console.log("selecting video")
 
-        ImagePicker.launchImageLibraryAsync({ 
+        ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Videos
-          }).then((result)=>{ 
+        }).then((result) => {
             if (!result.cancelled) {
-              // User picked a video
-              const {height, width, type, uri} = result;
-              console.log('video picked', uri);
-              setSelectedVideo(uri);
+                // User picked a video
+                const { height, width, type, uri } = result;
+                console.log('video picked', uri);
+                setSelectedVideo(uri);
             }
-         
-          }).catch((error)=>{
+
+        }).catch((error) => {
             throw error;
-          }); 
+        });
     };
 
     let selectContent = <Button title="Select a Video" onPress={() => selectVideoHandler()} />
-    if(selectedVideo) {
+    if (selectedVideo) {
         selectContent = <Button title="Clear Selected Video" onPress={() => setSelectedVideo(null)} />;
     }
-    
+
     return (
         <SafeAreaView>
             <View style={styles.container}>
