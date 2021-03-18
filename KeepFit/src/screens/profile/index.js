@@ -1,23 +1,22 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet, Image, View } from 'react-native';
+import React, {Component} from 'react';
+import { SafeAreaView, StyleSheet, Image, View, Button, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from "../../redux/actions/auth.js";
 import Text, { Header, SubHeader } from '@app/components/text.js';
+import { TouchableHighlight } from 'react-native-gesture-handler';
+import UserData from './userData'
 
 const ProfileScreen = props => {
     const isLoggedIn = useSelector(state => state.auth.loggedIn);
 
     const user_profile = useSelector(state => state.auth.currentUser);
 
-    const dispatch = useDispatch();
-
-    const logoutHandler = () => {
-        dispatch(logoutUser());
-        console.log("logged out");
-    }
-
+    const viewUserData = () => {
+        this.props.navigation.navigate("./userData");
+    };
+    
     return (
         <SafeAreaView>
             {isLoggedIn ? (
@@ -35,6 +34,11 @@ const ProfileScreen = props => {
                                 {user_profile.full_name}
                             </Text>
                         </View>
+                    </View>
+                    <View>
+                        <TouchableOpacity onPress={console.log("pressed")}>
+                            <Image source={require("../../../assets/gear.png")} style={styles.image} />
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.twoHeadings}>
                         <View style={styles.followers}>
@@ -55,21 +59,12 @@ const ProfileScreen = props => {
                         </View>
                     </View>
                     <View style={styles.twoHeadings}>
-                        <Text style={styles.subheading}>
-                            Exercise History
-                        </Text>
-                        <Text style={styles.subheading}>
-                            Saved Exercises
-                        </Text>
-                    </View>
-                    <View style={styles.googleButtonContainer}>
-                        <FontAwesome5.Button
-                            style={styles.googleButton}
-                            name="google"
-                            onPress={() => logoutHandler()}
-                        >
-                            <Text style={styles.googleText}>Log Out With Google</Text>
-                        </FontAwesome5.Button>
+                        <TouchableOpacity onPress={() => console.log("pressed")}>
+                            <Text style={styles.btnPress}>Workout History</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => console.log("pressed")}>
+                            <Text style={styles.btnPress}>Saved Exercises</Text>
+                        </TouchableOpacity>
                     </View>
                 </Container>
             ) : (
@@ -105,6 +100,7 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     userName: {
+        marginTop: 30,
         fontSize: 15,
         fontWeight: 'bold'
     },
@@ -133,7 +129,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15
     },
     subheading: {
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+    },
+    btnPress: {
+        color: 'black',
+        fontSize: 18
+    },
+    image: {
+        width: 25,
+        height: 25
     }
 });
 
