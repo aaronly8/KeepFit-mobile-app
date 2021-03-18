@@ -7,17 +7,13 @@ import { logoutUser } from "../../redux/actions/auth.js";
 import Text, { Header, SubHeader } from '@app/components/text.js';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
-const UserData = props => {
-    const dispatch = useDispatch();
+const UserDataScreen = props => {
+    const currentUser = useSelector(state => state.auth.currentUser);
 
-    const logoutHandler = () => {
-        dispatch(logoutUser());
-        console.log("logged out");
-    }
-    
     return (
         <SafeAreaView>
             <Container>
+                <Button title="<< Back" onPress={() => props.cancelDetails()} />
                 <View>
                     <Text style={styles.bigHeading}>
                         User Data
@@ -27,30 +23,48 @@ const UserData = props => {
                     <Text style={styles.subheading}>
                         Username:
                     </Text>
+                    <Text>
+                        {currentUser.username}
+                    </Text>
                 </View>
                 <View style={styles.tagName}>
                     <Text style={styles.subheading}>
                         Birthday:
                     </Text>
+                    <Text>
+                        {currentUser.birthday}
+                    </Text>
                 </View>
                 <View style={styles.tagName}>
-                    <Text style={styles.tagName}>
+                    <Text style={styles.subheading}>
                         Height:
                     </Text>
+                    <Text>
+                        {currentUser.height} inches
+                    </Text>
                 </View>
                 <View style={styles.tagName}>
-                    <Text style={styles.tagName}>
+                    <Text style={styles.subheading}>
                         Weight:
                     </Text>
-                </View>
-                <View style={styles.tagName}>
-                    <Text style={styles.tagName}>
-                        Gender:
+                    <Text>
+                        {currentUser.weight} lbs.
                     </Text>
                 </View>
                 <View style={styles.tagName}>
-                    <Text style={styles.tagName}>
+                    <Text style={styles.subheading}>
+                        Gender:
+                    </Text>
+                    <Text>
+                        {currentUser.gender}
+                    </Text>
+                </View>
+                <View style={styles.tagName}>
+                    <Text style={styles.subheading}>
                         Fitness Level:
+                    </Text>
+                    <Text>
+                        {currentUser.fitness_level}
                     </Text>
                 </View>
 
@@ -58,7 +72,7 @@ const UserData = props => {
                     <FontAwesome5.Button
                         style={styles.googleButton}
                         name="google"
-                        onPress={() => logoutHandler()}
+                        onPress={() => props.logoutHandler()}
                     >
                         <Text style={styles.googleText}>Log Out With Google</Text>
                     </FontAwesome5.Button>
@@ -82,7 +96,19 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: 'bold',
         textAlign: 'center'
+    },
+    googleText: {
+        color: 'white',
+        fontWeight: 'bold'
+    },
+    googleButton: {
+        height: 60,
+        paddingLeft: 50,
+        paddingRight: 50
+    },
+    googleButtonContainer: {
+        marginTop: 25
     }
 });
 
-export default UserData;
+export default UserDataScreen;
