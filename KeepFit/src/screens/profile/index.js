@@ -1,36 +1,44 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Button, Image, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Button, Image, View, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from "../../redux/actions/auth.js";
 import Text, { Header, SubHeader } from '@app/components/text.js';
+import { TouchableHighlight } from 'react-native-gesture-handler';
+import UserDataScreen from './userData'
+import Ionicons from '@expo/vector-icons/Ionicons';
 import EditProfileScreen from './EditProfileScreen';
 
 const ProfileScreen = props => {
-    const [editMode, setEditMode] = useState(false);
+    const [visibleScreen, setVisibleScreen] = useState(null);
 
     const isLoggedIn = useSelector(state => state.auth.loggedIn);
 
     const user_profile = useSelector(state => state.auth.currentUser);
-
+    
     const dispatch = useDispatch();
 
     const logoutHandler = () => {
         dispatch(logoutUser());
         console.log("logged out");
     }
+    console.log(visibleScreen);
 
     let mainContent;
     if (isLoggedIn) {
-        if (editMode) {
+        if (visibleScreen == "edit") {
             console.log("is edit mode");
-            mainContent = <EditProfileScreen cancelEdit={setEditMode.bind(this, false)} />
+            mainContent = <EditProfileScreen cancelEdit={setVisibleScreen.bind(this, null)} />
+        } else if (visibleScreen == "details") {
+            mainContent = <UserDataScreen 
+                cancelDetails={setVisibleScreen.bind(this, null)} 
+                logoutHandler={logoutHandler} 
+            />;
         } else {
-            console.log("is normal");
             mainContent = <Container style={styles.mainContainer}>
                 <View style={styles.editButtonContainer}>
-                    <Button title="Edit Profile" onPress={() => setEditMode(true)} />
+                    <Button title="Edit Profile" onPress={() => setVisibleScreen("edit")} />
                 </View>
                 <View style={styles.horizontalContainer}>
                     <Image
@@ -45,6 +53,11 @@ const ProfileScreen = props => {
                             {user_profile.full_name}
                         </Text>
                     </View>
+                </View>
+                <View>
+                    <TouchableOpacity onPress={() => setVisibleScreen("details")}>
+                        <Text style={styles.detailsText}>View Details</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.twoHeadings}>
                     <View style={styles.followers}>
@@ -65,12 +78,12 @@ const ProfileScreen = props => {
                     </View>
                 </View>
                 <View style={styles.twoHeadings}>
-                    <Text style={styles.subheading}>
-                        Exercise History
-                </Text>
-                    <Text style={styles.subheading}>
-                        Saved Exercises
-                </Text>
+                    <TouchableOpacity onPress={() => console.log("pressed")}>
+                        <Text style={styles.btnPress}>Workout History</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => console.log("pressed")}>
+                        <Text style={styles.btnPress}>Saved Exercises</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.googleButtonContainer}>
                     <FontAwesome5.Button
@@ -121,6 +134,7 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     userName: {
+        marginTop: 30,
         fontSize: 15,
         fontWeight: 'bold'
     },
@@ -149,11 +163,26 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15
     },
     subheading: {
+        fontWeight: 'bold',
+    },
+    btnPress: {
+        color: 'black',
+        fontSize: 18
+    },
+    image: {
+        width: 25,
+        height: 25,
         fontWeight: 'bold'
     },
     editButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-end'
+    },
+    detailsText: {
+        fontSize: 15,
+        color: 'blue',
+        fontWeight: 'bold',
+        paddingHorizontal: 15
     }
 });
 
