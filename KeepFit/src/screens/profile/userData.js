@@ -23,7 +23,7 @@ const UserDataScreen = props => {
                     <Text style={styles.subheading}>
                         Username:
                     </Text>
-                    <Text>
+                    <Text style={styles.entryHeading}>
                         {currentUser.username}
                     </Text>
                 </View>
@@ -31,7 +31,7 @@ const UserDataScreen = props => {
                     <Text style={styles.subheading}>
                         Birthday:
                     </Text>
-                    <Text>
+                    <Text style={styles.entryHeading}>
                         {currentUser.birthday}
                     </Text>
                 </View>
@@ -39,7 +39,7 @@ const UserDataScreen = props => {
                     <Text style={styles.subheading}>
                         Height:
                     </Text>
-                    <Text>
+                    <Text style={styles.entryHeading}>
                         {currentUser.height} inches
                     </Text>
                 </View>
@@ -47,7 +47,7 @@ const UserDataScreen = props => {
                     <Text style={styles.subheading}>
                         Weight:
                     </Text>
-                    <Text>
+                    <Text style={styles.entryHeading}>
                         {currentUser.weight} lbs.
                     </Text>
                 </View>
@@ -55,7 +55,7 @@ const UserDataScreen = props => {
                     <Text style={styles.subheading}>
                         Gender:
                     </Text>
-                    <Text>
+                    <Text style={styles.entryHeading}>
                         {currentUser.gender}
                     </Text>
                 </View>
@@ -63,7 +63,7 @@ const UserDataScreen = props => {
                     <Text style={styles.subheading}>
                         Fitness Level:
                     </Text>
-                    <Text>
+                    <Text style={styles.entryHeading}>
                         {currentUser.fitness_level}
                     </Text>
                 </View>
@@ -86,11 +86,15 @@ const styles = StyleSheet.create({
     tagName: {
         flexDirection: "row",
         justifyContent: 'space-between',
-        fontSize: 15,
-        marginTop: "10%"
+        fontSize: 30,
+        marginTop: "5%"
     },
     subheading: {
         fontWeight: 'bold',
+        fontSize: 20
+    },
+    entryheading: {
+        fontSize: 20
     },
     bigHeading: {
         fontSize: 30,

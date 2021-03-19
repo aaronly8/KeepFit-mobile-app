@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Button, Image, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Button, Image, View, ScrollView, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,12 +9,17 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 import UserDataScreen from './userData'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import EditProfileScreen from './EditProfileScreen';
+import SavedExercise from "../../models/saved_exercise";
+import { useEffect } from 'react';
+import db from "../../firebase/firebase";
+
 
 const ProfileScreen = props => {
     const [visibleScreen, setVisibleScreen] = useState(null);
+    const [displayWorkoutHistory, setDisplayWorkoutHistory] = useState(true);
+    const [filteredWorkoutHistory, setFilteredWorkoutHistory] = useState({});
 
     const isLoggedIn = useSelector(state => state.auth.loggedIn);
-
     const user_profile = useSelector(state => state.auth.currentUser);
     
     const dispatch = useDispatch();
@@ -24,6 +29,81 @@ const ProfileScreen = props => {
         console.log("logged out");
     }
     console.log(visibleScreen);
+
+    useEffect(() => {
+        var workoutHistory = {};
+        db.collection(SavedExercise.collection_name).get().then(snapshot => {
+            snapshot.forEach(doc => {
+                workoutHistory[doc.id] = doc.data();
+            });
+        setFilteredWorkoutHistory(workoutHistory);
+        console.log("history");
+        });
+    }, []);
+
+    const myWorkoutHist =
+    (
+        <View>
+            <ScrollView>
+                {Object.entries(filteredWorkoutHistory).map(SavedExercises =>
+                    <View style ={styles.horizontalContainer}>
+                    <Image
+                    source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                    style={styles.workoutPic}
+                    />
+                    <View>
+                        <Text style = {styles.workoutHistName}>{SavedExercises.category}</Text>
+                        <Text style = {styles.workoutHistSub}>{SavedExercises.completed_on}</Text>
+                        <View style={styles.horizontalContainer}>
+                            <Text style = {styles.tagName}>{SavedExercises.calories_burned}</Text>
+                            <Text style = {styles.tagName}>{SavedExercises.muscle_group}</Text>
+                            <Text style = {styles.tagName}>{SavedExercises.secondary_muscle_group}</Text>
+                        </View>
+                    </View>
+                </View>
+                )}
+            </ScrollView>
+        </View>
+    )
+    /*
+    const newWorkoutHist = 
+    (
+        <View style ={styles.horizontalContainer}>
+            <Image
+            source={require("../../../assets/cardio.jpeg")} style={styles.image}
+            style={styles.workoutPic}
+            />
+            <View>
+                <Text style = {styles.workoutHistName}>{Saved_Exercises.category}</Text>
+                <Text style = {styles.workoutHistSub}>{Saved_Exercises.completed_on}</Text>
+                <View style={styles.horizontalContainer}>
+                    <Text style = {styles.tagName}>{Saved_Exercises.calories_burned}</Text>
+                    <Text style = {styles.tagName}>{Saved_Exercises.muscle_group}</Text>
+                    <Text style = {styles.tagName}>{Saved_Exercises.secondary_muscle_group}</Text>
+                </View>
+            </View>
+        </View>
+    )*/
+    const mySavedExercises = 
+    (
+        <View style ={styles.horizontalContainer}>
+            <Image
+            source={require("../../../assets/strength.jpeg")} style={styles.image}
+            style={styles.workoutPic}
+            />
+            <View>
+                <Text style = {styles.workoutHistName}>Strength Workout</Text>
+                <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                <View style={styles.horizontalContainer}>
+                    <Text style = {styles.tagName}>Tag1</Text>
+                    <Text style = {styles.tagName}>Tag2</Text>
+                    <Text style = {styles.tagName}>Tag3</Text>
+                </View>
+            </View>
+        </View>
+    )
+    
+
 
     let mainContent;
     if (isLoggedIn) {
@@ -78,12 +158,23 @@ const ProfileScreen = props => {
                     </View>
                 </View>
                 <View style={styles.twoHeadings}>
-                    <TouchableOpacity onPress={() => console.log("pressed")}>
+                    <TouchableOpacity onPress={() => 
+                        {
+                            setDisplayWorkoutHistory(true);
+                            console.log("pressed")
+                        }}>
                         <Text style={styles.btnPress}>Workout History</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => console.log("pressed")}>
+                    <TouchableOpacity onPress={() => 
+                        {
+                            setDisplayWorkoutHistory(false);
+                            console.log("pressed");
+                        }}>
                         <Text style={styles.btnPress}>Saved Exercises</Text>
                     </TouchableOpacity>
+                </View>
+                <View>
+                    {(displayWorkoutHistory) ? myWorkoutHist : mySavedExercises}
                 </View>
                 <View style={styles.googleButtonContainer}>
                     <FontAwesome5.Button
@@ -183,6 +274,27 @@ const styles = StyleSheet.create({
         color: 'blue',
         fontWeight: 'bold',
         paddingHorizontal: 15
+    },
+    workoutHistName: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginTop: "5%",
+        paddingLeft: "5%"
+    },
+    workoutHistSub: {
+        fontSize: 18,
+        marginTop: "0%",
+        paddingLeft: "5%"
+    },
+    workoutPic: {
+        width: 110,
+        height: 110,
+        marginTop: "5%"
+    },
+    tagName: {
+        fontSize: 15,
+        marginTop: "10%",
+        paddingRight: "8%"
     }
 });
 
