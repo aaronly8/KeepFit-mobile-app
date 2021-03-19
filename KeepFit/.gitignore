@@ -4,3 +4,7 @@ node_modules
 yarn-error.log
 keys.js
 src/keys.js
+.ccls-cache/
+xcshareddata/
+xcuserdata/
+Pods/
