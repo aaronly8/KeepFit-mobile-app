@@ -43,7 +43,7 @@ const ProfileScreen = props => {
 
     const myWorkoutHist =
     (
-        <View>
+        <SafeAreaView>
             <ScrollView>
                 {Object.entries(filteredWorkoutHistory).map(SavedExercises =>
                     <View style ={styles.horizontalContainer}>
@@ -63,7 +63,7 @@ const ProfileScreen = props => {
                 </View>
                 )}
             </ScrollView>
-        </View>
+        </SafeAreaView>
     )
     /*
     const newWorkoutHist = 
@@ -86,13 +86,14 @@ const ProfileScreen = props => {
     )*/
     const mySavedExercises = 
     (
+    <ScrollView>
         <View style ={styles.horizontalContainer}>
             <Image
             source={require("../../../assets/strength.jpeg")} style={styles.image}
             style={styles.workoutPic}
             />
             <View>
-                <Text style = {styles.workoutHistName}>Strength Workout</Text>
+                <Text style = {styles.workoutHistName}>Chest Workout</Text>
                 <Text style = {styles.workoutHistSub}>50 minutes</Text>
                 <View style={styles.horizontalContainer}>
                     <Text style = {styles.tagName}>Tag1</Text>
@@ -101,6 +102,52 @@ const ProfileScreen = props => {
                 </View>
             </View>
         </View>
+        <View style ={styles.horizontalContainer}>
+            <Image
+            source={require("../../../assets/strength.jpeg")} style={styles.image}
+            style={styles.workoutPic}
+            />
+            <View>
+                <Text style = {styles.workoutHistName}>Legs Workout</Text>
+                <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                <View style={styles.horizontalContainer}>
+                    <Text style = {styles.tagName}>Tag1</Text>
+                    <Text style = {styles.tagName}>Tag2</Text>
+                    <Text style = {styles.tagName}>Tag3</Text>
+                </View>
+            </View>
+        </View>
+        <View style ={styles.horizontalContainer}>
+            <Image
+            source={require("../../../assets/cardio.jpeg")} style={styles.image}
+            style={styles.workoutPic}
+            />
+            <View>
+                <Text style = {styles.workoutHistName}>Cardio Workout</Text>
+                <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                <View style={styles.horizontalContainer}>
+                    <Text style = {styles.tagName}>Tag1</Text>
+                    <Text style = {styles.tagName}>Tag2</Text>
+                    <Text style = {styles.tagName}>Tag3</Text>
+                </View>
+            </View>
+        </View>
+        <View style ={styles.horizontalContainer}>
+            <Image
+            source={require("../../../assets/cardio.jpeg")} style={styles.image}
+            style={styles.workoutPic}
+            />
+            <View>
+                <Text style = {styles.workoutHistName}>Core Workout</Text>
+                <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                <View style={styles.horizontalContainer}>
+                    <Text style = {styles.tagName}>Tag1</Text>
+                    <Text style = {styles.tagName}>Tag2</Text>
+                    <Text style = {styles.tagName}>Tag3</Text>
+                </View>
+            </View>
+        </View>
+    </ScrollView>
     )
     
 
@@ -295,6 +342,9 @@ const styles = StyleSheet.create({
         fontSize: 15,
         marginTop: "10%",
         paddingRight: "8%"
+    },
+    searchContainer: {
+        paddingHorizontal: 25
     }
 });
 
