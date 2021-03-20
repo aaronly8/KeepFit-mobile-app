@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Button, Image, View, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Button, Image, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
@@ -41,10 +41,12 @@ const ProfileScreen = props => {
         });
     }, []);
 
+    const screenHeight = Dimensions.get('window').height
+
     const myWorkoutHist =
     (
-        <SafeAreaView>
-            <ScrollView>
+        <View style={{height: screenHeight}}>
+            <ScrollView contentContainerStyle={{flexGrow: 1}}>
                 {Object.entries(filteredWorkoutHistory).map(SavedExercises =>
                     <View style ={styles.horizontalContainer}>
                     <Image
@@ -63,91 +65,75 @@ const ProfileScreen = props => {
                 </View>
                 )}
             </ScrollView>
-        </SafeAreaView>
-    )
-    /*
-    const newWorkoutHist = 
-    (
-        <View style ={styles.horizontalContainer}>
-            <Image
-            source={require("../../../assets/cardio.jpeg")} style={styles.image}
-            style={styles.workoutPic}
-            />
-            <View>
-                <Text style = {styles.workoutHistName}>{Saved_Exercises.category}</Text>
-                <Text style = {styles.workoutHistSub}>{Saved_Exercises.completed_on}</Text>
-                <View style={styles.horizontalContainer}>
-                    <Text style = {styles.tagName}>{Saved_Exercises.calories_burned}</Text>
-                    <Text style = {styles.tagName}>{Saved_Exercises.muscle_group}</Text>
-                    <Text style = {styles.tagName}>{Saved_Exercises.secondary_muscle_group}</Text>
-                </View>
-            </View>
         </View>
-    )*/
+    )
+
     const mySavedExercises = 
     (
-    <ScrollView>
-        <View style ={styles.horizontalContainer}>
-            <Image
-            source={require("../../../assets/strength.jpeg")} style={styles.image}
-            style={styles.workoutPic}
-            />
-            <View>
-                <Text style = {styles.workoutHistName}>Chest Workout</Text>
-                <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                <View style={styles.horizontalContainer}>
-                    <Text style = {styles.tagName}>Tag1</Text>
-                    <Text style = {styles.tagName}>Tag2</Text>
-                    <Text style = {styles.tagName}>Tag3</Text>
+    <View style={{height: screenHeight}}>
+        <ScrollView contentContainerStyle={{flexGrow: 1}}> 
+            <View style ={styles.horizontalContainer}>
+                <Image
+                source={require("../../../assets/strength.jpeg")} style={styles.image}
+                style={styles.workoutPic}
+                />
+                <View>
+                    <Text style = {styles.workoutHistName}>Chest Workout</Text>
+                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                    <View style={styles.horizontalContainer}>
+                        <Text style = {styles.tagName}>Tag1</Text>
+                        <Text style = {styles.tagName}>Tag2</Text>
+                        <Text style = {styles.tagName}>Tag3</Text>
+                    </View>
                 </View>
             </View>
-        </View>
-        <View style ={styles.horizontalContainer}>
-            <Image
-            source={require("../../../assets/strength.jpeg")} style={styles.image}
-            style={styles.workoutPic}
-            />
-            <View>
-                <Text style = {styles.workoutHistName}>Legs Workout</Text>
-                <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                <View style={styles.horizontalContainer}>
-                    <Text style = {styles.tagName}>Tag1</Text>
-                    <Text style = {styles.tagName}>Tag2</Text>
-                    <Text style = {styles.tagName}>Tag3</Text>
+            <View style ={styles.horizontalContainer}>
+                <Image
+                source={require("../../../assets/strength.jpeg")} style={styles.image}
+                style={styles.workoutPic}
+                />
+                <View>
+                    <Text style = {styles.workoutHistName}>Legs Workout</Text>
+                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                    <View style={styles.horizontalContainer}>
+                        <Text style = {styles.tagName}>Tag1</Text>
+                        <Text style = {styles.tagName}>Tag2</Text>
+                        <Text style = {styles.tagName}>Tag3</Text>
+                    </View>
                 </View>
             </View>
-        </View>
-        <View style ={styles.horizontalContainer}>
-            <Image
-            source={require("../../../assets/cardio.jpeg")} style={styles.image}
-            style={styles.workoutPic}
-            />
-            <View>
-                <Text style = {styles.workoutHistName}>Cardio Workout</Text>
-                <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                <View style={styles.horizontalContainer}>
-                    <Text style = {styles.tagName}>Tag1</Text>
-                    <Text style = {styles.tagName}>Tag2</Text>
-                    <Text style = {styles.tagName}>Tag3</Text>
+            <View style ={styles.horizontalContainer}>
+                <Image
+                source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                style={styles.workoutPic}
+                />
+                <View>
+                    <Text style = {styles.workoutHistName}>Cardio Workout</Text>
+                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                    <View style={styles.horizontalContainer}>
+                        <Text style = {styles.tagName}>Tag1</Text>
+                        <Text style = {styles.tagName}>Tag2</Text>
+                        <Text style = {styles.tagName}>Tag3</Text>
+                    </View>
                 </View>
             </View>
-        </View>
-        <View style ={styles.horizontalContainer}>
-            <Image
-            source={require("../../../assets/cardio.jpeg")} style={styles.image}
-            style={styles.workoutPic}
-            />
-            <View>
-                <Text style = {styles.workoutHistName}>Core Workout</Text>
-                <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                <View style={styles.horizontalContainer}>
-                    <Text style = {styles.tagName}>Tag1</Text>
-                    <Text style = {styles.tagName}>Tag2</Text>
-                    <Text style = {styles.tagName}>Tag3</Text>
+            <View style ={styles.horizontalContainer}>
+                <Image
+                source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                style={styles.workoutPic}
+                />
+                <View>
+                    <Text style = {styles.workoutHistName}>Core Workout</Text>
+                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
+                    <View style={styles.horizontalContainer}>
+                        <Text style = {styles.tagName}>Tag1</Text>
+                        <Text style = {styles.tagName}>Tag2</Text>
+                        <Text style = {styles.tagName}>Tag3</Text>
+                    </View>
                 </View>
             </View>
-        </View>
-    </ScrollView>
+        </ScrollView>
+    </View>
     )
     
 
@@ -344,8 +330,8 @@ const styles = StyleSheet.create({
         paddingRight: "8%"
     },
     searchContainer: {
-        paddingHorizontal: 25
-    }
+        flexGrow: 1
+    },
 });
 
 export default ProfileScreen;
