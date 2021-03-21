@@ -45,7 +45,7 @@ const ProfileScreen = props => {
 
     const screenHeight = Dimensions.get('window').height
 
-    const myWorkoutHist = <FlatList data = {filteredWorkoutHistory} 
+    const myWorkoutHist = <FlatList style={styles.addFlex} data = {filteredWorkoutHistory} 
     renderItem = {({item}) => <Workout SavedExercises={item} />} 
     keyExtractor = {item => item.id}/>
 
@@ -55,18 +55,18 @@ const ProfileScreen = props => {
         console.log(props)
         return (
             <View style ={styles.horizontalContainer}>
-                {SavedExercises.category === "STRENGTH" ?
-                    <Image
-                    source={require("../../../assets/strength.jpeg")} style={styles.image}
-                    style={styles.workoutPic}
-                    />
-                    :
+                {SavedExercises.category === "CARDIO" ?
                     <Image
                     source={require("../../../assets/cardio.jpeg")} style={styles.image}
                     style={styles.workoutPic}
                     />
+                    :
+                    <Image
+                    source={require("../../../assets/strength.jpeg")} style={styles.image}
+                    style={styles.workoutPic}
+                    />
                 }
-                <View>
+                <View style={styles.addFlex}>
                     <Text style = {styles.workoutHistName}>{SavedExercises.category}</Text>
                     <Text style = {styles.workoutHistSub}>{SavedExercises.completed_on}</Text>
                     <View style={styles.horizontalContainer}>
@@ -134,7 +134,7 @@ const ProfileScreen = props => {
                 style={styles.workoutPic}
                 />
                 <View>
-                    <Text style = {styles.workoutHistName}>Core Workout</Text>
+                    <Text style = {styles.workoutHistName}>Cardio Workout</Text>
                     <Text style = {styles.workoutHistSub}>50 minutes</Text>
                     <View style={styles.horizontalContainer}>
                         <Text style = {styles.tagName}>Tag1</Text>
@@ -217,11 +217,10 @@ const ProfileScreen = props => {
                         <Text style={styles.btnPress}>Saved Exercises</Text>
                     </TouchableOpacity>
                 </View>
-                <View>
-                    <Pressable>
+                <View style={styles.addFlex}>
                         {(displayWorkoutHistory) ? myWorkoutHist : mySavedExercises}
-                    </Pressable>
                 </View>
+                {
                 <View style={styles.googleButtonContainer}>
                     <FontAwesome5.Button
                         style={styles.googleButton}
@@ -231,6 +230,7 @@ const ProfileScreen = props => {
                         <Text style={styles.googleText}>Log Out With Google</Text>
                     </FontAwesome5.Button>
                 </View>
+                }
             </Container>
         }
     } else {
@@ -342,9 +342,9 @@ const styles = StyleSheet.create({
         marginTop: "10%",
         paddingRight: "8%"
     },
-    searchContainer: {
+    addFlex: {
         flexGrow: 1
-    },
+    }
 });
 
 export default ProfileScreen;
