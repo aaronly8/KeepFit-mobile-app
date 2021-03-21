@@ -46,22 +46,31 @@ const ProfileScreen = props => {
     const screenHeight = Dimensions.get('window').height
 
     const myWorkoutHist = <FlatList data = {filteredWorkoutHistory} 
-    renderItem = {item=><Workout SavedExercises={item}></Workout>} 
-    keyExtractor = {item=>item.id}/>
+    renderItem = {({item}) => <Workout SavedExercises={item} />} 
+    keyExtractor = {item => item.id}/>
 
-
-    const Workout = ({SavedExercises}) => {
+    
+    const Workout = (props) => {
+        const {SavedExercises} = props
+        console.log(props)
         return (
             <View style ={styles.horizontalContainer}>
-                <Image
-                source={require("../../../assets/cardio.jpeg")} style={styles.image}
-                style={styles.workoutPic}
-                />
+                {SavedExercises.category === "STRENGTH" ?
+                    <Image
+                    source={require("../../../assets/strength.jpeg")} style={styles.image}
+                    style={styles.workoutPic}
+                    />
+                    :
+                    <Image
+                    source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                    style={styles.workoutPic}
+                    />
+                }
                 <View>
                     <Text style = {styles.workoutHistName}>{SavedExercises.category}</Text>
                     <Text style = {styles.workoutHistSub}>{SavedExercises.completed_on}</Text>
                     <View style={styles.horizontalContainer}>
-                        <Text style = {styles.tagName}>{SavedExercises.calories_burned}</Text>
+                        <Text style = {styles.tagName}>{SavedExercises.calories_burned === 0 ? 0 : 0}</Text>
                         <Text style = {styles.tagName}>{SavedExercises.muscle_group}</Text>
                         <Text style = {styles.tagName}>{SavedExercises.secondary_muscle_group}</Text>
                     </View>
