@@ -6,18 +6,18 @@ const ListItem = props => {
     return(
         <TouchableHighlight
         onPress={() => {
-            props.setDisplayedDetails(props.exercise);
+            props.setDisplayedDetails(props.object);
         }}>
             <View style={styles.listItemContainer}>
-                <Text style={styles.exerciseText}>{props.exercise[1].name}</Text>
-                <Text style={styles.descriptionText} numberOfLines={2}>{props.exercise[1].description}</Text>
+                <Text style={styles.objectText}>{props.object[1].name}</Text>
+                <Text style={styles.descriptionText} numberOfLines={2}>{props.object[1].description}</Text>
             </View>
         </TouchableHighlight>
     )
 };
 
 const styles = StyleSheet.create({
-    exerciseText: {
+    objectText: {
         fontSize: 30,
         marginTop: 10,
     },
