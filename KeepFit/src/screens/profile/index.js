@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Button, Image, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, FlatList, Button, Pressable, Image, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,7 +17,7 @@ import db from "../../firebase/firebase";
 const ProfileScreen = props => {
     const [visibleScreen, setVisibleScreen] = useState(null);
     const [displayWorkoutHistory, setDisplayWorkoutHistory] = useState(true);
-    const [filteredWorkoutHistory, setFilteredWorkoutHistory] = useState({});
+    const [filteredWorkoutHistory, setFilteredWorkoutHistory] = useState([]);
 
     const isLoggedIn = useSelector(state => state.auth.loggedIn);
     const user_profile = useSelector(state => state.auth.currentUser);
@@ -30,43 +30,45 @@ const ProfileScreen = props => {
     }
     console.log(visibleScreen);
 
+    const getWorkoutHistory = async() => {
+        const snapshot = await db.collection(SavedExercise.collection_name).get()
+        let workoutHist = []
+        snapshot.forEach(doc => {
+            workoutHist.push(doc.data())
+        })
+        setFilteredWorkoutHistory(workoutHist)
+        console.log(workoutHist)
+    }
     useEffect(() => {
-        var workoutHistory = {};
-        db.collection(SavedExercise.collection_name).get().then(snapshot => {
-            snapshot.forEach(doc => {
-                workoutHistory[doc.id] = doc.data();
-            });
-        setFilteredWorkoutHistory(workoutHistory);
-        console.log("history");
-        });
+        getWorkoutHistory()
     }, []);
 
     const screenHeight = Dimensions.get('window').height
 
-    const myWorkoutHist =
-    (
-        <View style={{height: screenHeight}}>
-            <ScrollView contentContainerStyle={{flexGrow: 1}}>
-                {Object.entries(filteredWorkoutHistory).map(SavedExercises =>
-                    <View style ={styles.horizontalContainer}>
-                    <Image
-                    source={require("../../../assets/cardio.jpeg")} style={styles.image}
-                    style={styles.workoutPic}
-                    />
-                    <View>
-                        <Text style = {styles.workoutHistName}>{SavedExercises.category}</Text>
-                        <Text style = {styles.workoutHistSub}>{SavedExercises.completed_on}</Text>
-                        <View style={styles.horizontalContainer}>
-                            <Text style = {styles.tagName}>{SavedExercises.calories_burned}</Text>
-                            <Text style = {styles.tagName}>{SavedExercises.muscle_group}</Text>
-                            <Text style = {styles.tagName}>{SavedExercises.secondary_muscle_group}</Text>
-                        </View>
+    const myWorkoutHist = <FlatList data = {filteredWorkoutHistory} 
+    renderItem = {item=><Workout SavedExercises={item}></Workout>} 
+    keyExtractor = {item=>item.id}/>
+
+
+    const Workout = ({SavedExercises}) => {
+        return (
+            <View style ={styles.horizontalContainer}>
+                <Image
+                source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                style={styles.workoutPic}
+                />
+                <View>
+                    <Text style = {styles.workoutHistName}>{SavedExercises.category}</Text>
+                    <Text style = {styles.workoutHistSub}>{SavedExercises.completed_on}</Text>
+                    <View style={styles.horizontalContainer}>
+                        <Text style = {styles.tagName}>{SavedExercises.calories_burned}</Text>
+                        <Text style = {styles.tagName}>{SavedExercises.muscle_group}</Text>
+                        <Text style = {styles.tagName}>{SavedExercises.secondary_muscle_group}</Text>
                     </View>
                 </View>
-                )}
-            </ScrollView>
-        </View>
-    )
+            </View>
+        )
+    }
 
     const mySavedExercises = 
     (
@@ -207,7 +209,9 @@ const ProfileScreen = props => {
                     </TouchableOpacity>
                 </View>
                 <View>
-                    {(displayWorkoutHistory) ? myWorkoutHist : mySavedExercises}
+                    <Pressable>
+                        {(displayWorkoutHistory) ? myWorkoutHist : mySavedExercises}
+                    </Pressable>
                 </View>
                 <View style={styles.googleButtonContainer}>
                     <FontAwesome5.Button
