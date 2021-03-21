@@ -59,6 +59,7 @@ const SearchExercisesScreen = props => {
         });
     }, []);
 
+    //Apply filters
     useEffect(() => {
         var newFilteredExerciseDictionary = {};
 
@@ -88,7 +89,7 @@ const SearchExercisesScreen = props => {
             } else {
                 filterFlag3 = true;
             }
-            console.log(filterFlag1, filterFlag2, filterFlag3);
+            
             if(filterFlag1 && filterFlag2 && filterFlag3) {
                 newFilteredExerciseDictionary[exercise] = exerciseDetails;
             }
@@ -125,7 +126,7 @@ const SearchExercisesScreen = props => {
                     <View style={styles.scrollView}>
                         <ScrollView style={{flexGrow: 1}}>
                         {Object.entries(filteredExerciseDictionary).map(exercise =>
-                            <ListItem setDisplayedDetails={setDisplayedDetails} exercise={exercise}>
+                            <ListItem setDisplayedDetails={setDisplayedDetails} object={exercise}>
 
                             </ListItem>
                         )}
