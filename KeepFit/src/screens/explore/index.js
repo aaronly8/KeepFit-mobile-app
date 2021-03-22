@@ -34,7 +34,7 @@ const ExploreScreen = props => {
                             Welcome to the Explore Screen!
                         </Header>
                         <Button onPress={() => changeScreenHandler("exercises")} title="Search Exercises" />
-                        <Button onPress={() => changeScreenHandler("workouts")} title="Search Workouts" />
+                        <Button onPress={() => changeScreenHandler("workouts")} title="Search Workout Videos" />
                         <Button onPress={() => changeScreenHandler("livestreams")} title="Search Livestreams" />
                         <Button onPress={() => changeScreenHandler("users")} title="Search Users" />
                     </Container>
