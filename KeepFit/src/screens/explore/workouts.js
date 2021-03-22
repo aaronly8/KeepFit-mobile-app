@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, ScrollView, Button, TouchableOpacity, Text, Linking, View } from 'react-native';
 import { Header } from '@app/components/text.js';
 import db from "../../firebase/firebase";
-import Video from '../../models/video';
 import ListItem from './listitem';
 import { updateLikedVideos } from "../../redux/actions/auth.js";
 import { useSelector, useDispatch } from 'react-redux';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
 import LikedVideo from "../../models/liked_video";
+import Video from "../../models/video";
+
 
 const Tag = props => {
     return (
@@ -26,10 +27,19 @@ const DetailsScreen = props => {
     const getLikedVideos = async () => {
         const snapshot = await db.collection(LikedVideo.collection_name).where("user_id", "==", current_user_id).get()
         let likedVideoDictionary = {}
+        let likedVideoIds = [];
+        let likedVideoData = [];
         snapshot.forEach(doc => {
             likedVideoDictionary[doc.data().video_id] = doc.data();
+            likedVideoIds.push(doc.data().video_id);
         });
-        dispatch(updateLikedVideos(likedVideoDictionary));
+        const video_snapshot = await db.collection(Video.collection_name).get()
+        video_snapshot.forEach(function(doc) {
+            if(likedVideoIds.includes(doc.id)) {
+                likedVideoData.push(doc.data());
+            }
+        })
+        dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
     }
 
     const likeVideo = () => {
@@ -117,11 +127,19 @@ const SearchWorkoutsScreen = props => {
     const getLikedVideos = async () => {
         const snapshot = await db.collection(LikedVideo.collection_name).where("user_id", "==", current_user_id).get()
         let likedVideoDictionary = {}
+        let likedVideoIds = [];
+        let likedVideoData = [];
         snapshot.forEach(doc => {
-            console.log(doc.data().video_id)
             likedVideoDictionary[doc.data().video_id] = doc.data();
+            likedVideoIds.push(doc.data().video_id);
         });
-        dispatch(updateLikedVideos(likedVideoDictionary));
+        const video_snapshot = await db.collection(Video.collection_name).get()
+        video_snapshot.forEach(function(doc) {
+            if(likedVideoIds.includes(doc.id)) {
+                likedVideoData.push(doc.data());
+            }
+        })
+        dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
     }
 
     if (!likedVideoData && isLoggedIn) {

@@ -37,9 +37,10 @@ export const updateSavedExercises = (saved_exercises) => {
 
 export const UPDATE_LIKED_VIDEOS = "UPDATE_LIKED_VIDEOS";
 
-export const updateLikedVideos = (liked_videos) => {
+export const updateLikedVideos = (liked_videos, video_data) => {
     return {
         type: UPDATE_LIKED_VIDEOS,
-        videos: liked_videos
+        videos: liked_videos,
+        video_data: video_data
     }
 }

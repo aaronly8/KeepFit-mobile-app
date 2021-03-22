@@ -7,7 +7,8 @@ const initialState = {
     creatingUser: false,
     currentUserId: null,
     currentUser: null,
-    likedVideos: null
+    likedVideos: null,
+    videoDatas: null
 }
 
 const authReducer = (state = initialState, action) => {
@@ -36,7 +37,8 @@ const authReducer = (state = initialState, action) => {
                 currentUserId: null,
                 currentUser: null,
                 savedExercises: null,
-                likedVideos: null
+                likedVideos: null,
+                videoDatas: null
             }
         case UPDATE_SAVED_EXERCISES:
             return {
@@ -46,7 +48,8 @@ const authReducer = (state = initialState, action) => {
         case UPDATE_LIKED_VIDEOS:
             return {
                 ...state,
-                likedVideos: action.videos
+                likedVideos: action.videos,
+                videoDatas: action.video_data
             }
         default:
             return state;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, FlatList, Button, TouchableHighlight, Image, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, FlatList, Button, TouchableHighlight, Image, View, Linking, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
-import { logoutUser, updateSavedExercises } from "../../redux/actions/auth.js";
+import { logoutUser, updateSavedExercises, updateLikedVideos } from "../../redux/actions/auth.js";
 import Text, { Header, SubHeader } from '@app/components/text.js';
 import UserDataScreen from './userData'
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -13,6 +13,8 @@ import EditProfileScreen from './EditProfileScreen';
 import SavedExercise from "../../models/saved_exercise";
 import { useEffect } from 'react';
 import db from "../../firebase/firebase";
+import LikedVideo from "../../models/liked_video";
+import Video from "../../models/video";
 
 
 const ProfileScreen = props => {
@@ -23,7 +25,9 @@ const ProfileScreen = props => {
     const current_user_id = useSelector(state => state.auth.currentUserId);
     const user_profile = useSelector(state => state.auth.currentUser);
     const filteredWorkoutHistory = useSelector(state => state.auth.savedExercises);
-    
+    const likedVideoData = useSelector(state => state.auth.likedVideos);
+    const likedVideoDataArray = useSelector(state => state.auth.videoDatas);
+
     const dispatch = useDispatch();
 
     const logoutHandler = () => {
@@ -31,7 +35,7 @@ const ProfileScreen = props => {
         console.log("logged out");
     }
 
-    const getSavedExercises = async() => {
+    const getSavedExercises = async () => {
         const snapshot = await db.collection(SavedExercise.collection_name).where("user_id", "==", current_user_id).get()
         let workoutHist = []
         snapshot.forEach(doc => {
@@ -39,137 +43,117 @@ const ProfileScreen = props => {
         })
         dispatch(updateSavedExercises(workoutHist));
     }
-    
-    if(!filteredWorkoutHistory && isLoggedIn) {
+
+    if (!filteredWorkoutHistory && isLoggedIn) {
         getSavedExercises();
     }
 
-    const screenHeight = Dimensions.get('window').height
+    const getLikedVideos = async () => {
+        const snapshot = await db.collection(LikedVideo.collection_name).where("user_id", "==", current_user_id).get()
+        let likedVideoDictionary = {}
+        let likedVideoIds = [];
+        let likedVideoData = [];
+        snapshot.forEach(doc => {
+            likedVideoDictionary[doc.data().video_id] = doc.data();
+            likedVideoIds.push(doc.data().video_id);
+        });
+        const video_snapshot = await db.collection(Video.collection_name).get()
+        video_snapshot.forEach(function (doc) {
+            if (likedVideoIds.includes(doc.id)) {
+                likedVideoData.push(doc.data());
+            }
+        })
+        dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
+    }
 
-    const myWorkoutHist = <FlatList style={styles.addFlex} data = {filteredWorkoutHistory} 
-    renderItem = {({item}) => <TouchableHighlight><Workout CompletedWorkout={item} /></TouchableHighlight>} 
-    keyExtractor = {item => item.id}/>
+    if (!likedVideoData && isLoggedIn) {
+        getLikedVideos();
+    }
 
-    
+    const myWorkoutHist = <FlatList style={styles.addFlex} data={filteredWorkoutHistory}
+        renderItem={({ item }) => <TouchableHighlight><Workout CompletedWorkout={item} /></TouchableHighlight>}
+        keyExtractor={item => item.id} />
+
+
     const Workout = (props) => {
-        const {CompletedWorkout} = props
+        const { CompletedWorkout } = props
         return (
-            <View style ={styles.unpaddedHorizontalContainer}>
+            <View style={styles.unpaddedHorizontalContainer}>
                 {CompletedWorkout.category === "CARDIO" ?
                     <Image
-                    source={CardioPicture} style={styles.image}
-                    style={styles.workoutPic}
+                        source={CardioPicture} style={styles.image}
+                        style={styles.workoutPic}
                     />
                     :
                     <Image
-                    source={StrengthPicture} style={styles.image}
-                    style={styles.workoutPic}
+                        source={StrengthPicture} style={styles.image}
+                        style={styles.workoutPic}
                     />
                 }
                 <View style={styles.addFlex}>
-                    <Text style = {styles.workoutHistName}>{CompletedWorkout.category}</Text>
-                    <Text style = {styles.workoutHistSub}>{CompletedWorkout.completed_on}</Text>
-                    <Text style = {styles.workoutHistLastSub}>{CompletedWorkout.caloriesBurned} cals. burned</Text>
+                    <Text style={styles.workoutHistName}>{CompletedWorkout.category}</Text>
+                    <Text style={styles.workoutHistSub}>{CompletedWorkout.completed_on}</Text>
+                    <Text style={styles.workoutHistLastSub}>{CompletedWorkout.caloriesBurned} cals. burned</Text>
                     <View style={styles.unpaddedTagsHorizontalContainer}>
-                        <Text style = {styles.tagName}>{CompletedWorkout.muscle_group}</Text>
-                        <Text style = {styles.tagName}>{CompletedWorkout.secondary_muscle_group}</Text>
+                        <Text style={styles.tagName}>{CompletedWorkout.muscle_group}</Text>
+                        <Text style={styles.tagName}>{CompletedWorkout.secondary_muscle_group}</Text>
                     </View>
                 </View>
             </View>
         )
     }
 
-    const mySavedExercises = 
-    (
-    <View>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}> 
-        <TouchableHighlight>
-            <View style ={styles.unpaddedHorizontalContainer}>
-                <Image
-                source={StrengthPicture} style={styles.image}
-                style={styles.workoutPic}
-                />
-                <View>
-                    <Text style = {styles.workoutHistName}>Chest Workout</Text>
-                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                    <View style={styles.unpaddedHorizontalContainer}>
-                        <Text style = {styles.tagName}>Tag1</Text>
-                        <Text style = {styles.tagName}>Tag2</Text>
-                        <Text style = {styles.tagName}>Tag3</Text>
+    const VideoItem = (props) => {
+        const { LikedVideo } = props
+        return (
+            <View style={styles.unpaddedHorizontalContainer}>
+                {LikedVideo.category === "CARDIO" ?
+                    <Image
+                        source={CardioPicture} style={styles.image}
+                        style={styles.workoutPic}
+                    />
+                    :
+                    <Image
+                        source={StrengthPicture} style={styles.image}
+                        style={styles.workoutPic}
+                    />
+                }
+                <View style={styles.addFlex}>
+                    <Text style={styles.workoutHistName}>{LikedVideo.title}</Text>
+                    <Text style={styles.workoutHistSub}>{LikedVideo.category}</Text>
+                    <Text style={styles.workoutHistVidLink}
+                        onPress={() => Linking.openURL(LikedVideo.video_link)}>
+                        Watch on Youtube
+                    </Text>
+                    <View style={styles.unpaddedTagsHorizontalContainer}>
+                        <Text style={styles.tagName}>{LikedVideo.muscle_group}</Text>
+                        <Text style={styles.tagName}>{LikedVideo.secondary_muscle_group}</Text>
                     </View>
                 </View>
             </View>
-            </TouchableHighlight>
-            <TouchableHighlight>
-            <View style ={styles.unpaddedHorizontalContainer}>
-                <Image
-                source={StrengthPicture} style={styles.image}
-                style={styles.workoutPic}
-                />
-                <View>
-                    <Text style = {styles.workoutHistName}>Legs Workout</Text>
-                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                    <View style={styles.horizontalContainer}>
-                        <Text style = {styles.tagName}>Tag1</Text>
-                        <Text style = {styles.tagName}>Tag2</Text>
-                        <Text style = {styles.tagName}>Tag3</Text>
-                    </View>
-                </View>
-            </View>
-            </TouchableHighlight>
-            <TouchableHighlight>
-            <View style ={styles.unpaddedHorizontalContainer}>
-                <Image
-                source={CardioPicture} style={styles.image}
-                style={styles.workoutPic}
-                />
-                <View>
-                    <Text style = {styles.workoutHistName}>Cardio Workout</Text>
-                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                    <View style={styles.horizontalContainer}>
-                        <Text style = {styles.tagName}>Tag1</Text>
-                        <Text style = {styles.tagName}>Tag2</Text>
-                        <Text style = {styles.tagName}>Tag3</Text>
-                    </View>
-                </View>
-            </View>
-            </TouchableHighlight>
-            <TouchableHighlight>
-            <View style ={styles.unpaddedHorizontalContainer}>
-                <Image
-                source={CardioPicture} style={styles.image}
-                style={styles.workoutPic}
-                />
-                <View>
-                    <Text style = {styles.workoutHistName}>Cardio Workout</Text>
-                    <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                    <View style={styles.horizontalContainer}>
-                        <Text style = {styles.tagName}>Tag1</Text>
-                        <Text style = {styles.tagName}>Tag2</Text>
-                        <Text style = {styles.tagName}>Tag3</Text>
-                    </View>
-                </View>
-            </View>
-            </TouchableHighlight>
-        </ScrollView>
-    </View>
-    )
-    
+        )
+    }
 
+    let myLikedVideos;
+    if (likedVideoDataArray && isLoggedIn) {
+        myLikedVideos = <FlatList style={styles.addFlex} data={likedVideoDataArray}
+            renderItem={({ item }) => <TouchableHighlight><VideoItem LikedVideo={item} /></TouchableHighlight>}
+            keyExtractor={item => item.id} />
+    }
 
     let mainContent;
     if (isLoggedIn) {
         if (visibleScreen == "edit") {
             mainContent = <EditProfileScreen cancelEdit={setVisibleScreen.bind(this, null)} />
         } else if (visibleScreen == "details") {
-            mainContent = <UserDataScreen 
-                cancelDetails={setVisibleScreen.bind(this, null)} 
-                logoutHandler={logoutHandler} 
+            mainContent = <UserDataScreen
+                cancelDetails={setVisibleScreen.bind(this, null)}
+                logoutHandler={logoutHandler}
             />;
         } else {
             let workout_history_style;
             let saved_exercise_style;
-            if(displayWorkoutHistory) {
+            if (displayWorkoutHistory) {
                 workout_history_style = styles.btnBluePress;
                 saved_exercise_style = styles.btnPress;
             } else {
@@ -218,32 +202,30 @@ const ProfileScreen = props => {
                     </View>
                 </View>
                 <View style={styles.twoHeadings}>
-                    <TouchableOpacity onPress={() => 
-                        {
-                            setDisplayWorkoutHistory(true);
-                        }}>
+                    <TouchableOpacity onPress={() => {
+                        setDisplayWorkoutHistory(true);
+                    }}>
                         <Text style={workout_history_style}>Workout History</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => 
-                        {
-                            setDisplayWorkoutHistory(false);
-                        }}>
+                    <TouchableOpacity onPress={() => {
+                        setDisplayWorkoutHistory(false);
+                    }}>
                         <Text style={saved_exercise_style}>Liked Videos</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.savedContentContainer}>
-                        {(displayWorkoutHistory) ? myWorkoutHist : mySavedExercises}
+                    {(displayWorkoutHistory) ? myWorkoutHist : myLikedVideos}
                 </View>
                 {
-                <View style={styles.googleButtonContainer}>
-                    <FontAwesome5.Button
-                        style={styles.googleButton}
-                        name="google"
-                        onPress={() => logoutHandler()}
-                    >
-                        <Text style={styles.googleText}>Log Out With Google</Text>
-                    </FontAwesome5.Button>
-                </View>
+                    <View style={styles.googleButtonContainer}>
+                        <FontAwesome5.Button
+                            style={styles.googleButton}
+                            name="google"
+                            onPress={() => logoutHandler()}
+                        >
+                            <Text style={styles.googleText}>Log Out With Google</Text>
+                        </FontAwesome5.Button>
+                    </View>
                 }
             </Container>
         }
@@ -365,6 +347,14 @@ const styles = StyleSheet.create({
         marginTop: "0%",
         marginBottom: "0%",
         paddingLeft: "5%"
+    },
+    workoutHistVidLink: {
+        fontSize: 18,
+        marginTop: "0%",
+        marginBottom: "0%",
+        paddingLeft: "5%",
+        color: 'blue',
+        textDecorationLine: "underline"
     },
     workoutPic: {
         width: 110,
