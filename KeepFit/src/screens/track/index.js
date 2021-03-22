@@ -7,7 +7,8 @@ import Container from '@app/components/container.js'
 import { Stopwatch } from 'react-native-stopwatch-timer';
 import { Header } from '@app/components/text.js';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateSavedExercises } from "../../redux/actions/auth.js";
 import db from '../../firebase/firebase';
 import SavedExercise from '../../models/saved_exercise';
 
@@ -23,6 +24,8 @@ const TrackScreen = props => {
     const [caloriesBurned, setCaloriesBurned] = useState(0);
     const [lastStartTime, setLastStartTime] = useState(new Date());
     const [elapsedTime, setElapsedTime] = useState(0);
+
+    const dispatch = useDispatch();
 
     const workoutCategoryHandler = inputText => {
         setWorkoutCategory(inputText);
@@ -68,6 +71,16 @@ const TrackScreen = props => {
         }
     };
 
+    const updateReduxSavedExercises = async() => {
+        console.log("getting saved");
+        const snapshot = await db.collection(SavedExercise.collection_name).where("user_id", "==", current_user_id).get()
+        let workoutHist = []
+        snapshot.forEach(doc => {
+            workoutHist.push(doc.data())
+        })
+        dispatch(updateSavedExercises(workoutHist));
+    }
+
     const saveHandler = () => {
         if (!enteredMuscleGroup || !enteredWorkoutCategory) {
             Alert.alert('Error', 'You must fill out all fields except secondary muscle group.', [
@@ -94,6 +107,7 @@ const TrackScreen = props => {
             setResetStopwatch(true);
             setElapsedTime(0);
             setCaloriesBurned(0);
+            updateReduxSavedExercises();
             Alert.alert('Success', 'Workout Successfully Saved!', [
                 { text: 'Dismiss', style: 'cancel' }
             ]);
