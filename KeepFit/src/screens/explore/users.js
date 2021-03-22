@@ -43,7 +43,6 @@ const SearchUsersScreen = props => {
       else{
         setFilteredUsers(users);
       }
-
     }
 
     // should be good.
