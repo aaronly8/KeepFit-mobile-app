@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, ScrollView, Button, Text, Linking, View } from 'react-native';
-import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
 import db from "../../firebase/firebase";
 import Livestream from '../../models/livestream';
 import ListItem from './listitem';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
-
 
 const Tag = props => {
     return (
@@ -21,7 +19,7 @@ const DetailsScreen = props => {
         <SafeAreaView>
             <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
             <Header style={styles.livestreamName}>
-                {props.livestream.name}
+                {props.livestream.title}
             </Header>
             <Text style={styles.videoLink}
              onPress={() => Linking.openURL(props.livestream.video_link)}>
