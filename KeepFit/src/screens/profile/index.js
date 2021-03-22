@@ -3,7 +3,7 @@ import { SafeAreaView, StyleSheet, FlatList, Button, TouchableHighlight, Image, 
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
-import { logoutUser } from "../../redux/actions/auth.js";
+import { logoutUser, updateSavedExercises } from "../../redux/actions/auth.js";
 import Text, { Header, SubHeader } from '@app/components/text.js';
 import UserDataScreen from './userData'
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -18,10 +18,11 @@ import db from "../../firebase/firebase";
 const ProfileScreen = props => {
     const [visibleScreen, setVisibleScreen] = useState(null);
     const [displayWorkoutHistory, setDisplayWorkoutHistory] = useState(true);
-    const [filteredWorkoutHistory, setFilteredWorkoutHistory] = useState([]);
 
     const isLoggedIn = useSelector(state => state.auth.loggedIn);
+    const current_user_id = useSelector(state => state.auth.currentUserId);
     const user_profile = useSelector(state => state.auth.currentUser);
+    const filteredWorkoutHistory = useSelector(state => state.auth.savedExercises);
     
     const dispatch = useDispatch();
 
@@ -29,34 +30,32 @@ const ProfileScreen = props => {
         dispatch(logoutUser());
         console.log("logged out");
     }
-    console.log(visibleScreen);
 
-    const getWorkoutHistory = async() => {
-        const snapshot = await db.collection(SavedExercise.collection_name).get()
+    const getSavedExercises = async() => {
+        const snapshot = await db.collection(SavedExercise.collection_name).where("user_id", "==", current_user_id).get()
         let workoutHist = []
         snapshot.forEach(doc => {
             workoutHist.push(doc.data())
         })
-        setFilteredWorkoutHistory(workoutHist)
-        console.log(workoutHist)
+        dispatch(updateSavedExercises(workoutHist));
     }
-    useEffect(() => {
-        getWorkoutHistory()
-    }, []);
+    
+    if(!filteredWorkoutHistory && isLoggedIn) {
+        getSavedExercises();
+    }
 
     const screenHeight = Dimensions.get('window').height
 
-    const mySavedExercises = <FlatList style={styles.addFlex} data = {filteredWorkoutHistory} 
-    renderItem = {({item}) => <TouchableHighlight><Workout SavedExercises={item} /></TouchableHighlight>} 
+    const myWorkoutHist = <FlatList style={styles.addFlex} data = {filteredWorkoutHistory} 
+    renderItem = {({item}) => <TouchableHighlight><Workout CompletedWorkout={item} /></TouchableHighlight>} 
     keyExtractor = {item => item.id}/>
 
     
     const Workout = (props) => {
-        const {SavedExercises} = props
-        console.log(props)
+        const {CompletedWorkout} = props
         return (
             <View style ={styles.unpaddedHorizontalContainer}>
-                {SavedExercises.category === "CARDIO" ?
+                {CompletedWorkout.category === "CARDIO" ?
                     <Image
                     source={CardioPicture} style={styles.image}
                     style={styles.workoutPic}
@@ -68,19 +67,19 @@ const ProfileScreen = props => {
                     />
                 }
                 <View style={styles.addFlex}>
-                    <Text style = {styles.workoutHistName}>{SavedExercises.category}</Text>
-                    <Text style = {styles.workoutHistSub}>{SavedExercises.completed_on}</Text>
-                    <Text style = {styles.workoutHistLastSub}>{SavedExercises.caloriesBurned} cals. burned</Text>
+                    <Text style = {styles.workoutHistName}>{CompletedWorkout.category}</Text>
+                    <Text style = {styles.workoutHistSub}>{CompletedWorkout.completed_on}</Text>
+                    <Text style = {styles.workoutHistLastSub}>{CompletedWorkout.caloriesBurned} cals. burned</Text>
                     <View style={styles.unpaddedTagsHorizontalContainer}>
-                        <Text style = {styles.tagName}>{SavedExercises.muscle_group}</Text>
-                        <Text style = {styles.tagName}>{SavedExercises.secondary_muscle_group}</Text>
+                        <Text style = {styles.tagName}>{CompletedWorkout.muscle_group}</Text>
+                        <Text style = {styles.tagName}>{CompletedWorkout.secondary_muscle_group}</Text>
                     </View>
                 </View>
             </View>
         )
     }
 
-    const myWorkoutHist = 
+    const mySavedExercises = 
     (
     <View>
         <ScrollView contentContainerStyle={{flexGrow: 1}}> 
@@ -161,7 +160,6 @@ const ProfileScreen = props => {
     let mainContent;
     if (isLoggedIn) {
         if (visibleScreen == "edit") {
-            console.log("is edit mode");
             mainContent = <EditProfileScreen cancelEdit={setVisibleScreen.bind(this, null)} />
         } else if (visibleScreen == "details") {
             mainContent = <UserDataScreen 
@@ -223,16 +221,14 @@ const ProfileScreen = props => {
                     <TouchableOpacity onPress={() => 
                         {
                             setDisplayWorkoutHistory(true);
-                            console.log("pressed")
                         }}>
                         <Text style={workout_history_style}>Workout History</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => 
                         {
                             setDisplayWorkoutHistory(false);
-                            console.log("pressed");
                         }}>
-                        <Text style={saved_exercise_style}>Saved Exercises</Text>
+                        <Text style={saved_exercise_style}>Liked Videos</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.savedContentContainer}>
