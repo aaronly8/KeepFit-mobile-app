@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, FlatList, Button, Pressable, Image, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, FlatList, Button, TouchableHighlight, Image, View, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from "../../redux/actions/auth.js";
 import Text, { Header, SubHeader } from '@app/components/text.js';
-import { TouchableHighlight } from 'react-native-gesture-handler';
 import UserDataScreen from './userData'
 import Ionicons from '@expo/vector-icons/Ionicons';
+import CardioPicture from "../../assets/cardio.jpeg";
+import StrengthPicture from "../../assets/strength.jpeg";
 import EditProfileScreen from './EditProfileScreen';
 import SavedExercise from "../../models/saved_exercise";
 import { useEffect } from 'react';
@@ -45,8 +46,8 @@ const ProfileScreen = props => {
 
     const screenHeight = Dimensions.get('window').height
 
-    const myWorkoutHist = <FlatList style={styles.addFlex} data = {filteredWorkoutHistory} 
-    renderItem = {({item}) => <Workout SavedExercises={item} />} 
+    const mySavedExercises = <FlatList style={styles.addFlex} data = {filteredWorkoutHistory} 
+    renderItem = {({item}) => <TouchableHighlight><Workout SavedExercises={item} /></TouchableHighlight>} 
     keyExtractor = {item => item.id}/>
 
     
@@ -54,23 +55,23 @@ const ProfileScreen = props => {
         const {SavedExercises} = props
         console.log(props)
         return (
-            <View style ={styles.horizontalContainer}>
+            <View style ={styles.unpaddedHorizontalContainer}>
                 {SavedExercises.category === "CARDIO" ?
                     <Image
-                    source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                    source={CardioPicture} style={styles.image}
                     style={styles.workoutPic}
                     />
                     :
                     <Image
-                    source={require("../../../assets/strength.jpeg")} style={styles.image}
+                    source={StrengthPicture} style={styles.image}
                     style={styles.workoutPic}
                     />
                 }
                 <View style={styles.addFlex}>
                     <Text style = {styles.workoutHistName}>{SavedExercises.category}</Text>
                     <Text style = {styles.workoutHistSub}>{SavedExercises.completed_on}</Text>
-                    <View style={styles.horizontalContainer}>
-                        <Text style = {styles.tagName}>{SavedExercises.calories_burned === 0 ? 0 : 0}</Text>
+                    <Text style = {styles.workoutHistLastSub}>{SavedExercises.caloriesBurned} cals. burned</Text>
+                    <View style={styles.unpaddedTagsHorizontalContainer}>
                         <Text style = {styles.tagName}>{SavedExercises.muscle_group}</Text>
                         <Text style = {styles.tagName}>{SavedExercises.secondary_muscle_group}</Text>
                     </View>
@@ -79,28 +80,31 @@ const ProfileScreen = props => {
         )
     }
 
-    const mySavedExercises = 
+    const myWorkoutHist = 
     (
-    <View style={{height: screenHeight}}>
+    <View>
         <ScrollView contentContainerStyle={{flexGrow: 1}}> 
-            <View style ={styles.horizontalContainer}>
+        <TouchableHighlight>
+            <View style ={styles.unpaddedHorizontalContainer}>
                 <Image
-                source={require("../../../assets/strength.jpeg")} style={styles.image}
+                source={StrengthPicture} style={styles.image}
                 style={styles.workoutPic}
                 />
                 <View>
                     <Text style = {styles.workoutHistName}>Chest Workout</Text>
                     <Text style = {styles.workoutHistSub}>50 minutes</Text>
-                    <View style={styles.horizontalContainer}>
+                    <View style={styles.unpaddedHorizontalContainer}>
                         <Text style = {styles.tagName}>Tag1</Text>
                         <Text style = {styles.tagName}>Tag2</Text>
                         <Text style = {styles.tagName}>Tag3</Text>
                     </View>
                 </View>
             </View>
-            <View style ={styles.horizontalContainer}>
+            </TouchableHighlight>
+            <TouchableHighlight>
+            <View style ={styles.unpaddedHorizontalContainer}>
                 <Image
-                source={require("../../../assets/strength.jpeg")} style={styles.image}
+                source={StrengthPicture} style={styles.image}
                 style={styles.workoutPic}
                 />
                 <View>
@@ -113,9 +117,11 @@ const ProfileScreen = props => {
                     </View>
                 </View>
             </View>
-            <View style ={styles.horizontalContainer}>
+            </TouchableHighlight>
+            <TouchableHighlight>
+            <View style ={styles.unpaddedHorizontalContainer}>
                 <Image
-                source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                source={CardioPicture} style={styles.image}
                 style={styles.workoutPic}
                 />
                 <View>
@@ -128,9 +134,11 @@ const ProfileScreen = props => {
                     </View>
                 </View>
             </View>
-            <View style ={styles.horizontalContainer}>
+            </TouchableHighlight>
+            <TouchableHighlight>
+            <View style ={styles.unpaddedHorizontalContainer}>
                 <Image
-                source={require("../../../assets/cardio.jpeg")} style={styles.image}
+                source={CardioPicture} style={styles.image}
                 style={styles.workoutPic}
                 />
                 <View>
@@ -143,6 +151,7 @@ const ProfileScreen = props => {
                     </View>
                 </View>
             </View>
+            </TouchableHighlight>
         </ScrollView>
     </View>
     )
@@ -160,6 +169,15 @@ const ProfileScreen = props => {
                 logoutHandler={logoutHandler} 
             />;
         } else {
+            let workout_history_style;
+            let saved_exercise_style;
+            if(displayWorkoutHistory) {
+                workout_history_style = styles.btnBluePress;
+                saved_exercise_style = styles.btnPress;
+            } else {
+                saved_exercise_style = styles.btnBluePress;
+                workout_history_style = styles.btnPress;
+            }
             mainContent = <Container style={styles.mainContainer}>
                 <View style={styles.editButtonContainer}>
                     <Button title="Edit Profile" onPress={() => setVisibleScreen("edit")} />
@@ -207,17 +225,17 @@ const ProfileScreen = props => {
                             setDisplayWorkoutHistory(true);
                             console.log("pressed")
                         }}>
-                        <Text style={styles.btnPress}>Workout History</Text>
+                        <Text style={workout_history_style}>Workout History</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => 
                         {
                             setDisplayWorkoutHistory(false);
                             console.log("pressed");
                         }}>
-                        <Text style={styles.btnPress}>Saved Exercises</Text>
+                        <Text style={saved_exercise_style}>Saved Exercises</Text>
                     </TouchableOpacity>
                 </View>
-                <View style={styles.addFlex}>
+                <View style={styles.savedContentContainer}>
                         {(displayWorkoutHistory) ? myWorkoutHist : mySavedExercises}
                 </View>
                 {
@@ -299,12 +317,26 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 15
     },
+    unpaddedHorizontalContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    },
+    unpaddedTagsHorizontalContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingLeft: "5%",
+        paddingTop: "0%"
+    },
     subheading: {
         fontWeight: 'bold',
     },
     btnPress: {
         color: 'black',
         fontSize: 18
+    },
+    btnBluePress: {
+        color: 'blue',
+        fontSize: 18,
     },
     image: {
         width: 25,
@@ -332,6 +364,12 @@ const styles = StyleSheet.create({
         marginTop: "0%",
         paddingLeft: "5%"
     },
+    workoutHistLastSub: {
+        fontSize: 18,
+        marginTop: "0%",
+        marginBottom: "0%",
+        paddingLeft: "5%"
+    },
     workoutPic: {
         width: 110,
         height: 110,
@@ -339,11 +377,16 @@ const styles = StyleSheet.create({
     },
     tagName: {
         fontSize: 15,
-        marginTop: "10%",
+        marginTop: "8%",
+        color: "skyblue",
+        fontWeight: "bold",
         paddingRight: "8%"
     },
     addFlex: {
         flexGrow: 1
+    },
+    savedContentContainer: {
+        height: 275
     }
 });
 
