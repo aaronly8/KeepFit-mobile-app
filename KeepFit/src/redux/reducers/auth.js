@@ -1,11 +1,13 @@
-import { LOGIN_USER, LOGOUT_USER, CREATE_USER, UPDATE_SAVED_EXERCISES } from '../actions/auth.js';
+import { LOGIN_USER, LOGOUT_USER, CREATE_USER, UPDATE_SAVED_EXERCISES, 
+    UPDATE_LIKED_VIDEOS } from '../actions/auth.js';
 
 const initialState = {
     loggedIn: false,
     savedExercises: null,
     creatingUser: false,
     currentUserId: null,
-    currentUser: null
+    currentUser: null,
+    likedVideos: null
 }
 
 const authReducer = (state = initialState, action) => {
@@ -33,12 +35,18 @@ const authReducer = (state = initialState, action) => {
                 creatingUser: false,
                 currentUserId: null,
                 currentUser: null,
-                savedExercises: null
+                savedExercises: null,
+                likedVideos: null
             }
         case UPDATE_SAVED_EXERCISES:
             return {
                 ...state,
                 savedExercises: action.exercises
+            }
+        case UPDATE_LIKED_VIDEOS:
+            return {
+                ...state,
+                likedVideos: action.videos
             }
         default:
             return state;

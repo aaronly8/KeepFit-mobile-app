@@ -26,11 +26,20 @@ export const createUser = (user_id, user_object) => {
     }
 }
 
-export const UPDATE_SAVED_EXERCISES = "UPDATE SAVED EXERCISES";
+export const UPDATE_SAVED_EXERCISES = "UPDATE_SAVED_EXERCISES";
 
 export const updateSavedExercises = (saved_exercises) => {
     return {
         type: UPDATE_SAVED_EXERCISES,
         exercises: saved_exercises
+    }
+}
+
+export const UPDATE_LIKED_VIDEOS = "UPDATE_LIKED_VIDEOS";
+
+export const updateLikedVideos = (liked_videos) => {
+    return {
+        type: UPDATE_LIKED_VIDEOS,
+        videos: liked_videos
     }
 }
