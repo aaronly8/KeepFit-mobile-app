@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Button, FlatList, Text, View, ScrollView, ListItem } from 'react-native';
+import { SafeAreaView, StyleSheet, Button, FlatList, Text, View, ScrollView } from 'react-native';
+import  UserItem  from '../explore/useritem.js'
 import Container from '@app/components/container.js'
 import SearchInput from '@app/components/input.js'
 import { Header } from '@app/components/text.js';
@@ -43,6 +44,7 @@ const SearchUsersScreen = props => {
       else{
         setFilteredUsers(users);
       }
+
     }
 
     // should be good.
@@ -61,19 +63,21 @@ const SearchUsersScreen = props => {
     useEffect(() => {
         var newFilteredUsers = {};
 
-        for(var user in usersDictionary) {
-            var userDetails = usersDictionary[user];
+        for(var user in filteredUsers) {
+            var userDetails = filteredUsers[user];
             newFilteredUsers[user] = userDetails;
         }
         setFilteredUsers(newFilteredUsers);
     }, []);
-
+    const detailsBackHandler = () => {
+        setDisplayedDetails(null);
+    };
     return (
       <SafeAreaView style={styles.searchContainer}>
               {displayedDetails ? (
                   <DetailsScreen
                       userID={displayedDetails[0]}
-                      user={newFilteredUsers[displayedDetails[0]]}
+                      user={filteredUsers[displayedDetails[0]]}
                       detailsBackHandler={detailsBackHandler}
                   />
               ) : (
@@ -85,8 +89,10 @@ const SearchUsersScreen = props => {
                     <View style={styles.scrollView}>
                         <ScrollView>
                         {Object.entries(filteredUsers).map(user =>
-                          <ListItem setDisplayedDetails={setDisplayedDetails} object={user}>
-                            </ListItem>
+
+                          <UserItem setDisplayedDetails={setDisplayedDetails} object={user}>
+                            </UserItem>
+
                           )}
                         </ScrollView>
                       </View>
