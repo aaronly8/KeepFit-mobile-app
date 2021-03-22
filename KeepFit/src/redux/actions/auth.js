@@ -25,3 +25,12 @@ export const createUser = (user_id, user_object) => {
         userObject: user_object
     }
 }
+
+export const UPDATE_SAVED_EXERCISES = "UPDATE SAVED EXERCISES";
+
+export const updateSavedExercises = (saved_exercises) => {
+    return {
+        type: UPDATE_SAVED_EXERCISES,
+        exercises: saved_exercises
+    }
+}

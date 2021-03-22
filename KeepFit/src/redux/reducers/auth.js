@@ -1,7 +1,8 @@
-import { LOGIN_USER, LOGOUT_USER, CREATE_USER } from '../actions/auth.js';
+import { LOGIN_USER, LOGOUT_USER, CREATE_USER, UPDATE_SAVED_EXERCISES } from '../actions/auth.js';
 
 const initialState = {
     loggedIn: false,
+    savedExercises: null,
     creatingUser: false,
     currentUserId: null,
     currentUser: null
@@ -31,7 +32,13 @@ const authReducer = (state = initialState, action) => {
                 loggedIn: false,
                 creatingUser: false,
                 currentUserId: null,
-                currentUser: null
+                currentUser: null,
+                savedExercises: null
+            }
+        case UPDATE_SAVED_EXERCISES:
+            return {
+                ...state,
+                savedExercises: action.exercises
             }
         default:
             return state;
