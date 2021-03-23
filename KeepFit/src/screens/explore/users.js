@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Button, FlatList, Text, View, ScrollView } from 'react-native';
+import { SafeAreaView, StyleSheet, Button, FlatList, Text, View, ScrollView, TouchableHighlight } from 'react-native';
 //import  UserItem  from '../explore/useritem.js'
 import Container from '@app/components/container.js'
 import SearchInput from '@app/components/input.js'
@@ -16,16 +16,17 @@ const DetailsScreen = props => {
             <Container>
                 <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
                 <Header style={styles.mainHeader}>
-                    Welcome to the Users Screen!
+                   {props.user.full_name}'s Profile
                 </Header>
             </Container>
             <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
             <Header style={styles.mainHeader}>
-                {props.user}
+                Some info.
             </Header>
         </SafeAreaView>
     );
 };
+
 
 const SearchUsersScreen = props => {
     const [users, setUsers] = useState([]);
@@ -35,6 +36,9 @@ const SearchUsersScreen = props => {
     const [displayedDetails, setDisplayedDetails] = useState(null);
 
     const current_user_id = useSelector(state => state.auth.currentUserId);
+    const detailsBackHandler = () => {
+        setDisplayedDetails(null);
+    };
 
     // Get snapshot (dictionary : id -> Object) of all Users from db.
     useEffect(() => {
@@ -68,6 +72,40 @@ const SearchUsersScreen = props => {
        });
    }, []);
 
+     const UserItem = ({ setDisplayedDetails, user, followed}) => {
+           if (!followed) {
+               console.log("UserItem id: " + user.id)
+             //  console.log("user object: " + users[userID].full_name)
+               return (
+                 <TouchableHighlight
+                 onPress={() => {
+                     setDisplayedDetails(user);
+                 }}>
+                   <View>
+                       <Text>
+                   {user.full_name}
+                       </Text>
+                       <Button title="Follow" onPress={() =>  followUser(current_user_id, user.id)} />
+                   </View>
+                     </TouchableHighlight>
+               )
+           }
+           else {
+               return (
+                 <TouchableHighlight
+                 onPress={() => {
+                     setDisplayedDetails(user);
+                 }}>
+                   <View>
+                       <Text>
+                       {user.full_name}
+                       </Text>
+                       <Button title="Unfollow" onPress={() =>  unfollowUser(current_user_id, user.id)} />
+                   </View>
+                     </TouchableHighlight>
+               )
+           }
+       }
 
      const followUser = async(follower_user_id, followee_user_id) => {
          await db.collection(Follows.collection_name).doc().set({
@@ -115,37 +153,15 @@ const SearchUsersScreen = props => {
         setFilteredUsers(users);
       }
     }
-    const UserItem = ({user, followed}) => {
-          if (!followed) {
-              console.log("UserItem id: " + user.id)
-            //  console.log("user object: " + users[userID].full_name)
-              return (
-                  <View>
-                      <Text>
-                  {user.full_name}
-                      </Text>
-                      <Button title="Follow" onPress={() =>  followUser(current_user_id, user.id)} />
-                  </View>
-              )
-          }
-          else {
-              return (
-                  <View>
-                      <Text>
-                      {user.full_name}
-                      </Text>
-                      <Button title="Unfollow" onPress={() =>  unfollowUser(current_user_id, user.id)} />
-                  </View>
-              )
-          }
-      }
+
     return (
       <SafeAreaView style={styles.searchContainer}>
               {displayedDetails ? (
                   <DetailsScreen
                       userID={displayedDetails[0]}
-                      user={filteredUsers[0]}
+                      user={displayedDetails}
                       detailsBackHandler={detailsBackHandler}
+                      changeScreenHandler={props.changeScreenHandler}
                   />
               ) : (
                 <View style={styles.listView}>
@@ -156,7 +172,8 @@ const SearchUsersScreen = props => {
                     <View style={styles.scrollView}>
                         <ScrollView>
                         {filteredUsers.map(user =>
-                          <UserItem user={ user } followed={ followedUserIds.includes(user.id) }/>
+                          <UserItem setDisplayedDetails={setDisplayedDetails}
+                                    user={ user } followed={ followedUserIds.includes(user.id) }/>
                           )}
                         </ScrollView>
                       </View>
@@ -174,7 +191,7 @@ const styles = StyleSheet.create({
         flexGrow:1,
     },
     mainHeader: {
-        fontSize: 50,
+        fontSize: 26,
         marginTop: "55%",
         textAlign: "center"
     },
