@@ -4,8 +4,8 @@ import Container from '@app/components/container.js'
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser, updateSavedExercises, updateLikedVideos } from "../../redux/actions/auth.js";
-import Text, { Header, SubHeader } from '@app/components/text.js';
 import UserDataScreen from './userData'
+import Text from '@app/components/text.js';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import CardioPicture from "../../assets/cardio.jpeg";
 import StrengthPicture from "../../assets/strength.jpeg";
@@ -15,7 +15,6 @@ import { useEffect } from 'react';
 import db from "../../firebase/firebase";
 import LikedVideo from "../../models/liked_video";
 import Video from "../../models/video";
-
 
 const ProfileScreen = props => {
     const [visibleScreen, setVisibleScreen] = useState(null);
@@ -73,23 +72,48 @@ const ProfileScreen = props => {
     const myWorkoutHist = <FlatList style={styles.addFlex} data={filteredWorkoutHistory}
         renderItem={({ item }) => <TouchableHighlight><Workout CompletedWorkout={item} /></TouchableHighlight>}
         keyExtractor={item => item.id} />
+        
+    const whichImage = (props) => {
+        const { CompletedWorkout } = props
+        switch (CompletedWorkout.category) {
+            case 'CARDIO':
+                return (<Image
+                    source={CardioPicture} style={styles.image}
+                    style={styles.workoutPic}
+                />);
+            case 'STRENGTH':
+                return <Image
+                    source={StrengthPicture} style={styles.image}
+                    style={styles.workoutPic}
+                />
+            case 'BODYWEIGHT':
+                return <Image
+                    source={require('../../assets/bodyweight.jpeg')} style={styles.image}
+                    style={styles.workoutPic}
+                />
+            case 'HIIT':
+                return <Image
+                    source={require('../../assets/hiit.jpeg')} style={styles.image}
+                    style={styles.workoutPic}
+                />
+            case 'WEIGHTLIFTING':
+                return <Image
+                    source={require('../../assets/weightlift.jpeg')} style={styles.image}
+                    style={styles.workoutPic}
+                />
+            default:
+                return <Image
+                    source={require('../../assets/hybrid.jpeg')} style={styles.image}
+                    style={styles.workoutPic}
+                />
+        }
+    }
 
-
-    const Workout = (props) => {
+    const Workout = props => {
         const { CompletedWorkout } = props
         return (
             <View style={styles.unpaddedHorizontalContainer}>
-                {CompletedWorkout.category === "CARDIO" ?
-                    <Image
-                        source={CardioPicture} style={styles.image}
-                        style={styles.workoutPic}
-                    />
-                    :
-                    <Image
-                        source={StrengthPicture} style={styles.image}
-                        style={styles.workoutPic}
-                    />
-                }
+                {whichImage({CompletedWorkout})}
                 <View style={styles.addFlex}>
                     <Text style={styles.workoutHistName}>{CompletedWorkout.category}</Text>
                     <Text style={styles.workoutHistSub}>{CompletedWorkout.completed_on}</Text>
@@ -161,44 +185,67 @@ const ProfileScreen = props => {
                 workout_history_style = styles.btnPress;
             }
             mainContent = <Container style={styles.mainContainer}>
-                <View style={styles.editButtonContainer}>
-                    <Button title="Edit Profile" onPress={() => setVisibleScreen("edit")} />
+                <View style={styles.userHeadings}>
+                    <Text style={styles.userName}>
+                        {user_profile.username}
+                    </Text>
+                    {
+                        <View style={styles.googleButtonContainer}>
+                            <FontAwesome5.Button
+                                style={styles.googleButton}
+                                name="google"
+                                onPress={() => logoutHandler()}
+                            >
+                                <Text style={styles.googleText}>Log Out</Text>
+                            </FontAwesome5.Button>
+                        </View>
+                    }
                 </View>
                 <View style={styles.horizontalContainer}>
                     <Image
                         style={styles.profilePic}
                         source={{ uri: user_profile.profile_picture }}
                     />
-                    <View>
-                        <Text style={styles.userName}>
-                            {user_profile.username}
-                        </Text>
-                        <Text style={styles.fullName}>
-                            {user_profile.full_name}
-                        </Text>
+                    <View style={styles.followHeadings}>
+                        <View style={styles.followBox}>
+                            <Text style={styles.numFollow}>
+                                15
+                            </Text>
+                            <Text style={styles.follow}>
+                                Followers
+                            </Text>
+                        </View>
+                        <View style={styles.followBox}>
+                            <Text style={styles.numFollow}>
+                                5
+                            </Text>
+                            <Text style={styles.follow}>
+                                Following
+                            </Text>
+                        </View>
                     </View>
                 </View>
-                <View>
-                    <TouchableOpacity onPress={() => setVisibleScreen("details")}>
-                        <Text style={styles.detailsText}>View Details</Text>
-                    </TouchableOpacity>
+                <View style={styles.nameContainer}>
+                    <Text style={styles.fullName}>
+                        {user_profile.full_name}
+                    </Text>
+                    <Text style={styles.bio}>
+                        Insert bio here
+                    </Text>
                 </View>
-                <View style={styles.twoHeadings}>
-                    <View style={styles.followers}>
-                        <Text style={styles.subheading}>
-                            Followers
-                    </Text>
-                        <Text>
-                            100
-                    </Text>
+                <View style={styles.editHeadings}>
+                    <View style={styles.editBorder}>
+                        <TouchableOpacity onPress={() => setVisibleScreen("edit")}>
+                            <Text style={styles.editText}>Edit Profile</Text>
+                        </TouchableOpacity>
                     </View>
-                    <View style={styles.following}>
-                        <Text style={styles.subheading}>
-                            Following
-                    </Text>
-                        <Text>
-                            55
-                    </Text>
+                    <View style={styles.spaceBox}>
+
+                    </View>
+                    <View style={styles.editBorder}>
+                        <TouchableOpacity onPress={() => setVisibleScreen("details")}>
+                            <Text style={styles.editText}>View Data</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.twoHeadings}>
@@ -216,17 +263,6 @@ const ProfileScreen = props => {
                 <View style={styles.savedContentContainer}>
                     {(displayWorkoutHistory) ? myWorkoutHist : myLikedVideos}
                 </View>
-                {
-                    <View style={styles.googleButtonContainer}>
-                        <FontAwesome5.Button
-                            style={styles.googleButton}
-                            name="google"
-                            onPress={() => logoutHandler()}
-                        >
-                            <Text style={styles.googleText}>Log Out With Google</Text>
-                        </FontAwesome5.Button>
-                    </View>
-                }
             </Container>
         }
     } else {
@@ -253,46 +289,77 @@ const styles = StyleSheet.create({
     },
     googleButton: {
         height: 60,
-        paddingLeft: 50,
-        paddingRight: 50
+        paddingLeft: 10,
+        paddingRight: 1,
+        justifyContent: "flex-end"
     },
     googleButtonContainer: {
-        marginTop: 25
+        marginTop: 0,
+        justifyContent: "flex-end"
     },
     googleText: {
         color: 'white',
-        fontWeight: 'bold'
-    },
-    fullName: {
+        fontWeight: 'bold',
         fontSize: 15
     },
-    userName: {
-        marginTop: 30,
+    nameContainer: {
+        marginLeft: "0%"
+    },
+    fullName: {
+        marginTop: "5%",
         fontSize: 15,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        marginBottom: "1%"
+    },
+    userHeadings: {
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+    userName: {
+        fontSize: 20,
+        marginTop: "0%",
+        fontWeight: "bold"
+    },
+    bio: {
+        fontSize: 15,
+        marginTop: "0%"
     },
     twoHeadings: {
         flexDirection: "row",
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         marginTop: 20,
         paddingHorizontal: 15
     },
-    followers: {
-        fontSize: 15,
-        fontWeight: 'bold'
+    followHeadings: {
+        flexDirection: "row",
+        justifyContent: 'space-between',
+        paddingHorizontal: 15
     },
-    following: {
+    followBox: {
+        justifyContent: "center"
+    },
+    numFollow: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: "0%",
+        textAlign: "center"
+    },
+    follow: {
         fontSize: 15,
-        fontWeight: 'bold'
+        marginTop: "0%",
+        textAlign: "center"
     },
     profilePic: {
-        width: 80,
-        height: 80,
-        borderRadius: 40
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        marginRight: "10%",
+        marginLeft: "0%",
+        justifyContent: 'flex-start'
     },
     horizontalContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         paddingHorizontal: 15
     },
     unpaddedHorizontalContainer: {
@@ -301,12 +368,19 @@ const styles = StyleSheet.create({
     },
     unpaddedTagsHorizontalContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         paddingLeft: "5%",
         paddingTop: "0%"
     },
     subheading: {
         fontWeight: 'bold',
+    },
+    editHeadings: {
+        flexDirection: "row",
+        justifyContent: 'space-around'
+    },
+    spaceBox: {
+        flex: 0.01
     },
     btnPress: {
         color: 'black',
@@ -321,15 +395,15 @@ const styles = StyleSheet.create({
         height: 25,
         fontWeight: 'bold'
     },
-    editButtonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'flex-end'
-    },
-    detailsText: {
+    editText: {
         fontSize: 15,
-        color: 'blue',
         fontWeight: 'bold',
-        paddingHorizontal: 15
+        textAlign: "center"
+    },
+    editBorder: {
+        borderColor: "grey",
+        borderWidth: 1,
+        flex: 1
     },
     workoutHistName: {
         fontSize: 18,
@@ -372,7 +446,7 @@ const styles = StyleSheet.create({
         flexGrow: 1
     },
     savedContentContainer: {
-        height: 275
+        height: "55%"
     }
 });
 
