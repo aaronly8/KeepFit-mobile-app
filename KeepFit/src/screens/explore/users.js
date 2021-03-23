@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Button, FlatList, Text, View, ScrollView } from 'react-native';
-import  UserItem  from '../explore/useritem.js'
+//import  UserItem  from '../explore/useritem.js'
 import Container from '@app/components/container.js'
 import SearchInput from '@app/components/input.js'
 import { Header } from '@app/components/text.js';
 import db from "../../firebase/firebase";
-import User from "../../models/user"
+import User from "../../models/user";
+import Follows from '../../models/follows';
 import { useScrollToTop } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux';
 
 const DetailsScreen = props => {
     return (
@@ -26,73 +28,135 @@ const DetailsScreen = props => {
 };
 
 const SearchUsersScreen = props => {
-    const [users, setUsers] = useState('index');
-    const [filteredUsers, setFilteredUsers] = useState('index');
+    const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [followedUserIds, setFollowedUserIds] = useState([]);
     const [searchPhrase, setSearchPhrase] = useState("");
     const [displayedDetails, setDisplayedDetails] = useState(null);
 
-    const handleChange = e => {
+    const current_user_id = useSelector(state => state.auth.currentUserId);
+
+    // Get snapshot (dictionary : id -> Object) of all Users from db.
+    useEffect(() => {
+        var usersArray = [];
+       db.collection(User.collection_name).get().then(snapshot => {
+            snapshot.forEach(doc => {
+                if (doc.id !== current_user_id){ //ignore the current user
+                usersArray.push({id: doc.id, ...doc.data()})
+              }
+            });
+            setUsers(usersArray);
+            setFilteredUsers(usersArray);
+            console.log("snap: " + filteredUsers.length + " users grabbed.")
+        });
+    }, []);
+
+    // Create a list of userIDs followed by current user.
+   useEffect(() => {
+       var userIds = [];
+       db.collection(Follows.collection_name).where("follower_id", "==", current_user_id).get().then(function (snapshot) {
+           snapshot.forEach(doc => {
+               let id = doc.data()["followee_id"];
+               console.log("followed by user: " + id)
+               if (id !== current_user_id){
+                userIds.push(id);
+              }
+           })
+
+           setFollowedUserIds(userIds);
+           console.log("length of followed: " + Object.entries(userIds).length)
+       });
+   }, []);
+
+
+     const followUser = async(follower_user_id, followee_user_id) => {
+         await db.collection(Follows.collection_name).doc().set({
+             follower_id: follower_user_id,
+             followee_id: followee_user_id
+         }).then(() => {
+             followedUserIds.push(followee_user_id);
+             setFollowedUserIds([...followedUserIds]);
+         });
+     }
+
+     const unfollowUser = async(follower_user_id, followee_user_id) => {
+         await db.collection(Follows.collection_name).where("followee_id", "==", followee_user_id)
+         .where("follower_id", "==", follower_user_id).get().then(function(querySnapshot) {
+             querySnapshot.forEach(function(doc) {
+               doc.ref.delete();
+             });
+             followedUserIds.splice(followedUserIds.indexOf(followee_user_id, 1));
+             setFollowedUserIds([...followedUserIds]);
+         });
+     }
+
+
+    //update filteredUsers upon any change to the search field.
+    const handleChange = async (e) => {
+      console.log("e type:" + typeof e)
+      console.log("e: " + e)
+    //  console.log("e.target.value is: " + e.target.value)
+
       setSearchPhrase(e);
-      let oldList = users.map(user => {
-        return { userID: user[0]}
-      })
-      if (searchPhrase !== ""){
-        let newList = [];
-        newList = oldList.filter(user => user.name.includes(searchPhrase.toLowerCase()))
-        setFilteredUsers(newList);
+
+      if (e !== ""){
+          console.log("search phrase: " + {e})
+          // this works!
+        let filtered = [];
+        for (let user of users){
+          let name = user.full_name;
+          console.log("name: " + name)
+          if (name.toLowerCase().includes(e.toLowerCase()))
+            filtered.push(user);
+        }
+          setFilteredUsers(filtered);
       }
       else{
         setFilteredUsers(users);
       }
-
     }
-
-    // should be good.
-    useEffect(() => {
-        var usersDictionary = {};
-        db.collection(User.collection_name).get().then(snapshot => {
-            snapshot.forEach(doc => {
-                usersDictionary[doc.id] = doc.data();
-            });
-            setUsers(usersDictionary);
-            setFilteredUsers(usersDictionary);
-        });
-    }, []);
-
-    //Apply search filters
-    useEffect(() => {
-        var newFilteredUsers = {};
-
-        for(var user in filteredUsers) {
-            var userDetails = filteredUsers[user];
-            newFilteredUsers[user] = userDetails;
-        }
-        setFilteredUsers(newFilteredUsers);
-    }, []);
-    const detailsBackHandler = () => {
-        setDisplayedDetails(null);
-    };
+    const UserItem = ({user, followed}) => {
+          if (!followed) {
+              console.log("UserItem id: " + user.id)
+            //  console.log("user object: " + users[userID].full_name)
+              return (
+                  <View>
+                      <Text>
+                  {user.full_name}
+                      </Text>
+                      <Button title="Follow" onPress={() =>  followUser(current_user_id, user.id)} />
+                  </View>
+              )
+          }
+          else {
+              return (
+                  <View>
+                      <Text>
+                      {user.full_name}
+                      </Text>
+                      <Button title="Unfollow" onPress={() =>  unfollowUser(current_user_id, user.id)} />
+                  </View>
+              )
+          }
+      }
     return (
       <SafeAreaView style={styles.searchContainer}>
               {displayedDetails ? (
                   <DetailsScreen
                       userID={displayedDetails[0]}
-                      user={filteredUsers[displayedDetails[0]]}
+                      user={filteredUsers[0]}
                       detailsBackHandler={detailsBackHandler}
                   />
               ) : (
                 <View style={styles.listView}>
                     <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
                     <View style={styles.searchContainer}>
-                      <SearchInput value={searchPhrase} onChange={e => handleChange(e.target.value)} />
+                      <SearchInput value={searchPhrase} onChangeText={e => handleChange(e)} />
                    </View>
                     <View style={styles.scrollView}>
                         <ScrollView>
-                        {Object.entries(filteredUsers).map(user =>
-
-                          <UserItem setDisplayedDetails={setDisplayedDetails} object={user}>
-                            </UserItem>
-
+                        {filteredUsers.map(user =>
+                          <UserItem user={ user } followed={ followedUserIds.includes(user.id) }/>
                           )}
                         </ScrollView>
                       </View>
@@ -101,6 +165,7 @@ const SearchUsersScreen = props => {
       </SafeAreaView>
 
     )
+    console.log(filteredUsers);
 };
 
 const styles = StyleSheet.create({
