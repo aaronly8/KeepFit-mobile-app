@@ -30,6 +30,7 @@ import {
     makeRedirectUri,
     useAuthRequest,
 } from 'expo-auth-session';
+import * as Linking from 'expo-linking';
 
 import { zoomClientId, zoomClientSecret } from '@app/keys.js';
 
@@ -110,7 +111,7 @@ const CreateLivestreamsScreen = (props) => {
                     headers,
                 }
             );
-            return res.data.join_url;
+            return res.data;
         } catch (e) {
             console.error(e);
         }
@@ -133,9 +134,10 @@ const CreateLivestreamsScreen = (props) => {
 
     const createLivestream = async () => {
         const token = await getAccessToken();
-        const joinLink = await createMeeting(token);
+        const meeting = await createMeeting(token);
+        console.log(meeting);
         // uncomment for testing purposes without wasting API calls
-        // const joinLink =
+        // const meeting =
         //     (await getZoomUser(token)) ||
         //     'https://zoom.us';
 
@@ -144,7 +146,7 @@ const CreateLivestreamsScreen = (props) => {
             .collection(Livestream.collection_name)
             .doc()
             .set({
-                video_link: joinLink,
+                video_link: meeting.join_url,
                 user_id: current_user_id,
                 title: enteredTitle,
                 description: enteredDescription,
@@ -157,9 +159,11 @@ const CreateLivestreamsScreen = (props) => {
         setTitle('');
         setDescription('');
         props.changeScreenHandler('index');
-        Alert.alert('Success!', `Join at ${joinLink}!`, [
-            { text: 'Dismiss', style: 'cancel' },
-        ]);
+
+        Linking.openURL(meeting.start_url);
+        // Alert.alert('Success!', `Join at ${joinLink}!`, [
+        //     { text: 'Dismiss', style: 'cancel' },
+        // ]);
     };
 
     React.useEffect(() => {
