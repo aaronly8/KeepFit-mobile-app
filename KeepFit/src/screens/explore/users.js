@@ -9,6 +9,7 @@ import User from "../../models/user";
 import Follows from '../../models/follows';
 import { useScrollToTop } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
+import UserDetailsScreen from "./userDetails";
 
 const DetailsScreen = props => {
     return (
@@ -157,7 +158,7 @@ const SearchUsersScreen = props => {
     return (
         <SafeAreaView style={styles.searchContainer}>
             {displayedDetails ? (
-                <DetailsScreen
+                <UserDetailsScreen
                     userID={displayedDetails[0]}
                     user={displayedDetails}
                     detailsBackHandler={detailsBackHandler}
