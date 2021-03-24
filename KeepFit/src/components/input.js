@@ -10,7 +10,7 @@ const Input = props => {
 const SearchInput = ({value, handleChange}) => {
     return (
         <div>
-          <input value={value} onChange={handleChange} />
+          <TextInput {...props} value={value} onChange={handleChange} />
         </div>
     );
 };
