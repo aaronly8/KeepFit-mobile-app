@@ -7,8 +7,23 @@ const Input = props => {
     );
 };
 
+const SearchInput = ({value, handleChange}) => {
+    return (
+        <div>
+          <TextInput {...props} value={value} onChange={handleChange} />
+        </div>
+    );
+};
+
+
 const styles = StyleSheet.create({
     input: {
+        height: 30,
+        borderBottomColor: 'grey',
+        borderBottomWidth: 1,
+        marginVertical: 10
+    },
+    searchInput: {
         height: 30,
         borderBottomColor: 'grey',
         borderBottomWidth: 1,
@@ -17,3 +32,4 @@ const styles = StyleSheet.create({
 });
 
 export default Input;
+export { SearchInput} ;
