@@ -29,6 +29,7 @@
         "expo-updates": "~0.4.0",
         "expo-web-browser": "~8.6.0",
         "firebase": "7.9.0",
+        "firebase-admin": "^9.5.0",
         "react": "16.13.1",
         "react-dom": "16.13.1",
         "react-native": "~0.63.4",
@@ -47,6 +48,7 @@
         "@babel/core": "~7.9.0",
         "babel-jest": "~25.2.6",
         "babel-plugin-module-resolver": "^4.1.0",
+        "firestore-jest-mock": "^0.10.0",
         "identity-obj-proxy": "^3.0.0",
         "jest": "~25.2.6",
         "jest-expo": "^40.0.2",
@@ -55,7 +57,7 @@
     "jest": {
         "preset": "jest-expo",
         "transformIgnorePatterns": [
-            "node_modules/(?!(jest-)?react-native|@react-native-picker|react-clone-referenced-element|@react-native-community|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|@sentry/.*)"
+            "node_modules/(?!(jest-)?react-native|@react-native-picker|react-clone-referenced-element|@react-native-community|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|@expo/vector-icons|native-base|@sentry/.*)"
         ],
         "timers": "fake",
         "testEnvironment": "jsdom",

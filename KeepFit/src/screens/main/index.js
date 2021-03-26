@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button, SafeAreaView, StyleSheet } from 'react-native'
-import { FontAwesome5 } from "@expo/vector-icons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import Container from '@app/components/container.js'
 import Text, { Header, Subheader } from '@app/components/text.js'

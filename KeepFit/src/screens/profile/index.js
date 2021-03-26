@@ -6,7 +6,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser, updateSavedExercises, updateLikedVideos } from "../../redux/actions/auth.js";
 import UserDataScreen from './userData'
 import Text from '@app/components/text.js';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import CardioPicture from "../../assets/cardio.jpeg";
 import StrengthPicture from "../../assets/strength.jpeg";
 import BodyweightPicture from "../../assets/bodyweight.jpeg";
