@@ -9,6 +9,10 @@ import Text from '@app/components/text.js';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import CardioPicture from "../../assets/cardio.jpeg";
 import StrengthPicture from "../../assets/strength.jpeg";
+import BodyweightPicture from "../../assets/bodyweight.jpeg";
+import WeightliftPicture from "../../assets/weightlift.jpeg";
+import HybridPicture from "../../assets/hybrid.jpeg";
+import HiitPicture from "../../assets/hiit.jpeg";
 import EditProfileScreen from './EditProfileScreen';
 import SavedExercise from "../../models/saved_exercise";
 import { useEffect } from 'react';
@@ -88,22 +92,22 @@ const ProfileScreen = props => {
                 />
             case 'BODYWEIGHT':
                 return <Image
-                    source={require('../../assets/bodyweight.jpeg')} style={styles.image}
+                    source={BodyweightPicture} style={styles.image}
                     style={styles.workoutPic}
                 />
             case 'HIIT':
                 return <Image
-                    source={require('../../assets/hiit.jpeg')} style={styles.image}
+                    source={HiitPicture} style={styles.image}
                     style={styles.workoutPic}
                 />
             case 'WEIGHTLIFTING':
                 return <Image
-                    source={require('../../assets/weightlift.jpeg')} style={styles.image}
+                    source={WeightliftPicture} style={styles.image}
                     style={styles.workoutPic}
                 />
             default:
                 return <Image
-                    source={require('../../assets/hybrid.jpeg')} style={styles.image}
+                    source={HybridPicture} style={styles.image}
                     style={styles.workoutPic}
                 />
         }
