@@ -12,6 +12,26 @@ import { updateSavedExercises } from "../../redux/actions/auth.js";
 import db from '../../firebase/firebase';
 import SavedExercise from '../../models/saved_exercise';
 
+export const caloriesCalculator = (elapsedTime, category, weight) => {
+    var MET;
+    if (!category) {
+        return "N/A";
+    } else if (category == "CARDIO") {
+        MET = 7;
+    } else if (category == "BODYWEIGHT") {
+        MET = 6;
+    } else if (category == "WEIGHTLIFTING") {
+        MET = 3;
+    } else if (category == "HIIT") {
+        MET = 9;
+    } else if (category == "HYBRID") {
+        MET = 5;
+    }
+    var minutes = elapsedTime / 60;
+    var calories = (minutes * (MET * 3.5 * weight * 0.453592)) / 200;
+    return Math.floor(calories);
+};
+
 const TrackScreen = props => {
     const current_user_id = useSelector(state => state.auth.currentUserId);
     const user_profile = useSelector(state => state.auth.currentUser);
@@ -41,24 +61,8 @@ const TrackScreen = props => {
     };
 
     const caloriesHandler = (category) => {
-        var MET;
-        if (!category) {
-            setCaloriesBurned("N/A");
-            return;
-        } else if (category == "CARDIO") {
-            MET = 7;
-        } else if (category == "BODYWEIGHT") {
-            MET = 6;
-        } else if (category == "WEIGHTLIFTING") {
-            MET = 3;
-        } else if (category == "HIIT") {
-            MET = 9;
-        } else if (category == "HYBRID") {
-            MET = 5;
-        }
-        var minutes = elapsedTime / 60;
-        var calories = (minutes * (MET * 3.5 * user_profile.weight * 0.453592)) / 200;
-        setCaloriesBurned(Math.floor(calories));
+        const calories = caloriesCalculator(elapsedTime, category, user_profile.weight);
+        setCaloriesBurned(calories);
     };
 
     const lastStartHandler = () => {
@@ -138,7 +142,8 @@ const TrackScreen = props => {
                             caloriesHandler(enteredWorkoutCategory);
                         }
                         setResetStopwatch(false);
-                    }}>
+                    }}
+                    testID={!isStopwatchStart ? 'startButton' : 'stopButton'}>
                     <Text style={styles.buttonText}>
                         {!isStopwatchStart ? 'START' : 'STOP'}
                     </Text>
@@ -183,7 +188,7 @@ const TrackScreen = props => {
                     />
                     <Text style={styles.caloriesHeader}>Calories Burned: {caloriesBurned}</Text>
                 </View>
-                <TouchableOpacity onPress={() => saveHandler()}>
+                <TouchableOpacity onPress={() => saveHandler()} testID="saveButton">
                     <Text style={styles.saveButton}>SAVE</Text>
                 </TouchableOpacity>
             </View>
