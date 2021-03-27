@@ -10,6 +10,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { FontAwesome5 } from "@expo/vector-icons";
 import { createUser, loginUser, logoutUser } from "../src/redux/actions/auth"
 import { rootReducer } from "../src/redux/store";
+import RootStackNavigator from "../src/navigation/RootStackNavigator";
 const { mockWhere } = require('firestore-jest-mock/mocks/firestore');
 
 
@@ -74,6 +75,64 @@ describe('Create User Input Validation', () => {
         fireEvent.changeText(getByTestId('weightInput'), "2f5");
 
         expect(getByTestId('weightInput').props.value).toEqual('25');
+    });
+});
+
+describe('Ensuring Proper Auth Rendering Based on Redux State', () => {
+    const initialState = {
+        auth: {
+            loggedIn: true,
+            savedExercises: null,
+            creatingUser: false,
+            currentUserId: "1",
+            currentUser: { "full_name": 'Sajan Gutta' },
+            likedVideos: null,
+            videoDatas: null
+        }
+    }
+    const mockStore = configureStore()
+    let store, wrapper
+
+    it('if creating user, create user screen is shown', () => {
+        const thisInitialState = {
+            auth: {
+                loggedIn: false,
+                savedExercises: null,
+                creatingUser: true,
+                currentUserId: "1",
+                currentUser: { "full_name": 'Sajan Gutta' },
+                likedVideos: null,
+                videoDatas: null
+            }
+        }
+
+        store = mockStore(thisInitialState)
+
+        const { getByTestId, getByText } = render(<Provider store={store}><RootStackNavigator /></Provider>);
+        
+        // this raises an error if text is not present, test will fail
+        expect(getByText("Welcome to KeepFit!"));
+    });
+
+    it('if not creating user, not logged in, login screen is shown', () => {
+        const thisInitialState = {
+            auth: {
+                loggedIn: false,
+                savedExercises: null,
+                creatingUser: false,
+                currentUserId: null,
+                currentUser: null,
+                likedVideos: null,
+                videoDatas: null
+            }
+        }
+
+        store = mockStore(thisInitialState)
+
+        const { UNSAFE_getByType } = render(<Provider store={store}><RootStackNavigator /></Provider>);
+        
+        // this raises an error if the google login button is not present, test will fail
+        expect(UNSAFE_getByType(FontAwesome5.Button));
     });
 });
 
