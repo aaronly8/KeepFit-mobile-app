@@ -22,4 +22,6 @@ mockFirebase({
   },
 });
 
+
+
 jest.mock('@expo/vector-icons');
