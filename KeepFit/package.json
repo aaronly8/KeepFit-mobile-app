@@ -16,7 +16,10 @@
         "@react-navigation/native": "^5.9.3",
         "@react-navigation/stack": "^5.14.3",
         "@reduxjs/toolkit": "^1.5.0",
+        "@testing-library/react-native": "^7.2.0",
         "axios": "^0.21.1",
+        "enzyme": "^3.11.0",
+        "enzyme-adapter-react-16": "^1.15.6",
         "expo": "^40.0.1",
         "expo-auth-session": "~3.0.0",
         "expo-font": "~8.4.0",
@@ -52,7 +55,8 @@
         "identity-obj-proxy": "^3.0.0",
         "jest": "~25.2.6",
         "jest-expo": "^40.0.2",
-        "react-test-renderer": "^16.13.1"
+        "react-test-renderer": "^16.13.1",
+        "redux-mock-store": "^1.5.4"
     },
     "jest": {
         "preset": "jest-expo",

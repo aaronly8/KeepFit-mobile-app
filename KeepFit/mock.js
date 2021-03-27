@@ -12,10 +12,13 @@ const { mockFirebase } = require('firestore-jest-mock');
 mockFirebase({
   database: {
     users: [
-      { id: 'abc123', name: 'Homer Simpson' },
-      { id: 'abc456', name: 'Lisa Simpson' },
-    ],
-    posts: [{ id: '123abc', title: 'Really cool title' }],
+      { id: '1', full_name: 'Sajan Gutta', username: "sjgutta" },
+      { id: '2', full_name: 'Max Friedman', username: "maxfriedman" },
+      { id: '3', full_name: 'Victor Udobong', username: "victorudobong" },
+      { id: '4', full_name: 'Aaron Ly', username: "aaronly" },
+      { id: '5', full_name: 'Devin Mui', username: "devinmui" },
+      { id: '6', full_name: 'Roddur Dasgupta', username: "roddurdasgupta" },
+    ]
   },
 });
 

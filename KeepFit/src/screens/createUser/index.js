@@ -64,7 +64,6 @@ const CreateUserScreen = props => {
         }
         let username = enteredUsername.toLowerCase();
         db.collection(User.collection_name).where("username", "==", username).get().then(function (snapshot) {
-            console.log("complete")
             if (!snapshot.empty) {
                 Alert.alert('Error', 'A user already exists with that username!', [
                     { text: 'Dismiss', style: 'cancel' }
@@ -103,16 +102,17 @@ const CreateUserScreen = props => {
                     keyboardType="default"
                     onChangeText={usernameInputHandler}
                     value={enteredUsername}
+                    testID="usernameInput"
                 />
                 <Text style={styles.inputHeader}>Birthday:</Text>
                     <DateTimePicker
-                        testID="dateTimePicker"
                         value={enteredBirthday}
                         maximumDate={Date.parse(new Date())}
                         mode="date"
                         display="default"
                         onChange={birthdayInputHandler}
                         style={styles.dateTimePicker}
+                        testID="birthdayInput"
                     />
                 <Text style={styles.inputHeader}>Height (Inches):</Text>
                 <Input style={styles.input}
@@ -123,6 +123,7 @@ const CreateUserScreen = props => {
                     maxLength={2}
                     onChangeText={heightInputHandler}
                     value={enteredHeight}
+                    testID="heightInput"
                 />
                 <Text style={styles.inputHeader}>Weight (pounds):</Text>
                 <Input style={styles.input}
@@ -133,6 +134,7 @@ const CreateUserScreen = props => {
                     maxLength={3}
                     onChangeText={weightInputHandler}
                     value={enteredWeight}
+                    testID="weightInput"
                 />
                 <View>
                     <Text style={styles.inputHeader}>Gender:</Text>
@@ -140,15 +142,17 @@ const CreateUserScreen = props => {
                         selectedValue={enteredGender}
                         onValueChange={genderInputHandler}
                         style={styles.picker}
+                        testID="genderInput"
                     />
                     <Text style={styles.inputHeader}>Fitness Level:</Text>
                     <FitnessLevelPicker
                         selectedValue={enteredFitnessLevel}
                         onValueChange={fitnessLevelInputHandler}
                         style={styles.picker}
+                        testID="fitnessInput"
                     />
                 </View>
-                <Button title="Create" onPress={() => { finishCreateHandler(currentUserId, currentUser) }} />
+                <Button title="Create" testID="createButton" onPress={() => { finishCreateHandler(currentUserId, currentUser) }} />
             </SafeAreaView>
         </TouchableWithoutFeedback>
     );
