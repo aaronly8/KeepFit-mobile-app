@@ -15,10 +15,10 @@ const Tag = props => {
     );
 };
 
-const DetailsScreen = props => {
+export const DetailsScreen = props => {
     return (
         <SafeAreaView>
-            <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
+            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton' />
             <Header style={styles.exerciseName}>
                 {props.exercise.name}
             </Header>
@@ -62,7 +62,6 @@ const SearchExercisesScreen = props => {
     //Apply filters
     useEffect(() => {
         var newFilteredExerciseDictionary = {};
-
         for(var exercise in exerciseDictionary) {
             var exerciseDetails = exerciseDictionary[exercise];
             var filterFlag1 = false, filterFlag2 = false, filterFlag3 = false;
@@ -111,7 +110,7 @@ const SearchExercisesScreen = props => {
                     />
                 ) : (
                 <View style={styles.listView}>
-                    <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
+                    <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton' />
                     <View style={styles.filterContainer}>
                         <MuscleGroupPicker onValueChange={value => {
                             setMuscleGroupFilter1(value);

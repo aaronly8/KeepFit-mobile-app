@@ -14,10 +14,10 @@ const Tag = props => {
     );
 };
 
-const DetailsScreen = props => {
+export const DetailsScreen = props => {
     return (
         <SafeAreaView>
-            <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
+            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton'/>
             <Header style={styles.livestreamName}>
                 {props.livestream.title}
             </Header>

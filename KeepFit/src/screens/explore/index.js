@@ -17,11 +17,11 @@ const ExploreScreen = props => {
 
     let visibleContent;
     if (displayedScreen == "exercises") {
-        visibleContent = <SearchExercisesScreen changeScreenHandler={changeScreenHandler} />
+        visibleContent = <SearchExercisesScreen changeScreenHandler={changeScreenHandler} testID="searchExerciseScreen"/>
     } else if (displayedScreen == "workouts") {
-        visibleContent = <SearchWorkoutsScreen changeScreenHandler={changeScreenHandler} />
+        visibleContent = <SearchWorkoutsScreen changeScreenHandler={changeScreenHandler} testID="searchWorkoutScreen"/>
     } else if (displayedScreen == "livestreams") {
-        visibleContent = <SearchLivestreamsScreen changeScreenHandler={changeScreenHandler} />
+        visibleContent = <SearchLivestreamsScreen changeScreenHandler={changeScreenHandler} testID="searchLivestreamScreen"/>
     } else if (displayedScreen == "users") {
         visibleContent = <SearchUsersScreen changeScreenHandler={changeScreenHandler} />
     } 
@@ -33,9 +33,9 @@ const ExploreScreen = props => {
                         <Header style={styles.mainHeader}>
                             Welcome to the Explore Screen!
                         </Header>
-                        <Button onPress={() => changeScreenHandler("exercises")} title="Search Exercises" />
-                        <Button onPress={() => changeScreenHandler("workouts")} title="Search Workout Videos" />
-                        <Button onPress={() => changeScreenHandler("livestreams")} title="Search Livestreams" />
+                        <Button onPress={() => changeScreenHandler("exercises")} title="Search Exercises" testID = 'exercisesButton'/>
+                        <Button onPress={() => changeScreenHandler("workouts")} title="Search Workout Videos" testID = 'workoutsButton'/>
+                        <Button onPress={() => changeScreenHandler("livestreams")} title="Search Livestreams" testID = 'livestreamsButton'/>
                         <Button onPress={() => changeScreenHandler("users")} title="Search Users" />
                     </Container>
                 ) : (
