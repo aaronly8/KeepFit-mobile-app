@@ -19,6 +19,40 @@ afterEach(() => {
     jest.clearAllMocks();
 });
 
+describe('Upload Video Tests', () => {
+    const likedVideo = {
+        id: "1",
+        title: "liked vid 1",
+        description: "sample description"
+    }
+    const initialState = {
+        auth: {
+            loggedIn: true,
+            savedExercises: null,
+            creatingUser: false,
+            currentUserId: "2",
+            currentUser: { "full_name": 'Max Friedman' },
+            likedVideos: {"1": likedVideo},
+            videoDatas: null
+        }
+    }
+    
+    const mockStore = configureStore()
+    let store
+
+    // WORKOUTS
+    it('Video upload reflects on SearchWorkoutsScreen', async () => {
+        store = mockStore(initialState)
+
+        act(() => {
+            const useEffect_spy = jest.spyOn(React, 'useEffect');
+            const { getByTestId } = render(<Provider store={store}><SearchWorkoutsScreen /></Provider>);
+            fireEvent.press(getByTestId('workoutsButton'));
+            expect(useEffect_spy).toHaveBeenCalledTimes(2);
+        });
+    });
+});
+
 describe('Create Video Input Validation', () => {
     const mockStore = configureStore();
 
