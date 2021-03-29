@@ -15,12 +15,12 @@ const DetailsScreen = props => {
     return (
         <SafeAreaView>
             <Container>
-                <Button title="<< Back" onPress={() => props.changeScreenHandler("index")}  testID='backButton'/>
+                <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
                 <Header style={styles.mainHeader}>
                     {props.user.full_name}'s Profile
                 </Header>
             </Container>
-            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton' />
+            <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
             <Header style={styles.mainHeader}>
                 Some info.
             </Header>
@@ -86,7 +86,7 @@ const SearchUsersScreen = props => {
                         <Text style={styles.userItemName}>
                             {user.full_name}
                         </Text>
-                        <Button title="Follow" onPress={() => followUser(current_user_id, user.id)} />
+                        <Button title="Follow" testID="followUser" onPress={() => followUser(current_user_id, user.id)} />
                     </View>
                 </TouchableOpacity>
             )
@@ -101,7 +101,7 @@ const SearchUsersScreen = props => {
                         <Text style={styles.userItemName}>
                             {user.full_name}
                         </Text>
-                        <Button title="Unfollow" onPress={() => unfollowUser(current_user_id, user.id)} />
+                        <Button title="Unfollow" testID="unfollowUser" onPress={() => unfollowUser(current_user_id, user.id)} />
                     </View>
                 </TouchableOpacity>
             )
@@ -166,12 +166,12 @@ const SearchUsersScreen = props => {
                 />
             ) : (
                     <View style={styles.listView}>
-                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton' />
+                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
                         <View style={styles.searchHeaderContainer}>
                             <Text style={styles.searchHeader}>Search by Name:</Text>
                         </View>
                         <View style={styles.searchContainer}>
-                            <SearchInput value={searchPhrase} onChangeText={e => handleChange(e)} />
+                            <SearchInput testID='searchBar' value={searchPhrase} onChangeText={e => handleChange(e)} />
                         </View>
                         <View style={styles.scrollView}>
                             <ScrollView>
