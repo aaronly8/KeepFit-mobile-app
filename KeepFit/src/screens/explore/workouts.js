@@ -18,7 +18,7 @@ const Tag = props => {
     );
 };
 
-const DetailsScreen = props => {
+export const DetailsScreen = props => {
     const likedVideoData = useSelector(state => state.auth.likedVideos);
     const current_user_id = useSelector(state => state.auth.currentUserId);
 
@@ -65,18 +65,18 @@ const DetailsScreen = props => {
 
     let likeBtn;
     if (likedVideoData && props.workoutID in likedVideoData) {
-        likeBtn = <TouchableOpacity onPress={() => unLikeVideo()}>
+        likeBtn = <TouchableOpacity testID="likeBtn" onPress={() => unLikeVideo()}>
             <Tag style={styles.likedBtn} value="Liked" />
         </TouchableOpacity>
     } else {
-        likeBtn = <TouchableOpacity onPress={() => likeVideo()}>
+        likeBtn = <TouchableOpacity testID="likeBtn" onPress={() => likeVideo()}>
             <Tag style={styles.likeBtn} value="Like" />
         </TouchableOpacity>
     }
 
     return (
         <SafeAreaView>
-            <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
+            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton'/>
             <Header style={styles.workoutName}>
                 {props.workout.title}
             </Header>
@@ -198,7 +198,7 @@ const SearchWorkoutsScreen = props => {
                 />
             ) : (
                     <View style={styles.listView}>
-                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
+                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton'/>
                         <View style={styles.filterContainer}>
                             <MuscleGroupPicker onValueChange={value => {
                                 setMuscleGroupFilter1(value);

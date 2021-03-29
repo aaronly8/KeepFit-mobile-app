@@ -108,7 +108,7 @@ const SearchLivestreamsScreen = props => {
                     />
                 ) : (
                 <View style={styles.listView}>
-                    <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
+                    <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton'/>
                     <View style={styles.filterContainer}>
                         <MuscleGroupPicker onValueChange={value => {
                             setMuscleGroupFilter1(value);

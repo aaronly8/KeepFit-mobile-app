@@ -8,7 +8,7 @@ import { Alert } from 'react-native'
 import { FitnessLevelPicker, GenderPicker } from "../src/components/pickers";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { FontAwesome5 } from "@expo/vector-icons";
-import { createUser, loginUser, logoutUser } from "../src/redux/actions/auth"
+import { createUser, loginUser, logoutUser, updateSavedExercises, updateLikedVideos } from "../src/redux/actions/auth"
 import { rootReducer } from "../src/redux/store";
 import RootStackNavigator from "../src/navigation/RootStackNavigator";
 const { mockWhere } = require('firestore-jest-mock/mocks/firestore');
@@ -221,5 +221,49 @@ describe('Login Button Triggers Redux Login and auth reducers work properly', ()
         expect(new_state.auth.creatingUser).toEqual(true);
         expect(new_state.auth.currentUserId).toEqual(user_id);
         expect(new_state.auth.currentUser).toEqual(user_object);
+    });
+
+    it('testing updateSavedExercises reducer', () => {
+        const saved_exercises = [
+            {
+                category: "CARDIO",
+                caloriesBurned: "25"
+            },
+            {
+                category: "HIIT",
+                caloriesBurned: "20"
+            }
+        ]
+
+        const action = updateSavedExercises(saved_exercises);
+
+        const new_state = rootReducer(state=initialState, action)
+
+        expect(new_state.auth.savedExercises).toEqual(saved_exercises);
+    });
+
+    it('testing updateLikedVideos reducer', () => {
+        const likedVideoData = [
+            {
+                id: "1",
+                title: "test1"
+            },
+            {
+                id: "2",
+                title: "test2"
+            }
+        ]
+
+        const likedVideoDictionary = {
+            "1": likedVideoData[0],
+            "2": likedVideoData[1]
+        }
+
+        const action = updateLikedVideos(likedVideoDictionary, likedVideoData);
+
+        const new_state = rootReducer(state=initialState, action)
+
+        expect(new_state.auth.likedVideos).toEqual(likedVideoDictionary);
+        expect(new_state.auth.videoDatas).toEqual(likedVideoData);
     });
 });
