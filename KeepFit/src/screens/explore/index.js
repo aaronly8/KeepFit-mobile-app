@@ -24,7 +24,7 @@ const ExploreScreen = props => {
         visibleContent = <SearchLivestreamsScreen changeScreenHandler={changeScreenHandler} testID="searchLivestreamScreen"/>
     } else if (displayedScreen == "users") {
         visibleContent = <SearchUsersScreen changeScreenHandler={changeScreenHandler} />
-    } 
+    }
 
     return (
         <SafeAreaView>
@@ -36,7 +36,7 @@ const ExploreScreen = props => {
                         <Button onPress={() => changeScreenHandler("exercises")} title="Search Exercises" testID = 'exercisesButton'/>
                         <Button onPress={() => changeScreenHandler("workouts")} title="Search Workout Videos" testID = 'workoutsButton'/>
                         <Button onPress={() => changeScreenHandler("livestreams")} title="Search Livestreams" testID = 'livestreamsButton'/>
-                        <Button onPress={() => changeScreenHandler("users")} title="Search Users" />
+                        <Button onPress={() => changeScreenHandler("users")} title="Search Users" testID = 'usersButton'/>
                     </Container>
                 ) : (
                     visibleContent)}

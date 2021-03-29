@@ -2,6 +2,7 @@ import ExploreScreen from "../src/screens/explore/index"
 import SearchExercisesScreen from "../src/screens/explore/exercises"
 import SearchLivestreamsScreen, { DetailsScreen } from "../src/screens/explore/livestreams"
 import SearchWorkoutsScreen from "../src/screens/explore/workouts"
+import SearchUsersScreen from "../src/screens/explore/users"
 import { render, fireEvent, screen } from '@testing-library/react-native';
 import React, { useEffect } from 'react';
 import { act } from 'react-dom/test-utils';
@@ -27,6 +28,7 @@ describe('Explore Screen Tests', () => {
     const mockStore = configureStore()
     let store
 
+    // EXERCISES
     it('SearchExercisesScreen loads properly ', async () => {
         act(() => {
             const useEffect_spy = jest.spyOn(React, 'useEffect');
@@ -35,6 +37,7 @@ describe('Explore Screen Tests', () => {
             expect(useEffect_spy).toHaveBeenCalledTimes(2);
         });
     });
+    // LIVESTREAM
 
     it('SearchLivestreamsScreen loads properly', async () => {
         act(() => {
@@ -45,18 +48,34 @@ describe('Explore Screen Tests', () => {
         });
     });
 
+    // WORKOUTS
     it('SearchWorkoutsScreen loads properly', async () => {
         store = mockStore(initialState)
 
         act(() => {
             const useEffect_spy = jest.spyOn(React, 'useEffect');
-            const { getByTestId } = render(<Provider store={store}><ExploreScreen /></Provider>);    
+            const { getByTestId } = render(<Provider store={store}><ExploreScreen /></Provider>);
             fireEvent.press(getByTestId('workoutsButton'));
             expect(useEffect_spy).toHaveBeenCalledTimes(6);
         });
     });
 
-    it('Return to explore index screen correctly', () => {
+    // USERS
+    it('SearchUsersScreen loads properly', async () => {
+      store = mockStore(initialState)
+        act(() => {
+            const useEffect_spy = jest.spyOn(React, 'useEffect');
+            const { getByTestId } = render(<Provider store={store}><ExploreScreen /></Provider>);
+            fireEvent.press(getByTestId('usersButton'));
+            expect(useEffect_spy).toHaveBeenCalledTimes(8);
+        });
+    });
+
+
+
+
+
+    it('Return from exercises to search screen correctly', () => {
         act(() => {
             const mockBackButton = jest.fn();
             const { getByTestId } = render(<SearchExercisesScreen changeScreenHandler={mockBackButton} />);
@@ -65,7 +84,7 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    it('Return to search screen correctly', () => {
+    it('Return from livestreams to search screen correctly', () => {
         const livestream = {
             title: "test",
             video_link: "test.com",
@@ -82,13 +101,17 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    // it('Filters run when picker value is changed', () => {        
-    //     act(() => {
-    //         const useEffect_spy = jest.spyOn(React, 'useEffect');
-    //         const { getByTestId, UNSAFE_getByType } = render(<SearchExercisesScreen />);
-    //         expect(useEffect_spy).toHaveBeenCalledTimes(8);
-    //         fireEvent(UNSAFE_getByType(WorkoutCategoryPicker), 'onValueChange', "CARDIO");
-    //         expect(useEffect_spy).toHaveBeenCalledTimes(9);
-    //     });
-    // });
+    it('Return from users to search screen correctly', () => {
+        store = mockStore(initialState)
+        act(() => {
+            const mockBackButton = jest.fn();
+            const { getByTestId } = render(
+              <Provider store={store}>
+              <SearchUsersScreen changeScreenHandler={mockBackButton} detailsBackHandler={mockBackButton}/>
+              </Provider>);
+            fireEvent.press(getByTestId('backButton'));
+            expect(mockBackButton).toHaveBeenCalledTimes(1);
+        });
+    });
+
 });

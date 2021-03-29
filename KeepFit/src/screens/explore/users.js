@@ -15,12 +15,12 @@ const DetailsScreen = props => {
     return (
         <SafeAreaView>
             <Container>
-                <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
+                <Button title="<< Back" onPress={() => props.changeScreenHandler("index")}  testID='backButton'/>
                 <Header style={styles.mainHeader}>
                     {props.user.full_name}'s Profile
                 </Header>
             </Container>
-            <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
+            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton' />
             <Header style={styles.mainHeader}>
                 Some info.
             </Header>
@@ -166,7 +166,7 @@ const SearchUsersScreen = props => {
                 />
             ) : (
                     <View style={styles.listView}>
-                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} />
+                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton' />
                         <View style={styles.searchHeaderContainer}>
                             <Text style={styles.searchHeader}>Search by Name:</Text>
                         </View>
