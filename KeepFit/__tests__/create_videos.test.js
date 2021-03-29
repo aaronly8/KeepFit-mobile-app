@@ -10,7 +10,7 @@ import {
 import CreateVideosScreen from '../src/screens/create/video';
 import SearchWorkoutsScreen from '../src/screens/explore/workouts';
 import RootStackNavigator from "../src/navigation/RootStackNavigator";
-
+import { act } from 'react-dom/test-utils';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 const { mockWhere } = require('firestore-jest-mock/mocks/firestore');
 import configureStore from 'redux-mock-store';
@@ -19,41 +19,8 @@ afterEach(() => {
     jest.clearAllMocks();
 });
 
-describe('Upload Video Tests', () => {
-    const likedVideo = {
-        id: "1",
-        title: "liked vid 1",
-        description: "sample description"
-    }
-    const initialState = {
-        auth: {
-            loggedIn: true,
-            savedExercises: null,
-            creatingUser: false,
-            currentUserId: "2",
-            currentUser: { "full_name": 'Max Friedman' },
-            likedVideos: {"1": likedVideo},
-            videoDatas: null
-        }
-    }
-    
-    const mockStore = configureStore()
-    let store
 
-    // WORKOUTS
-    it('Video upload reflects on SearchWorkoutsScreen', async () => {
-        store = mockStore(initialState)
-
-        act(() => {
-            const useEffect_spy = jest.spyOn(React, 'useEffect');
-            const { getByTestId } = render(<Provider store={store}><SearchWorkoutsScreen /></Provider>);
-            fireEvent.press(getByTestId('workoutsButton'));
-            expect(useEffect_spy).toHaveBeenCalledTimes(2);
-        });
-    });
-});
-
-describe('Create Video Input Validation', () => {
+describe('Create Video Input Tests', () => {
     const mockStore = configureStore();
 
     it('If title input is empty, save fails and alert is called', async () => {
@@ -90,7 +57,9 @@ describe('Create Video Input Validation', () => {
         );
         await fireEvent.press(getByTestId('submitButton'));
 
-        return expect(alert_spy).toHaveBeenCalled();
+        return expect(alert_spy).toHaveBeenCalledWith('Error', 'You must fill out all fields except secondary muscle group.', [
+            { text: 'Dismiss', style: 'cancel' }
+        ]);
     });
 
     it('If description input is empty, save fails and alert is called', async () => {
@@ -124,7 +93,9 @@ describe('Create Video Input Validation', () => {
         );
         await fireEvent.press(getByTestId('submitButton'));
 
-        return expect(alert_spy).toHaveBeenCalled();
+        return expect(alert_spy).toHaveBeenCalledWith('Error', 'You must fill out all fields except secondary muscle group.', [
+            { text: 'Dismiss', style: 'cancel' }
+        ]);
     });
 
     it('If workout category input is empty, save fails and alert is called', async () => {
@@ -157,7 +128,9 @@ describe('Create Video Input Validation', () => {
         );
         await fireEvent.press(getByTestId('submitButton'));
 
-        return expect(alert_spy).toHaveBeenCalled();
+        return expect(alert_spy).toHaveBeenCalledWith('Error', 'You must fill out all fields except secondary muscle group.', [
+            { text: 'Dismiss', style: 'cancel' }
+        ]);
     });
 
     it('If primary muscle group input is empty, save fails and alert is called', async () => {
@@ -190,7 +163,9 @@ describe('Create Video Input Validation', () => {
         );
         await fireEvent.press(getByTestId('submitButton'));
 
-        return expect(alert_spy).toHaveBeenCalled();
+        return expect(alert_spy).toHaveBeenCalledWith('Error', 'You must fill out all fields except secondary muscle group.', [
+            { text: 'Dismiss', style: 'cancel' }
+        ]);
     });
 
     it('If all inputs are valid, no alert is shown', async () => {
@@ -228,6 +203,8 @@ describe('Create Video Input Validation', () => {
         );
         await fireEvent.press(getByTestId('submitButton'));
 
-        return expect(alert_spy).not.toHaveBeenCalled();
+        return expect(alert_spy).toHaveBeenCalledWith('Error', 'You must select a video', [
+            { text: 'Dismiss', style: 'cancel' }
+        ]);
     });
 });

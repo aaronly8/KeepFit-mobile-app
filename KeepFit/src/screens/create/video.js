@@ -40,14 +40,14 @@ const CreateVideosScreen = props => {
     };
 
     const uploadHandler = async () => {
-        if (!selectedVideo) {
-            Alert.alert('Error', 'You must select a video', [
+        if (!enteredTitle || !enteredWorkoutCategory || !enteredMuscleGroup || !enteredDescription) {
+            Alert.alert('Error', 'You must fill out all fields except secondary muscle group.', [
                 { text: 'Dismiss', style: 'cancel' }
             ]);
             return;
         }
-        if (!enteredTitle || !enteredWorkoutCategory || !enteredMuscleGroup || !enteredDescription) {
-            Alert.alert('Error', 'You must fill out all fields except secondary muscle group.', [
+        if (!selectedVideo) {
+            Alert.alert('Error', 'You must select a video', [
                 { text: 'Dismiss', style: 'cancel' }
             ]);
             return;
@@ -100,7 +100,7 @@ const CreateVideosScreen = props => {
         });
     };
 
-    let selectContent = <Button title="Select a Video" onPress={() => selectVideoHandler()} />
+    let selectContent = <Button title="Select a Video" testID="selectButton" onPress={() => selectVideoHandler()} />
     if (selectedVideo) {
         selectContent = <Button title="Clear Selected Video" onPress={() => setSelectedVideo(null)} />;
     }
@@ -124,6 +124,7 @@ const CreateVideosScreen = props => {
                     keyboardType="default"
                     onChangeText={titleInputHandler}
                     value={enteredTitle}
+                    testID="titleInput"
                 />
                 <Text style={styles.inputHeader}>Short Description (255 max):</Text>
                 <Input style={styles.input}
@@ -134,6 +135,7 @@ const CreateVideosScreen = props => {
                     keyboardType="default"
                     onChangeText={descriptionInputHandler}
                     value={enteredDescription}
+                    testID="descriptionInput"
                 />
                 <View>
                     <Text style={styles.inputHeader}>Workout Category:</Text>
@@ -155,7 +157,7 @@ const CreateVideosScreen = props => {
                         style={styles.picker}
                     />
                 </View>
-                <TouchableOpacity onPress={() => uploadHandler()}>
+                <TouchableOpacity onPress={() => uploadHandler()} testID="submitButton">
                     <Text style={styles.uploadButton}>Upload</Text>
                 </TouchableOpacity>
             </View>

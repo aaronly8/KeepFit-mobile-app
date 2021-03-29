@@ -65,11 +65,11 @@ export const DetailsScreen = props => {
 
     let likeBtn;
     if (likedVideoData && props.workoutID in likedVideoData) {
-        likeBtn = <TouchableOpacity onPress={() => unLikeVideo()}>
+        likeBtn = <TouchableOpacity testID="likeBtn" onPress={() => unLikeVideo()}>
             <Tag style={styles.likedBtn} value="Liked" />
         </TouchableOpacity>
     } else {
-        likeBtn = <TouchableOpacity onPress={() => likeVideo()}>
+        likeBtn = <TouchableOpacity testID="likeBtn" onPress={() => likeVideo()}>
             <Tag style={styles.likeBtn} value="Like" />
         </TouchableOpacity>
     }
