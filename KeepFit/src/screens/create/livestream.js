@@ -206,6 +206,7 @@ const CreateLivestreamsScreen = (props) => {
                     keyboardType="default"
                     onChangeText={titleInputHandler}
                     value={enteredTitle}
+                    testID="titleInput"
                 />
                 <Text style={styles.inputHeader}>
                     Short Description (255 max):
@@ -219,6 +220,7 @@ const CreateLivestreamsScreen = (props) => {
                     keyboardType="default"
                     onChangeText={descriptionInputHandler}
                     value={enteredDescription}
+                    testID="descriptionInput"
                 />
                 <View>
                     <Text style={styles.inputHeader}>Workout Category:</Text>
@@ -226,6 +228,7 @@ const CreateLivestreamsScreen = (props) => {
                         selectedValue={enteredWorkoutCategory}
                         onValueChange={workoutCategoryHandler}
                         style={styles.picker}
+                        testID="workoutCategoryInput"
                     />
                     <Text style={styles.inputHeader}>
                         Muscle Group (Primary):
@@ -234,6 +237,7 @@ const CreateLivestreamsScreen = (props) => {
                         selectedValue={enteredMuscleGroup}
                         onValueChange={muscleGroupHandler}
                         style={styles.picker}
+                        testID="primaryMuscleGroupInput"
                     />
                     <Text style={styles.inputHeader}>
                         Muscle Group (Secondary):
@@ -242,9 +246,10 @@ const CreateLivestreamsScreen = (props) => {
                         selectedValue={enteredSecondaryMuscleGroup}
                         onValueChange={secondayMuscleGroupHandler}
                         style={styles.picker}
+                        testID="secondaryMuscleGroupInput"
                     />
                 </View>
-                <TouchableOpacity onPress={submit}>
+                <TouchableOpacity onPress={submit} testID="submitButton">
                     <Text style={styles.uploadButton}>Create Livestream</Text>
                 </TouchableOpacity>
             </View>
