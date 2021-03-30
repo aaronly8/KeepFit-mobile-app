@@ -81,7 +81,7 @@ const SearchUsersScreen = props => {
                         <Text style={styles.userItemName}>
                             {user.full_name}
                         </Text>
-                        <Button title="Follow" testID="followUser" onPress={() => followUser(current_user_id, user.id)} />
+                        <Button title="Follow" testID="followUserTest" onPress={() => followUser(current_user_id, user.id)}></Button>
                     </View>
                 </TouchableOpacity>
             )
@@ -96,7 +96,7 @@ const SearchUsersScreen = props => {
                         <Text style={styles.userItemName}>
                             {user.full_name}
                         </Text>
-                        <Button title="Unfollow" testID="unfollowUser" onPress={() => unfollowUser(current_user_id, user.id)} />
+                        <Button title="Unfollow" testID="unfollowUserTest" onPress={() => unfollowUser(current_user_id, user.id)} />
                     </View>
                 </TouchableOpacity>
             )
@@ -161,7 +161,10 @@ const SearchUsersScreen = props => {
                             <Text style={styles.searchHeader}>Search by Name:</Text>
                         </View>
                         <View style={styles.searchContainer}>
-                            <SearchInput testID='searchBar' value={searchPhrase} onChangeText={e => handleChange(e)} />
+                            <SearchInput
+                              value={searchPhrase}
+                              onChangeText={e => handleChange(e)}
+                              testID="searchBar" />
                         </View>
                         <View style={styles.scrollView}>
                             <ScrollView>

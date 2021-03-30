@@ -1,6 +1,6 @@
 import SearchUsersScreen from "../src/screens/explore/users"
 import React, { useState } from 'react';
-import {render, fireEvent, waitFor} from '@testing-library/react';
+import {render, fireEvent, waitFor} from '@testing-library/react-native';
 import { Provider } from 'react-redux'
 import configureStore from 'redux-mock-store'
 import { rootReducer } from "../src/redux/store";
@@ -29,15 +29,14 @@ describe('Follow Events', () => {
     store = mockStore(initialState)
     const { getByTestId } = render(
       <Provider store={store}>
-        <SearchUsersScreen current_user_id={'3'} followedUserIds={['5', '6']}/>
+        <SearchUsersScreen displayedDetails={false} displayedDetails={false} current_user_id={'3'} followedUserIds={['5', '6']}/>
       </Provider>
     );
 
     //type in search term
-    await fireEvent.change(getByTestId("searchBar"), { target: { value: 'aron' } })
-
+    await fireEvent.changeText(getByTestId('searchBar'), "aron");
     //The button should exist, else, fail the test
-    expect(getByTestId('followUser'));
+    expect(getByText('Follow'));
   });
 
   it('follow button calls followUser', async () => {
@@ -46,14 +45,14 @@ describe('Follow Events', () => {
     store = mockStore(initialState)
     const { getByTestId } = render(
       <Provider store={store}>
-        <SearchUsersScreen current_user_id={'3'} followedUserIds={['5', '6']} followUser={followMock} />
+        <SearchUsersScreen displayedDetails={false} current_user_id={'3'} followedUserIds={['5', '6']} followUser={followMock} />
       </Provider>
     );
 
     //type in search term
-    await fireEvent.change(getByTestId("searchBar"), { target: { value: 'aron' } })
+    await fireEvent.changeText(getByTestId('searchBar'), "aron");
 
-    fireEvent(getByTestId('followUser'), 'onPress');
+    fireEvent(getByTestId('followUserTest'), 'onPress');
     expect(followMock).toHaveBeenCalled();
   });
 
@@ -61,14 +60,14 @@ describe('Follow Events', () => {
     store = mockStore(initialState)
     const { getByTestId } = render(
       <Provider store={store}>
-        <SearchUsersScreen current_user_id={'3'} followedUserIds={['4', '5', '6']} />
+        <SearchUsersScreen displayedDetails={false} current_user_id={'3'} followedUserIds={['4', '5', '6']} />
       </Provider>
     );
 
     //type in search term
-    await fireEvent.change(getByTestId("searchBar"), { target: { value: 'aron' } })
+    await fireEvent.changeText(getByTestId('searchBar'), "aron");
 
-    expect(getByTestId('unfollowUser'));
+    expect(getByTitle('Follow'));
   });
 
   it('unfollow button calls unfollowUser', async () => {
@@ -77,14 +76,14 @@ describe('Follow Events', () => {
     store = mockStore(initialState)
     const { getByTestId } = render(
       <Provider store={store}>
-        <SearchUsersScreen current_user_id={'3'} followedUserIds={['4', '5', '6']} unfollowUser={unfollowMock} />
+        <SearchUsersScreen displayedDetails={false} current_user_id={'3'} followedUserIds={['4', '5', '6']} unfollowUser={unfollowMock} />
       </Provider>
     );
 
     //type in search term
-    await fireEvent.change(getByTestId("searchBar"), { target: { value: 'aron' } })
+    await fireEvent.changeText(getByTestId('searchBar'), "aron");
 
-    fireEvent(getByTestId('unfollowUser'), 'onPress');
+    fireEvent(getByTestId('unfollowUserTest'), 'onPress');
     expect(unfollowMock).toHaveBeenCalled();
   });
 
@@ -95,14 +94,14 @@ describe('Follow Events', () => {
     store = mockStore(initialState)
     const { getByTestId } = render(
       <Provider store={store}>
-        <SearchUsersScreen current_user_id={'3'} followedUserIds={['5', '6']} />
+        <SearchUsersScreen displayedDetails={false} current_user_id={'3'} followedUserIds={['5', '6']} />
       </Provider>
     );
 
     //type in search term
-    await fireEvent.change(getByTestId("searchBar"), { target: { value: 'aron' } })
+    await fireEvent.changeText(getByTestId('searchBar'), "aron");
 
-    fireEvent(getByTestId('followUser'), 'onPress');
+    fireEvent(getByTestId('followUserTest'), 'onPress');
     let result
 
     db.collection('follows')
@@ -123,15 +122,15 @@ describe('Follow Events', () => {
     store = mockStore(initialState)
     const { getByTestId } = render(
       <Provider store={store}>
-        <SearchUsersScreen current_user_id={'3'} followedUserIds={['5', '6']} />
+        <SearchUsersScreen displayedDetails={false} current_user_id={'3'} followedUserIds={['5', '6']} />
       </Provider>
     );
 
     //type in search term
-    await fireEvent.change(getByTestId("searchBar"), { target: { value: 'aron' } })
+    await fireEvent.changeText(getByTestId('searchBar'), "aron");
 
-    fireEvent(getByTestId('followUser'), 'onPress');
-    fireEvent(getByTestId('unfollowUser'), 'onPress');
+    fireEvent(getByTestId('followUserTest'), 'onPress');
+    fireEvent(getByTestId('unfollowUserTest'), 'onPress');
     let result
 
     db.collection('follows')
