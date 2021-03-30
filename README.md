@@ -15,7 +15,16 @@ KeepFit is an application intended to help users remain in shape during the COVI
 5. Devin Mui
 6. Roddur Dasgupta
 
-# Deployment/Demo Instructions for Assignment 4
+# Instructions for Tests in Assignment 4
+
+## Running All Tests
+
+1. Navigate to the KeepFit directory from your terminal or command line.
+2. Make sure you have installed all node_modules.
+3. Run npm test.
+4. Test case execution will output to the terminal/command line.
+
+# Deployment/Demo Instructions for Assignment 3
 
 ## Some Notes/Prerequisite Information
 
