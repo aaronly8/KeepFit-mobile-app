@@ -18,8 +18,13 @@ mockFirebase({
       { id: '4', full_name: 'Aaron Ly', username: "aaronly" },
       { id: '5', full_name: 'Devin Mui', username: "devinmui" },
       { id: '6', full_name: 'Roddur Dasgupta', username: "roddurdasgupta" },
+    ],
+    videos: [
+      {id: '1', title: 'vid1', description: 'description of vid 1'},
+      {id: '2', title: 'vid2', description: 'description of vid 2'},
+      {id: '3', title: 'vid3', description: 'description of vid 3'},
     ]
-  },
+  }
 });
 
 
