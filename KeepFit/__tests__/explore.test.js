@@ -28,7 +28,6 @@ describe('Explore Screen Tests', () => {
     const mockStore = configureStore()
     let store
 
-    // EXERCISES
     it('SearchExercisesScreen loads properly ', async () => {
         act(() => {
             const useEffect_spy = jest.spyOn(React, 'useEffect');
@@ -37,7 +36,6 @@ describe('Explore Screen Tests', () => {
             expect(useEffect_spy).toHaveBeenCalledTimes(2);
         });
     });
-    // LIVESTREAM
 
     it('SearchLivestreamsScreen loads properly', async () => {
         act(() => {
@@ -48,7 +46,6 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    // WORKOUTS
     it('SearchWorkoutsScreen loads properly', async () => {
         store = mockStore(initialState)
 
@@ -60,7 +57,6 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    // USERS
     it('SearchUsersScreen loads properly', async () => {
       store = mockStore(initialState)
         act(() => {
@@ -72,10 +68,8 @@ describe('Explore Screen Tests', () => {
     });
 
 
-
-
-
-    it('Return from exercises to search screen correctly', () => {
+// ------------------- BACK BUTTON TESTS (all blackbox) -------------------
+    it('Return from exercises to search index screen correctly', () => {
         act(() => {
             const mockBackButton = jest.fn();
             const { getByTestId } = render(<SearchExercisesScreen changeScreenHandler={mockBackButton} />);
@@ -84,7 +78,7 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    it('Return from livestreams to search screen correctly', () => {
+    it('Return from livestream Details to livestream Search correctly', () => {
         const livestream = {
             title: "test",
             video_link: "test.com",
@@ -101,7 +95,7 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    it('Return from users to search screen correctly', () => {
+    it('Return from users to search index screen correctly', () => {
         store = mockStore(initialState)
         act(() => {
             const mockBackButton = jest.fn();
@@ -113,5 +107,8 @@ describe('Explore Screen Tests', () => {
             expect(mockBackButton).toHaveBeenCalledTimes(1);
         });
     });
+
+
+
 
 });
