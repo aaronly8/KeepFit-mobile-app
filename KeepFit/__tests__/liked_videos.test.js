@@ -81,21 +81,48 @@ describe('Ensure Liked Videos are Displayed Based on Redux State', () => {
         });
     });
 
-    // it('If video is unliked, title is removed from users profile page', () => {
-    //     const thisInitialState = {
-    //         auth: {
-    //             loggedIn: false,
-    //             savedExercises: null,
-    //             creatingUser: true,
-    //             currentUserId: "1",
-    //             currentUser: { "full_name": 'Sajan Gutta' },
-    //             likedVideos: null,
-    //             videoDatas: null
-    //         }
-    //     }
+    it('If video is unliked, pressing like button calls delete query on firebase', () => {
+        act(async () => {
+            const thisInitialState = {
+                auth: {
+                    loggedIn: false,
+                    savedExercises: null,
+                    creatingUser: true,
+                    currentUserId: "1",
+                    currentUser: { "full_name": 'Sajan Gutta' },
+                    likedVideos: null,
+                    videoDatas: null
+                }
+            }
 
-    //     store = mockStore(thisInitialState)
+            const likedVideoData = [
+                {
+                    id: "1",
+                    title: "test1"
+                },
+                {
+                    id: "2",
+                    title: "test2"
+                }
+            ]
 
-    //     expect(new_state.auth.likedVideos).toEqual(null);
-    // });
+            const likedVideoDictionary = {
+                "1": likedVideoData[0],
+                "2": likedVideoData[1]
+            }
+
+            const workoutId = "1";
+
+            store = mockStore(thisInitialState)
+            const { getByTestId, UNSAFE_getByType } = await render(<Provider store={store}><DetailsScreen
+                workoutID={workoutId}
+                workout={likedVideoDictionary[workoutId]}
+                detailsBackHandler={jest.fn()}
+            /></Provider>);
+
+            fireEvent.press(getByTestId('likeBtn'));
+
+            expect(mockDelete).toHaveBeenCalled();
+        });
+    });
 });
