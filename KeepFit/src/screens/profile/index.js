@@ -18,7 +18,6 @@ import UserDataScreen from './userData';
 import Text from '@app/components/text.js';
 
 import VideoItem from './video-item';
-import whichImage from './workout-image';
 import Workout from './workout';
 
 import styles from './styles';
@@ -368,4 +367,3 @@ const ProfileScreen = (props) => {
 };
 
 export default ProfileScreen;
-
