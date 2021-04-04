@@ -88,8 +88,6 @@ const ProfileScreen = props => {
     }
 
     const deleteSavedExerciseHandler = (saved_exercise_id) => {
-        console.log("handler");
-        console.log(saved_exercise_id);
         db.collection(SavedExercise.collection_name).doc(saved_exercise_id)
         .get().then(function (doc) {
             doc.ref.delete().then(function () {
@@ -196,8 +194,6 @@ const ProfileScreen = props => {
             </View>
         )
     }
-
-    console.log(likedVideoDataArray);
 
     let myLikedVideos;
     if (likedVideoDataArray && isLoggedIn) {
