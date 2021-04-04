@@ -41,7 +41,9 @@ const ProfileScreen = props => {
         const snapshot = await db.collection(SavedExercise.collection_name).where("user_id", "==", current_user_id).get()
         let workoutHist = []
         snapshot.forEach(doc => {
-            workoutHist.push(doc.data())
+            let this_data = doc.data();
+            this_data["id"] = doc.id;
+            workoutHist.push(this_data);
         })
         dispatch(updateSavedExercises(workoutHist));
     }
@@ -62,7 +64,9 @@ const ProfileScreen = props => {
         const video_snapshot = await db.collection(Video.collection_name).get()
         video_snapshot.forEach(function (doc) {
             if (likedVideoIds.includes(doc.id)) {
-                likedVideoData.push(doc.data());
+                let this_data = doc.data();
+                this_data["id"] = doc.id;
+                likedVideoData.push(this_data);
             }
         })
         dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
@@ -72,10 +76,32 @@ const ProfileScreen = props => {
         getLikedVideos();
     }
 
+    const deleteVideoHandler = (video_id) => {
+        db.collection(LikedVideo.collection_name).where("video_id", "==", video_id)
+        .where("user_id", "==", current_user_id).get().then(function (snapshot) {
+            snapshot.forEach(function(doc) {
+                doc.ref.delete().then(function () {
+                    getLikedVideos();
+                });
+            })
+        });
+    }
+
+    const deleteSavedExerciseHandler = (saved_exercise_id) => {
+        console.log("handler");
+        console.log(saved_exercise_id);
+        db.collection(SavedExercise.collection_name).doc(saved_exercise_id)
+        .get().then(function (doc) {
+            doc.ref.delete().then(function () {
+                getSavedExercises();
+            });
+        });
+    }
+
     const myWorkoutHist = <FlatList style={styles.addFlex} data={filteredWorkoutHistory}
         renderItem={({ item }) => <TouchableHighlight><Workout CompletedWorkout={item} /></TouchableHighlight>}
         keyExtractor={item => item.id} />
-        
+
     const whichImage = (props) => {
         const { CompletedWorkout } = props
         switch (CompletedWorkout.category) {
@@ -116,9 +142,14 @@ const ProfileScreen = props => {
         const { CompletedWorkout } = props
         return (
             <View style={styles.unpaddedHorizontalContainer}>
-                {whichImage({CompletedWorkout})}
+                {whichImage({ CompletedWorkout })}
                 <View style={styles.addFlex}>
-                    <Text style={styles.workoutHistName}>{CompletedWorkout.category}</Text>
+                    <View style={styles.horizontalItemContainer}>
+                        <Text style={styles.workoutHistName}>{CompletedWorkout.category}</Text>
+                        <TouchableOpacity onPress={() => deleteSavedExerciseHandler(CompletedWorkout.id)}>
+                            <Text style={styles.deleteText}>X</Text>
+                        </TouchableOpacity>
+                    </View>
                     <Text style={styles.workoutHistSub}>{CompletedWorkout.completed_on}</Text>
                     <Text style={styles.workoutHistLastSub}>{CompletedWorkout.caloriesBurned} cals. burned</Text>
                     <View style={styles.unpaddedTagsHorizontalContainer}>
@@ -146,7 +177,12 @@ const ProfileScreen = props => {
                     />
                 }
                 <View style={styles.addFlex}>
-                    <Text style={styles.workoutHistName}>{LikedVideo.title}</Text>
+                    <View style={styles.horizontalItemContainer}>
+                        <Text style={styles.workoutHistName}>{LikedVideo.title}</Text>
+                        <TouchableOpacity onPress={() => deleteVideoHandler(LikedVideo.id)}>
+                            <Text style={styles.deleteText}>X</Text>
+                        </TouchableOpacity>
+                    </View>
                     <Text style={styles.workoutHistSub}>{LikedVideo.category}</Text>
                     <Text style={styles.workoutHistVidLink}
                         onPress={() => Linking.openURL(LikedVideo.video_link)}>
@@ -160,6 +196,8 @@ const ProfileScreen = props => {
             </View>
         )
     }
+
+    console.log(likedVideoDataArray);
 
     let myLikedVideos;
     if (likedVideoDataArray && isLoggedIn) {
@@ -318,6 +356,10 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between"
     },
+    deleteText: {
+        color: "red",
+        fontSize: 20
+    },
     userName: {
         fontSize: 20,
         marginTop: "0%",
@@ -364,6 +406,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         paddingHorizontal: 15
+    },
+    horizontalItemContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     },
     unpaddedHorizontalContainer: {
         flexDirection: 'row',

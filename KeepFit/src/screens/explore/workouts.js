@@ -36,7 +36,9 @@ export const DetailsScreen = props => {
         const video_snapshot = await db.collection(Video.collection_name).get()
         video_snapshot.forEach(function(doc) {
             if(likedVideoIds.includes(doc.id)) {
-                likedVideoData.push(doc.data());
+                let this_data = doc.data();
+                this_data["id"] = doc.id;
+                likedVideoData.push(this_data);
             }
         })
         dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
@@ -136,7 +138,9 @@ const SearchWorkoutsScreen = props => {
         const video_snapshot = await db.collection(Video.collection_name).get()
         video_snapshot.forEach(function(doc) {
             if(likedVideoIds.includes(doc.id)) {
-                likedVideoData.push(doc.data());
+                let this_data = doc.data();
+                this_data["id"] = doc.id;
+                likedVideoData.push(this_data);
             }
         })
         dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
