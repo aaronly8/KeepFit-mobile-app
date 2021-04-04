@@ -12,8 +12,10 @@ import {
     Linking,
     TouchableOpacity,
 } from 'react-native';
-import Container from '@app/components/container.js';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { Agenda } from 'react-native-calendars';
+import Container from '@app/components/container.js';
 import UserDataScreen from './userData';
 import Text from '@app/components/text.js';
 
@@ -36,9 +38,15 @@ import {
     updateLikedVideos,
 } from '../../redux/actions/auth.js';
 
+import * as Notifications from 'expo-notifications';
+
 const ProfileScreen = (props) => {
     const [visibleScreen, setVisibleScreen] = useState(null);
     const [displayPane, setDisplayPane] = useState(0);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [userVideos, setUserVideos] = useState([]);
+    const [day, setDay] = useState(new Date());
+    const [date, setDate] = useState(new Date());
 
     const isLoggedIn = useSelector((state) => state.auth.loggedIn);
     const current_user_id = useSelector((state) => state.auth.currentUserId);
@@ -48,8 +56,6 @@ const ProfileScreen = (props) => {
     );
     const likedVideoData = useSelector((state) => state.auth.likedVideos);
     const likedVideoDataArray = useSelector((state) => state.auth.videoDatas);
-
-    const [userVideos, setUserVideos] = useState([]);
 
     const dispatch = useDispatch();
 
@@ -146,17 +152,57 @@ const ProfileScreen = (props) => {
         await getUserVideos();
     };
 
+    const scheduleWorkout = async (date) => {
+        date.setDate(day.getDate());
+        date.setMonth(day.getMonth());
+        try {
+            await Notifications.scheduleNotificationAsync({
+                content: {
+                    title: "You've got mail! 📬",
+                    body: 'Use Keep Fit to stay active!',
+                    data: { data: 'goes here' },
+                },
+                trigger: date,
+            });
+            return 1;
+        } catch (e) {
+            return 0;
+        }
+    };
+
     const myWorkoutHist = (
-        <FlatList
-            style={styles.addFlex}
-            data={filteredWorkoutHistory}
-            renderItem={({ item }) => (
-                <TouchableHighlight>
-                    <Workout CompletedWorkout={item} />
-                </TouchableHighlight>
-            )}
-            keyExtractor={(item) => item.id}
-        />
+        <>
+            <Agenda
+                onDayPress={(day) => {
+                    setDay(
+                        new Date(
+                            day.timestamp +
+                                new Date().getTimezoneOffset() * 60 * 1000
+                        )
+                    );
+                }}
+                renderEmptyData={() => (
+                    <>
+                        <Button
+                            title="Create reminder"
+                            onPress={() => {
+                                setModalVisible(true);
+                            }}
+                        />
+                    </>
+                )}
+            />
+            <FlatList
+                style={styles.addFlex}
+                data={filteredWorkoutHistory}
+                renderItem={({ item }) => (
+                    <TouchableHighlight>
+                        <Workout CompletedWorkout={item} />
+                    </TouchableHighlight>
+                )}
+                keyExtractor={(item) => item.id}
+            />
+        </>
     );
 
     let myLikedVideos;
@@ -248,6 +294,31 @@ const ProfileScreen = (props) => {
         default:
             return (
                 <SafeAreaView>
+                    <DateTimePickerModal
+                        isVisible={modalVisible}
+                        mode="time"
+                        onConfirm={async (date) => {
+                            if (!(await scheduleWorkout(date)))
+                                return Alert.alert(
+                                    'Pick a time not in the past'
+                                );
+                            Alert.alert(
+                                'Created reminder',
+                                "You'll get a notification from us soon",
+                                [
+                                    {
+                                        text: 'OK',
+                                        onPress: () => {
+                                            setModalVisible(false);
+                                        },
+                                    },
+                                ]
+                            );
+                        }}
+                        onCancel={() => {
+                            setModalVisible(false);
+                        }}
+                    />
                     <Container style={styles.mainContainer}>
                         <View style={styles.userHeadings}>
                             <Text style={styles.userName}>

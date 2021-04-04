@@ -180,4 +180,16 @@ export default StyleSheet.create({
     savedContentContainer: {
         height: '55%',
     },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 22,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 4,
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+    },
+    modalContentTitle: {
+        fontSize: 20,
+        marginBottom: 12,
+    },
 });
