@@ -121,10 +121,43 @@ const SearchWorkoutsScreen = props => {
             snapshot.forEach(doc => {
                 fetchedWorkoutDictionary[doc.id] = doc.data();
             });
-            setFilteredWorkoutDictionary(fetchedWorkoutDictionary);
-            setWorkoutDictionary(fetchedWorkoutDictionary);
+            sortVideosByLikes(fetchedWorkoutDictionary);
         });
     }, []);
+
+    const sortVideosByLikes = async (fetchedWorkoutDictionary) => {
+        var likeCountDictionary = {};
+        var sortedMap = {};
+        db.collection(LikedVideo.collection_name).get().then(snapshot => {
+            snapshot.forEach(doc => {
+                if(likeCountDictionary[doc.data().video_id]) {
+                    likeCountDictionary[doc.data().video_id]++;
+                } else {
+                    likeCountDictionary[doc.data().video_id] = 1;
+                }
+            });
+
+            var sortedArray = Object.keys(likeCountDictionary).sort(function(a, b) {
+                return likeCountDictionary[b] - likeCountDictionary[a];
+            });
+
+            sortedArray.forEach(element => {
+                console.log(element);
+                console.log(fetchedWorkoutDictionary[element])
+                sortedMap[element] = fetchedWorkoutDictionary[element];
+            });
+            for(var key in fetchedWorkoutDictionary) {
+                if(!(key in sortedMap)) {
+                    sortedMap[key] = fetchedWorkoutDictionary[key];
+                }
+            }
+            console.log(JSON.stringify(sortedMap));
+
+
+            setWorkoutDictionary(sortedMap);
+            setFilteredWorkoutDictionary(sortedMap);
+        });
+    }
 
     const getLikedVideos = async () => {
         const snapshot = await db.collection(LikedVideo.collection_name).where("user_id", "==", current_user_id).get()
