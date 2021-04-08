@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import Text from '@app/components/text.js';
 
+import whichImage from './workout-image';
+
 import styles from './styles';
 
 export default function Workout(props) {
