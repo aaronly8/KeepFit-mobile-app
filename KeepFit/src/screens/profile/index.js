@@ -173,13 +173,26 @@ const ProfileScreen = (props) => {
             .get();
         await doc.ref.delete();
         await getUserVideos();
+        const liked_videos_snapshot = await db.collection(LikedVideo.collection_name).where("video_id", "==", videoId).get();
+        liked_videos_snapshot.forEach(function (doc) {
+            doc.ref.delete();
+        });
+        const watched_videos_snapshot = await db.collection(WatchedVideo.collection_name).where("video_id", "==", videoId).get();
+        watched_videos_snapshot.forEach(function (doc) {
+            doc.ref.delete();
+        });
+        getLikedVideos();
+        getWatchedVideos();
     };
+
     const deleteWatchedVideoHandler = async (videoId) => {
-        const doc = await db
+        const snapshot = await db
             .collection(WatchedVideo.collection_name)
-            .doc(videoId)
+            .where('video_id', '==', videoId)
             .get();
-        await doc.ref.delete();
+        snapshot.forEach(async (doc) => {
+            await doc.ref.delete();
+        });
         await getWatchedVideos();
     };
 
