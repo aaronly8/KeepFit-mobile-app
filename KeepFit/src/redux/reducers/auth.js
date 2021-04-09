@@ -10,6 +10,7 @@ const initialState = {
     likedVideos: null,
     videoDatas: null,
     watchedVideos: null,
+    w_videoDatas: null,
     uploadedVideos: null
 }
 
