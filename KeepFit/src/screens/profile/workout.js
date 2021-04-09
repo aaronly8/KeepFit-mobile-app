@@ -18,7 +18,7 @@ import whichImage from './workout-image';
 import styles from './styles';
 
 export default function Workout(props) {
-    const { CompletedWorkout } = props;
+    const { CompletedWorkout, deleteSavedExerciseHandler } = props;
     return (
         <View style={styles.unpaddedHorizontalContainer}>
             {whichImage({ CompletedWorkout })}

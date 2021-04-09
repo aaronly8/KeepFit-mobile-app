@@ -25,6 +25,7 @@ import Workout from './workout';
 import styles from './styles';
 
 import EditProfileScreen from './EditProfileScreen';
+import UserCalendarScreen from './Calendar';
 
 import SavedExercise from '../../models/saved_exercise';
 import LikedVideo from '../../models/liked_video';
@@ -172,32 +173,12 @@ const ProfileScreen = (props) => {
 
     const myWorkoutHist = (
         <>
-            <Agenda
-                onDayPress={(day) => {
-                    setDay(
-                        new Date(
-                            day.timestamp +
-                                new Date().getTimezoneOffset() * 60 * 1000
-                        )
-                    );
-                }}
-                renderEmptyData={() => (
-                    <>
-                        <Button
-                            title="Create reminder"
-                            onPress={() => {
-                                setModalVisible(true);
-                            }}
-                        />
-                    </>
-                )}
-            />
             <FlatList
                 style={styles.addFlex}
                 data={filteredWorkoutHistory}
                 renderItem={({ item }) => (
                     <TouchableHighlight>
-                        <Workout CompletedWorkout={item} />
+                        <Workout deleteSavedExerciseHandler={deleteSavedExerciseHandler} CompletedWorkout={item} />
                     </TouchableHighlight>
                 )}
                 keyExtractor={(item) => item.id}
@@ -276,12 +257,12 @@ const ProfileScreen = (props) => {
 
     switch (visibleScreen) {
         case 'edit':
-            return;
+            return(
             <SafeAreaView>
                 <EditProfileScreen
                     cancelEdit={setVisibleScreen.bind(this, null)}
                 />
-            </SafeAreaView>;
+            </SafeAreaView>);
         case 'details':
             return (
                 <SafeAreaView>
@@ -291,34 +272,18 @@ const ProfileScreen = (props) => {
                     />
                 </SafeAreaView>
             );
+        case 'calendar':
+            return (
+                <SafeAreaView>
+                    <UserCalendarScreen 
+                        cancelCalendar={setVisibleScreen.bind(this, null)}
+                        deleteSavedExerciseHandler={deleteSavedExerciseHandler}
+                    />
+                </SafeAreaView>
+            )
         default:
             return (
                 <SafeAreaView>
-                    <DateTimePickerModal
-                        isVisible={modalVisible}
-                        mode="time"
-                        onConfirm={async (date) => {
-                            if (!(await scheduleWorkout(date)))
-                                return Alert.alert(
-                                    'Pick a time not in the past'
-                                );
-                            Alert.alert(
-                                'Created reminder',
-                                "You'll get a notification from us soon",
-                                [
-                                    {
-                                        text: 'OK',
-                                        onPress: () => {
-                                            setModalVisible(false);
-                                        },
-                                    },
-                                ]
-                            );
-                        }}
-                        onCancel={() => {
-                            setModalVisible(false);
-                        }}
-                    />
                     <Container style={styles.mainContainer}>
                         <View style={styles.userHeadings}>
                             <Text style={styles.userName}>
@@ -377,6 +342,16 @@ const ProfileScreen = (props) => {
                                 >
                                     <Text style={styles.editText}>
                                         View Data
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.spaceBox}></View>
+                            <View style={styles.editBorder}>
+                                <TouchableOpacity
+                                    onPress={() => setVisibleScreen('calendar')}
+                                >
+                                    <Text style={styles.editText}>
+                                        Calendar
                                     </Text>
                                 </TouchableOpacity>
                             </View>
