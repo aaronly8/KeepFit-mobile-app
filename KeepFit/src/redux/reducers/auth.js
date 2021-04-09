@@ -9,7 +9,8 @@ const initialState = {
     currentUser: null,
     likedVideos: null,
     videoDatas: null,
-    watchedVideos: null
+    watchedVideos: null,
+    w_videoDatas: null
 }
 
 const authReducer = (state = initialState, action) => {
