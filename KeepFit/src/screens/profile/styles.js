@@ -192,4 +192,9 @@ export default StyleSheet.create({
         fontSize: 20,
         marginBottom: 12,
     },
+    calendarHeader: {
+        fontSize: 20,
+        fontWeight: "bold",
+        textAlign: "center"
+    }
 });
