@@ -1,5 +1,5 @@
 import { LOGIN_USER, LOGOUT_USER, CREATE_USER, UPDATE_SAVED_EXERCISES, 
-    UPDATE_LIKED_VIDEOS, UPDATE_WATCHED_VIDEOS } from '../actions/auth.js';
+    UPDATE_LIKED_VIDEOS, UPDATE_WATCHED_VIDEOS, UPDATE_UPLOADED_VIDEOS } from '../actions/auth.js';
 
 const initialState = {
     loggedIn: false,
@@ -9,7 +9,8 @@ const initialState = {
     currentUser: null,
     likedVideos: null,
     videoDatas: null,
-    watchedVideos: null
+    watchedVideos: null,
+    uploadedVideos: null
 }
 
 const authReducer = (state = initialState, action) => {
@@ -58,6 +59,11 @@ const authReducer = (state = initialState, action) => {
                 ...state,
                 watchedVideos: action.w_videos,
                 w_videoDatas: action.w_video_data
+            }
+        case UPDATE_UPLOADED_VIDEOS:
+            return {
+                ...state,
+                uploadedVideos: action.uploaded_videos
             }
         default:
             return state;

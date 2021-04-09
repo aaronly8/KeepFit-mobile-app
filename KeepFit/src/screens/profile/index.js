@@ -40,6 +40,7 @@ import {
     updateSavedExercises,
     updateLikedVideos,
     updateWatchedVideos,
+    updateUploadedVideos
 } from '../../redux/actions/auth.js';
 
 import * as Notifications from 'expo-notifications';
@@ -48,7 +49,6 @@ const ProfileScreen = (props) => {
     const [visibleScreen, setVisibleScreen] = useState(null);
     const [displayPane, setDisplayPane] = useState(0);
     const [modalVisible, setModalVisible] = useState(false);
-    const [userVideos, setUserVideos] = useState([]);
     const [day, setDay] = useState(new Date());
     const [date, setDate] = useState(new Date());
 
@@ -58,6 +58,9 @@ const ProfileScreen = (props) => {
     const filteredWorkoutHistory = useSelector((state) => state.auth.savedExercises);
     const likedVideoDataArray = useSelector((state) => state.auth.videoDatas);
     const watchedVideoDataArray = useSelector((state) => state.auth.w_videoDatas);
+    const userVideos = useSelector((state) => state.auth.uploadedVideos);
+
+    console.log(userVideos);
 
     const dispatch = useDispatch();
 
@@ -140,7 +143,7 @@ const ProfileScreen = (props) => {
             data['id'] = doc.id;
             return data;
         });
-        setUserVideos(data);
+        dispatch(updateUploadedVideos(data));
     };
 
     const unlikeVideoHandler = async (video_id) => {

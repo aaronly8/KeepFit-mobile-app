@@ -54,3 +54,12 @@ export const updateWatchedVideos = (watched_videos, w_video_data) => {
         w_video_data: w_video_data
     }
 }
+
+export const UPDATE_UPLOADED_VIDEOS = "UPDATE_UPLOADED_VIDEOS";
+
+export const updateUploadedVideos = (uploaded_videos) => {
+    return {
+        type: UPDATE_UPLOADED_VIDEOS,
+        uploaded_videos: uploaded_videos
+    }
+}

@@ -3,7 +3,10 @@ import { SafeAreaView, StyleSheet, Text, TouchableOpacity, Alert, View, Button }
 import Input from '../../components/input';
 import { Header } from '@app/components/text.js';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    updateUploadedVideos
+} from '../../redux/actions/auth.js';
 import * as ImagePicker from 'expo-image-picker';
 import Video from '../../models/video'
 import db, { firebase } from "../../firebase/firebase";
@@ -18,6 +21,8 @@ const CreateVideosScreen = props => {
     const [enteredMuscleGroup, setMuscleGroup] = useState(null);
     const [enteredSecondaryMuscleGroup, setSecondaryMuscleGroup] = useState(null);
     const [selectedVideo, setSelectedVideo] = useState(null);
+
+    const dispatch = useDispatch();
 
     const titleInputHandler = inputText => {
         setTitle(inputText);
@@ -37,6 +42,19 @@ const CreateVideosScreen = props => {
 
     const secondayMuscleGroupHandler = inputText => {
         setSecondaryMuscleGroup(inputText);
+    };
+
+    const getUserVideos = async () => {
+        const snapshot = await db
+            .collection(Video.collection_name)
+            .where('user_id', '==', current_user_id)
+            .get();
+        const data = snapshot.docs.map((doc) => {
+            let data = doc.data();
+            data['id'] = doc.id;
+            return data;
+        });
+        dispatch(updateUploadedVideos(data));
     };
 
     const uploadHandler = async () => {
@@ -74,6 +92,7 @@ const CreateVideosScreen = props => {
                     setTitle('');
                     setDescription('');
                     props.changeScreenHandler("index")
+                    getUserVideos();
                     Alert.alert('Success!', 'Your video was uploaded!', [
                         { text: 'Dismiss', style: 'cancel' }
                     ]);
