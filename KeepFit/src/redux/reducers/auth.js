@@ -56,8 +56,8 @@ const authReducer = (state = initialState, action) => {
         case UPDATE_WATCHED_VIDEOS:
             return {
                 ...state,
-                watchedVideos: action.videos,
-                videoDatas: action.video_data
+                watchedVideos: action.w_videos,
+                w_videoDatas: action.w_video_data
             }
         default:
             return state;

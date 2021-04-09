@@ -51,16 +51,13 @@ const ProfileScreen = (props) => {
     const [userVideos, setUserVideos] = useState([]);
     const [day, setDay] = useState(new Date());
     const [date, setDate] = useState(new Date());
-    const [watchedVideos, setWatchedVideos] = useState([]);
 
     const isLoggedIn = useSelector((state) => state.auth.loggedIn);
     const current_user_id = useSelector((state) => state.auth.currentUserId);
     const user_profile = useSelector((state) => state.auth.currentUser);
     const filteredWorkoutHistory = useSelector((state) => state.auth.savedExercises);
-    const likedVideoData = useSelector((state) => state.auth.likedVideos);
     const likedVideoDataArray = useSelector((state) => state.auth.videoDatas);
-    const watchedVideoData = useSelector((state) => state.auth.watchedVideos);
-    const watchedVideoDataArray = useSelector((state) => state.auth.videoDatas);
+    const watchedVideoDataArray = useSelector((state) => state.auth.w_videoDatas);
 
     const dispatch = useDispatch();
 
@@ -114,16 +111,23 @@ const ProfileScreen = (props) => {
     };
 
     const getWatchedVideos = async () => {
-        const snapshot = await db
-            .collection(WatchedVideo.collection_name)
-            .where('user_id', '==', current_user_id)
-            .get();
-        const data = snapshot.docs.map((doc) => {
-            let data = doc.data();
-            data['id'] = doc.id;
-            return data;
+        const snapshot = await db.collection(WatchedVideo.collection_name).where("user_id", "==", current_user_id).get()
+        let watchedVideoDictionary = {}
+        let watchedVideoIds = [];
+        let watchedVideoData = [];
+        snapshot.forEach(doc => {
+            watchedVideoDictionary[doc.data().video_id] = doc.data();
+            watchedVideoIds.push(doc.data().video_id);
         });
-        setWatchedVideos(data);
+        const video_snapshot = await db.collection(Video.collection_name).get()
+        video_snapshot.forEach(function(doc) {
+            if(watchedVideoIds.includes(doc.id)) {
+                let this_data = doc.data();
+                this_data["id"] = doc.id;
+                watchedVideoData.push(this_data);
+            }
+        })
+        dispatch(updateWatchedVideos(watchedVideoDictionary, watchedVideoData));
     }
 
     const getUserVideos = async () => {
@@ -266,7 +270,7 @@ const ProfileScreen = (props) => {
     const myWatchedVideos = (
         <FlatList
             style={styles.addFlex}
-            data={watchedVideos}
+            data={watchedVideoDataArray}
             renderItem={({ item }) => (
                 <TouchableHighlight>
                     <VideoItem

@@ -147,7 +147,6 @@ const SearchWorkoutsScreen = props => {
 
     const current_user_id = useSelector(state => state.auth.currentUserId);
     const likedVideoData = useSelector(state => state.auth.likedVideos);
-    const watchedVideoData = useSelector(state => state.auth.watchedVideos);
     const isLoggedIn = useSelector(state => state.auth.loggedIn);
 
     const dispatch = useDispatch();
