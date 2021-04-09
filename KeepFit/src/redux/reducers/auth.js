@@ -1,5 +1,5 @@
 import { LOGIN_USER, LOGOUT_USER, CREATE_USER, UPDATE_SAVED_EXERCISES, 
-    UPDATE_LIKED_VIDEOS, /*UPDATE_WATCHED_VIDEOS*/ } from '../actions/auth.js';
+    UPDATE_LIKED_VIDEOS, UPDATE_WATCHED_VIDEOS } from '../actions/auth.js';
 
 const initialState = {
     loggedIn: false,
