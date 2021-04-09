@@ -22,23 +22,13 @@ import HiitPicture from '../../assets/hiit.jpeg';
 
 import styles from './styles';
 
+import whichVideoImage from './video-image';
+
 export default function VideoItem(props) {
     const { Video } = props;
     return (
         <View style={styles.unpaddedHorizontalContainer}>
-            {Video.category === 'CARDIO' ? (
-                <Image
-                    source={CardioPicture}
-                    style={styles.image}
-                    style={styles.workoutPic}
-                />
-            ) : (
-                <Image
-                    source={StrengthPicture}
-                    style={styles.image}
-                    style={styles.workoutPic}
-                />
-            )}
+            {whichVideoImage({ Video })}
             <View style={styles.addFlex}>
                 <View style={styles.horizontalItemContainer}>
                     <Text style={styles.workoutHistName}>{Video.title}</Text>

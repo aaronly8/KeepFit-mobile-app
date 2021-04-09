@@ -44,3 +44,13 @@ export const updateLikedVideos = (liked_videos, video_data) => {
         video_data: video_data
     }
 }
+
+export const UPDATE_WATCHED_VIDEOS = "UPDATE_WATCHED_VIDEOS";
+
+export const updateWatchedVideos = (watched_videos, video_data) => {
+    return {
+        type: UPDATE_WATCHED_VIDEOS,
+        videos: watched_videos,
+        video_data: video_data
+    }
+}

@@ -31,12 +31,15 @@ import SavedExercise from '../../models/saved_exercise';
 import LikedVideo from '../../models/liked_video';
 import Video from '../../models/video';
 import db from '../../firebase/firebase';
+import WatchedVideo from '../../models/watched_video';
+
 
 import { useSelector, useDispatch } from 'react-redux';
 import {
     logoutUser,
     updateSavedExercises,
     updateLikedVideos,
+    updateWatchedVideos,
 } from '../../redux/actions/auth.js';
 
 import * as Notifications from 'expo-notifications';
@@ -48,15 +51,16 @@ const ProfileScreen = (props) => {
     const [userVideos, setUserVideos] = useState([]);
     const [day, setDay] = useState(new Date());
     const [date, setDate] = useState(new Date());
+    const [watchedVideos, setWatchedVideos] = useState([]);
 
     const isLoggedIn = useSelector((state) => state.auth.loggedIn);
     const current_user_id = useSelector((state) => state.auth.currentUserId);
     const user_profile = useSelector((state) => state.auth.currentUser);
-    const filteredWorkoutHistory = useSelector(
-        (state) => state.auth.savedExercises
-    );
+    const filteredWorkoutHistory = useSelector((state) => state.auth.savedExercises);
     const likedVideoData = useSelector((state) => state.auth.likedVideos);
     const likedVideoDataArray = useSelector((state) => state.auth.videoDatas);
+    const watchedVideoData = useSelector((state) => state.auth.watchedVideos);
+    const watchedVideoDataArray = useSelector((state) => state.auth.videoDatas);
 
     const dispatch = useDispatch();
 
@@ -64,6 +68,7 @@ const ProfileScreen = (props) => {
         getSavedExercises();
         getLikedVideos();
         getUserVideos();
+        getWatchedVideos();
     }, []);
 
     const logoutHandler = () => {
@@ -108,6 +113,19 @@ const ProfileScreen = (props) => {
         dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
     };
 
+    const getWatchedVideos = async () => {
+        const snapshot = await db
+            .collection(WatchedVideo.collection_name)
+            .where('user_id', '==', current_user_id)
+            .get();
+        const data = snapshot.docs.map((doc) => {
+            let data = doc.data();
+            data['id'] = doc.id;
+            return data;
+        });
+        setWatchedVideos(data);
+    }
+
     const getUserVideos = async () => {
         const snapshot = await db
             .collection(Video.collection_name)
@@ -151,6 +169,14 @@ const ProfileScreen = (props) => {
             .get();
         await doc.ref.delete();
         await getUserVideos();
+    };
+    const deleteWatchedVideoHandler = async (videoId) => {
+        const doc = await db
+            .collection(WatchedVideo.collection_name)
+            .doc(videoId)
+            .get();
+        await doc.ref.delete();
+        await getWatchedVideos();
     };
 
     const scheduleWorkout = async (date) => {
@@ -205,6 +231,70 @@ const ProfileScreen = (props) => {
         );
     }
 
+    const myUploadedVideos = (
+        <FlatList
+            style={styles.addFlex}
+            data={userVideos}
+            renderItem={({ item }) => (
+                <TouchableHighlight>
+                    <VideoItem
+                        Video={item}
+                        onDelete={(id) => {
+                            Alert.alert(
+                                'Delete Video',
+                                'This action cannot be undone',
+                                [
+                                    { text: 'Cancel', style: 'cancel' },
+                                    {
+                                        text: 'OK',
+                                        onPress: async () => {
+                                            await deleteVideoHandler(
+                                                id
+                                            );
+                                        },
+                                    },
+                                ]
+                            );
+                        }}
+                    />
+                </TouchableHighlight>
+            )}
+            keyExtractor={(item) => item.id}
+        />
+    );
+
+    const myWatchedVideos = (
+        <FlatList
+            style={styles.addFlex}
+            data={watchedVideos}
+            renderItem={({ item }) => (
+                <TouchableHighlight>
+                    <VideoItem
+                        Video={item}
+                        onDelete={(id) => {
+                            Alert.alert(
+                                'Delete Video',
+                                'This action cannot be undone',
+                                [
+                                    { text: 'Cancel', style: 'cancel' },
+                                    {
+                                        text: 'OK',
+                                        onPress: async () => {
+                                            await deleteWatchedVideoHandler(
+                                                id
+                                            );
+                                        },
+                                    },
+                                ]
+                            );
+                        }}
+                    />
+                </TouchableHighlight>
+            )}
+            keyExtractor={(item) => item.id}
+        />
+    );
+
     let paneContent = <></>;
     switch (displayPane) {
         case 0:
@@ -214,37 +304,10 @@ const ProfileScreen = (props) => {
             paneContent = myLikedVideos;
             break;
         case 2:
-            paneContent = (
-                <FlatList
-                    style={styles.addFlex}
-                    data={userVideos}
-                    renderItem={({ item }) => (
-                        <TouchableHighlight>
-                            <VideoItem
-                                Video={item}
-                                onDelete={(id) => {
-                                    Alert.alert(
-                                        'Delete Video',
-                                        'This action cannot be undone',
-                                        [
-                                            { text: 'Cancel', style: 'cancel' },
-                                            {
-                                                text: 'OK',
-                                                onPress: async () => {
-                                                    await deleteVideoHandler(
-                                                        id
-                                                    );
-                                                },
-                                            },
-                                        ]
-                                    );
-                                }}
-                            />
-                        </TouchableHighlight>
-                    )}
-                    keyExtractor={(item) => item.id}
-                />
-            );
+            paneContent = myUploadedVideos;
+            break;
+        case 3:
+            paneContent = myWatchedVideos;
             break;
     }
 
@@ -369,7 +432,22 @@ const ProfileScreen = (props) => {
                                             : styles.btnPress
                                     }
                                 >
-                                    Workout History
+                                    Workout Hist
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setDisplayPane(3);
+                                }}
+                            >
+                                <Text
+                                    style={
+                                        displayPane === 3
+                                            ? styles.btnBluePress
+                                            : styles.btnPress
+                                    }
+                                >
+                                    Video Hist
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -384,7 +462,7 @@ const ProfileScreen = (props) => {
                                             : styles.btnPress
                                     }
                                 >
-                                    Liked Videos
+                                    Liked Vids
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -399,7 +477,7 @@ const ProfileScreen = (props) => {
                                             : styles.btnPress
                                     }
                                 >
-                                    Your Videos
+                                    My Vids
                                 </Text>
                             </TouchableOpacity>
                         </View>
