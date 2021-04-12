@@ -32,7 +32,7 @@ import LikedVideo from '../../models/liked_video';
 import Video from '../../models/video';
 import db from '../../firebase/firebase';
 import WatchedVideo from '../../models/watched_video';
-
+import Follows from '../../models/follows';
 
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -51,6 +51,8 @@ const ProfileScreen = (props) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [day, setDay] = useState(new Date());
     const [date, setDate] = useState(new Date());
+    const [numFollowers, setNumFollowers] = useState(0);
+    const [numFollowing, setNumFollowing] = useState(0);
 
     const isLoggedIn = useSelector((state) => state.auth.loggedIn);
     const current_user_id = useSelector((state) => state.auth.currentUserId);
@@ -69,6 +71,8 @@ const ProfileScreen = (props) => {
         getLikedVideos();
         getUserVideos();
         getWatchedVideos();
+        getNumFollowers();
+        getNumFollowing();
     }, []);
 
     const logoutHandler = () => {
@@ -145,6 +149,33 @@ const ProfileScreen = (props) => {
         });
         dispatch(updateUploadedVideos(data));
     };
+
+    const getNumFollowers = async () => {
+        const snapshot = await db
+            .collection(Follows.collection_name)
+            .where('followee_id', '==', current_user_id)
+            .get()
+        let myNumFollowers = 0;
+        snapshot.forEach(function (doc) {
+            myNumFollowers++;
+        })
+        setNumFollowers(myNumFollowers);
+    }
+    console.log(numFollowers);
+
+    const getNumFollowing = async () => {
+        const snapshot = await db
+            .collection(Follows.collection_name)
+            .where('follower_id', '==', current_user_id)
+            .get()
+        let myNumFollowing = 0;
+        snapshot.forEach(function (doc) {
+            myNumFollowing++;
+        })
+        setNumFollowing(myNumFollowing);
+    }
+    console.log(numFollowing);
+
 
     const unlikeVideoHandler = async (video_id) => {
         const snapshot = await db
@@ -393,11 +424,11 @@ const ProfileScreen = (props) => {
                             />
                             <View style={styles.followHeadings}>
                                 <View style={styles.followBox}>
-                                    <Text style={styles.numFollow}>15</Text>
+                                    <Text style={styles.numFollow}>{numFollowers}</Text>
                                     <Text style={styles.follow}>Followers</Text>
                                 </View>
                                 <View style={styles.followBox}>
-                                    <Text style={styles.numFollow}>5</Text>
+                                    <Text style={styles.numFollow}>{numFollowing}</Text>
                                     <Text style={styles.follow}>Following</Text>
                                 </View>
                             </View>
