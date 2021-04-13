@@ -3,11 +3,12 @@ import { SafeAreaView, StyleSheet, ScrollView, Button, TouchableOpacity, Text, L
 import { Header } from '@app/components/text.js';
 import db from "../../firebase/firebase";
 import ListItem from './listitem';
-import { updateLikedVideos } from "../../redux/actions/auth.js";
+import { updateLikedVideos, updateWatchedVideos } from "../../redux/actions/auth.js";
 import { useSelector, useDispatch } from 'react-redux';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
 import LikedVideo from "../../models/liked_video";
 import Video from "../../models/video";
+import WatchedVideo from '../../models/watched_video';
 
 
 const Tag = props => {
@@ -21,6 +22,7 @@ const Tag = props => {
 export const DetailsScreen = props => {
     const likedVideoData = useSelector(state => state.auth.likedVideos);
     const current_user_id = useSelector(state => state.auth.currentUserId);
+    const watchedVideoData = useSelector((state) => state.auth.watchedVideos);
 
     const dispatch = useDispatch();
 
@@ -36,11 +38,34 @@ export const DetailsScreen = props => {
         const video_snapshot = await db.collection(Video.collection_name).get()
         video_snapshot.forEach(function(doc) {
             if(likedVideoIds.includes(doc.id)) {
-                likedVideoData.push(doc.data());
+                let this_data = doc.data();
+                this_data["id"] = doc.id;
+                likedVideoData.push(this_data);
             }
         })
         dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
     }
+    
+    const getWatchedVideos = async () => {
+        const snapshot = await db.collection(WatchedVideo.collection_name).where("user_id", "==", current_user_id).get()
+        let watchedVideoDictionary = {}
+        let watchedVideoIds = [];
+        let watchedVideoData = [];
+        snapshot.forEach(doc => {
+            watchedVideoDictionary[doc.data().video_id] = doc.data();
+            watchedVideoIds.push(doc.data().video_id);
+        });
+        const video_snapshot = await db.collection(Video.collection_name).get()
+        video_snapshot.forEach(function(doc) {
+            if(watchedVideoIds.includes(doc.id)) {
+                let this_data = doc.data();
+                this_data["id"] = doc.id;
+                watchedVideoData.push(this_data);
+            }
+        })
+        dispatch(updateWatchedVideos(watchedVideoDictionary, watchedVideoData));
+    }
+    
 
     const likeVideo = () => {
         db.collection(LikedVideo.collection_name).doc().set({
@@ -63,6 +88,16 @@ export const DetailsScreen = props => {
         });
     }
 
+    const watchVideo = () => {
+        db.collection(WatchedVideo.collection_name).doc().set({
+            user_id: current_user_id,
+            video_id: props.workoutID,
+            watched_on: new Date().toLocaleDateString()
+        }).then(function () {
+            getWatchedVideos();
+        });
+    }
+
     let likeBtn;
     if (likedVideoData && props.workoutID in likedVideoData) {
         likeBtn = <TouchableOpacity testID="likeBtn" onPress={() => unLikeVideo()}>
@@ -81,7 +116,10 @@ export const DetailsScreen = props => {
                 {props.workout.title}
             </Header>
             <Text style={styles.videoLink}
-                onPress={() => Linking.openURL(props.workout.video_link)}>
+                onPress={() => {
+                    Linking.openURL(props.workout.video_link)
+                    watchVideo()
+                }}>
                 Watch Workout on Youtube
             </Text>
             <Text>
@@ -119,10 +157,43 @@ const SearchWorkoutsScreen = props => {
             snapshot.forEach(doc => {
                 fetchedWorkoutDictionary[doc.id] = doc.data();
             });
-            setFilteredWorkoutDictionary(fetchedWorkoutDictionary);
-            setWorkoutDictionary(fetchedWorkoutDictionary);
+            sortVideosByLikes(fetchedWorkoutDictionary);
         });
     }, []);
+
+    const sortVideosByLikes = async (fetchedWorkoutDictionary) => {
+        var likeCountDictionary = {};
+        var sortedMap = {};
+        db.collection(LikedVideo.collection_name).get().then(snapshot => {
+            snapshot.forEach(doc => {
+                if(likeCountDictionary[doc.data().video_id]) {
+                    likeCountDictionary[doc.data().video_id]++;
+                } else {
+                    likeCountDictionary[doc.data().video_id] = 1;
+                }
+            });
+
+            var sortedArray = Object.keys(likeCountDictionary).sort(function(a, b) {
+                return likeCountDictionary[b] - likeCountDictionary[a];
+            });
+
+            sortedArray.forEach(element => {
+                console.log(element);
+                console.log(fetchedWorkoutDictionary[element])
+                sortedMap[element] = fetchedWorkoutDictionary[element];
+            });
+            for(var key in fetchedWorkoutDictionary) {
+                if(!(key in sortedMap)) {
+                    sortedMap[key] = fetchedWorkoutDictionary[key];
+                }
+            }
+            console.log(JSON.stringify(sortedMap));
+
+
+            setWorkoutDictionary(sortedMap);
+            setFilteredWorkoutDictionary(sortedMap);
+        });
+    }
 
     const getLikedVideos = async () => {
         const snapshot = await db.collection(LikedVideo.collection_name).where("user_id", "==", current_user_id).get()
@@ -136,7 +207,9 @@ const SearchWorkoutsScreen = props => {
         const video_snapshot = await db.collection(Video.collection_name).get()
         video_snapshot.forEach(function(doc) {
             if(likedVideoIds.includes(doc.id)) {
-                likedVideoData.push(doc.data());
+                let this_data = doc.data();
+                this_data["id"] = doc.id;
+                likedVideoData.push(this_data);
             }
         })
         dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));

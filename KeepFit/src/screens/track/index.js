@@ -80,7 +80,9 @@ const TrackScreen = props => {
         const snapshot = await db.collection(SavedExercise.collection_name).where("user_id", "==", current_user_id).get()
         let workoutHist = []
         snapshot.forEach(doc => {
-            workoutHist.push(doc.data())
+            let this_data = doc.data();
+            this_data["id"] = doc.id;
+            workoutHist.push(this_data);
         })
         dispatch(updateSavedExercises(workoutHist));
     }

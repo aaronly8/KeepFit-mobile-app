@@ -5,10 +5,28 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from "../../redux/actions/auth.js";
 import Text, { Header, SubHeader } from '@app/components/text.js';
+import User from "../../models/user";
+import firebase from "firebase";
+import db from "../../firebase/firebase";
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 const UserDataScreen = props => {
+    const current_user_id = useSelector(state => state.auth.currentUserId);
     const currentUser = useSelector(state => state.auth.currentUser);
+
+    const dispatch = useDispatch();
+
+    const deleteAccountHandler = () => {
+        db.collection(User.collection_name).where("username", "==", currentUser.username)
+        .get().then(function (snapshot) {
+            snapshot.forEach(function(doc) {
+                doc.ref.delete().then(function () {
+                    firebase.auth().currentUser.delete();
+                    dispatch(logoutUser());
+                });
+            })
+        });
+    };
 
     return (
         <SafeAreaView>
@@ -77,6 +95,13 @@ const UserDataScreen = props => {
                         <Text style={styles.googleText}>Log Out With Google</Text>
                     </FontAwesome5.Button>
                 </View>
+                <View style={styles.deleteAccountContainer}>
+                    <TouchableOpacity
+                        onPress={() => deleteAccountHandler()}
+                    >
+                        <Text style={styles.deleteAccountText}>(X) Delete Account</Text>
+                    </TouchableOpacity>
+                </View>
             </Container>
         </SafeAreaView>
     )
@@ -112,6 +137,19 @@ const styles = StyleSheet.create({
     },
     googleButtonContainer: {
         marginTop: 25
+    },
+    deleteAccountContainer: {
+        backgroundColor: "red",
+        marginTop: 25,
+        height: 60,
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 5
+    },
+    deleteAccountText: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: 17
     }
 });
 

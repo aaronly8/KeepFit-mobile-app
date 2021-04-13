@@ -44,3 +44,31 @@ export const updateLikedVideos = (liked_videos, video_data) => {
         video_data: video_data
     }
 }
+
+export const UPDATE_WATCHED_VIDEOS = "UPDATE_WATCHED_VIDEOS";
+
+export const updateWatchedVideos = (watched_videos, w_video_data) => {
+    return {
+        type: UPDATE_WATCHED_VIDEOS,
+        w_videos: watched_videos,
+        w_video_data: w_video_data
+    }
+}
+
+export const UPDATE_UPLOADED_VIDEOS = "UPDATE_UPLOADED_VIDEOS";
+
+export const updateUploadedVideos = (uploaded_videos) => {
+    return {
+        type: UPDATE_UPLOADED_VIDEOS,
+        uploaded_videos: uploaded_videos
+    }
+}
+
+export const UPDATE_SEARCHED_USERS = "UPDATE_SEARCHED_USERS";
+
+export const updateSearchedUsers = (searched_users) => {
+    return {
+        type: UPDATE_SEARCHED_USERS,
+        searchedUsers: searched_users,
+    }
+}

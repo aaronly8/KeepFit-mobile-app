@@ -10,6 +10,7 @@ import Follows from '../../models/follows';
 import { useScrollToTop } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import UserDetailsScreen from "./userDetails";
+import { updateSearchedUsers } from '../../redux/actions/auth.js';
 
 const DetailsScreen = props => {
     return (
@@ -37,6 +38,11 @@ const SearchUsersScreen = props => {
     const [displayedDetails, setDisplayedDetails] = useState(null);
 
     const current_user_id = useSelector(state => state.auth.currentUserId);
+    //keep track of users searched, in a reverse chrono stack.
+    const searchedUsers = useSelector(state => state.auth.searchedUsers);
+
+    const dispatch = useDispatch();
+
     const detailsBackHandler = () => {
         setDisplayedDetails(null);
     };
@@ -69,12 +75,22 @@ const SearchUsersScreen = props => {
             setFollowedUserIds(userIds);
         });
     }, []);
-
     const UserItem = ({ setDisplayedDetails, user, followed }) => {
         if (!followed) {
             return (
                 <TouchableOpacity
                     onPress={() => {
+                        let newSearchedUsers = [];
+                        for (var i=0; i<searchedUsers.length; i++){
+                            newSearchedUsers.push(searchedUsers[i]);
+                        }
+                        if (newSearchedUsers.includes(user)){ // remove the user from stack if applicable, bringing them to top
+                            newSearchedUsers.splice(newSearchedUsers.indexOf(user), 1);
+                        }
+                        newSearchedUsers.push(user);
+                        dispatch(updateSearchedUsers(newSearchedUsers)); // update user history array
+                        console.log("added a searched user. searched user history: ");
+                        console.log(searchedUsers);
                         setDisplayedDetails(user);
                     }}>
                     <View style={styles.userItemContainer}>
@@ -166,9 +182,14 @@ const SearchUsersScreen = props => {
                               onChangeText={e => handleChange(e)}
                               testID="searchBar" />
                         </View>
+                        
                         <View style={styles.scrollView}>
                             <ScrollView>
                                 {filteredUsers.map(user =>
+                                    <UserItem setDisplayedDetails={setDisplayedDetails}
+                                        user={user} followed={followedUserIds.includes(user.id)} />
+                                )}
+                                {searchedUsers.map(user =>
                                     <UserItem setDisplayedDetails={setDisplayedDetails}
                                         user={user} followed={followedUserIds.includes(user.id)} />
                                 )}
@@ -202,7 +223,7 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     scrollView: {
-        height: "80%"
+        height: "50%"
     },
     userItemContainer: {
         flex: 1,
