@@ -10,17 +10,18 @@ import Follows from '../../models/follows';
 import { useScrollToTop } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import UserDetailsScreen from "./userDetails";
+import { updateSearchedUsers } from '../../redux/actions/auth.js';
 
 const DetailsScreen = props => {
     return (
         <SafeAreaView>
             <Container>
-                <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton'/>
+                <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton' />
                 <Header style={styles.mainHeader}>
                     {props.user.full_name}'s Profile
                 </Header>
             </Container>
-            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton'/>
+            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton' />
             <Header style={styles.mainHeader}>
                 Some info.
             </Header>
@@ -37,6 +38,11 @@ const SearchUsersScreen = props => {
     const [displayedDetails, setDisplayedDetails] = useState(null);
 
     const current_user_id = useSelector(state => state.auth.currentUserId);
+    //keep track of users searched, in a reverse chrono stack.
+    const searchedUsers = useSelector(state => state.auth.searchedUsers);
+
+    const dispatch = useDispatch();
+
     const detailsBackHandler = () => {
         setDisplayedDetails(null);
     };
@@ -52,7 +58,6 @@ const SearchUsersScreen = props => {
             });
             setUsers(usersArray);
             setFilteredUsers(usersArray);
-            console.log("snap: " + filteredUsers.length + " users grabbed.")
         });
     }, []);
 
@@ -62,31 +67,35 @@ const SearchUsersScreen = props => {
         db.collection(Follows.collection_name).where("follower_id", "==", current_user_id).get().then(function (snapshot) {
             snapshot.forEach(doc => {
                 let id = doc.data()["followee_id"];
-                console.log("followed by user: " + id)
                 if (id !== current_user_id) {
                     userIds.push(id);
                 }
             })
 
             setFollowedUserIds(userIds);
-            console.log("length of followed: " + Object.entries(userIds).length)
         });
     }, []);
-
     const UserItem = ({ setDisplayedDetails, user, followed }) => {
         if (!followed) {
-            console.log("UserItem id: " + user.id)
-            //  console.log("user object: " + users[userID].full_name)
             return (
                 <TouchableOpacity
                     onPress={() => {
+                        let newSearchedUsers = [];
+                        for (var i = 0; i < searchedUsers.length; i++) {
+                            newSearchedUsers.push(searchedUsers[i]);
+                        }
+                        if (newSearchedUsers.includes(user)) { // remove the user from stack if applicable, bringing them to top
+                            newSearchedUsers.splice(newSearchedUsers.indexOf(user), 1);
+                        }
+                        newSearchedUsers.push(user);
+                        dispatch(updateSearchedUsers(newSearchedUsers)); // update user history array
                         setDisplayedDetails(user);
                     }}>
                     <View style={styles.userItemContainer}>
                         <Text style={styles.userItemName}>
                             {user.full_name}
                         </Text>
-                        <Button title="Follow" testID="followUser" onPress={() => followUser(current_user_id, user.id)} />
+                        <Button title="Follow" testID="followUserTest" onPress={() => followUser(current_user_id, user.id)}></Button>
                     </View>
                 </TouchableOpacity>
             )
@@ -95,13 +104,22 @@ const SearchUsersScreen = props => {
             return (
                 <TouchableOpacity
                     onPress={() => {
+                        let newSearchedUsers = [];
+                        for (var i = 0; i < searchedUsers.length; i++) {
+                            newSearchedUsers.push(searchedUsers[i]);
+                        }
+                        if (newSearchedUsers.includes(user)) { // remove the user from stack if applicable, bringing them to top
+                            newSearchedUsers.splice(newSearchedUsers.indexOf(user), 1);
+                        }
+                        newSearchedUsers.push(user);
+                        dispatch(updateSearchedUsers(newSearchedUsers)); // update user history array
                         setDisplayedDetails(user);
                     }}>
                     <View style={styles.userItemContainer}>
                         <Text style={styles.userItemName}>
                             {user.full_name}
                         </Text>
-                        <Button title="Unfollow" testID="unfollowUser" onPress={() => unfollowUser(current_user_id, user.id)} />
+                        <Button title="Unfollow" testID="unfollowUserTest" onPress={() => unfollowUser(current_user_id, user.id)} />
                     </View>
                 </TouchableOpacity>
             )
@@ -132,19 +150,14 @@ const SearchUsersScreen = props => {
 
     //update filteredUsers upon any change to the search field.
     const handleChange = async (e) => {
-        console.log("e type:" + typeof e)
-        console.log("e: " + e)
-        //  console.log("e.target.value is: " + e.target.value)
 
         setSearchPhrase(e);
 
         if (e !== "") {
-            console.log("search phrase: " + { e })
             // this works!
             let filtered = [];
             for (let user of users) {
                 let name = user.full_name;
-                console.log("name: " + name)
                 if (name.toLowerCase().includes(e.toLowerCase()))
                     filtered.push(user);
             }
@@ -166,16 +179,27 @@ const SearchUsersScreen = props => {
                 />
             ) : (
                     <View style={styles.listView}>
-                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton'/>
+                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton' />
                         <View style={styles.searchHeaderContainer}>
                             <Text style={styles.searchHeader}>Search by Name:</Text>
                         </View>
                         <View style={styles.searchContainer}>
-                            <SearchInput testID='searchBar' value={searchPhrase} onChangeText={e => handleChange(e)} />
+                            <SearchInput
+                                value={searchPhrase}
+                                onChangeText={e => handleChange(e)}
+                                testID="searchBar" />
                         </View>
-                        <View style={styles.scrollView}>
-                            <ScrollView>
+                        <View>
+                            <Text style={styles.searchHeader}>Results</Text>
+                            <ScrollView style={styles.scrollView}>
                                 {filteredUsers.map(user =>
+                                    <UserItem setDisplayedDetails={setDisplayedDetails}
+                                        user={user} followed={followedUserIds.includes(user.id)} />
+                                )}
+                            </ScrollView>
+                            <Text style={styles.searchHeader}>Recently Searched</Text>
+                            <ScrollView style={styles.scrollView}>
+                                {searchedUsers.slice(0).reverse().map(user =>
                                     <UserItem setDisplayedDetails={setDisplayedDetails}
                                         user={user} followed={followedUserIds.includes(user.id)} />
                                 )}
@@ -186,7 +210,6 @@ const SearchUsersScreen = props => {
         </SafeAreaView>
 
     )
-    console.log(filteredUsers);
 };
 
 const styles = StyleSheet.create({
@@ -210,7 +233,8 @@ const styles = StyleSheet.create({
         textAlign: "center"
     },
     scrollView: {
-        height: "80%"
+        height: "35%",
+        marginBottom: 10
     },
     userItemContainer: {
         flex: 1,

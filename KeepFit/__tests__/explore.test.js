@@ -28,7 +28,6 @@ describe('Explore Screen Tests', () => {
     const mockStore = configureStore()
     let store
 
-    // EXERCISES
     it('SearchExercisesScreen loads properly ', async () => {
         act(() => {
             const useEffect_spy = jest.spyOn(React, 'useEffect');
@@ -48,7 +47,6 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    // WORKOUTS
     it('SearchWorkoutsScreen loads properly', async () => {
         store = mockStore(initialState)
 
@@ -60,7 +58,6 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    // USERS
     it('SearchUsersScreen loads properly', async () => {
       store = mockStore(initialState)
         act(() => {
@@ -117,7 +114,7 @@ describe('Explore Screen Tests', () => {
         });
     });
 
-    it('Return from users to search screen correctly', () => {
+    it('Return from users to search index screen correctly', () => {
         store = mockStore(initialState)
         act(() => {
             const mockBackButton = jest.fn();
@@ -129,5 +126,8 @@ describe('Explore Screen Tests', () => {
             expect(mockBackButton).toHaveBeenCalledTimes(1);
         });
     });
+
+
+
 
 });

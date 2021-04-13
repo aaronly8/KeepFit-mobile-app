@@ -63,3 +63,12 @@ export const updateUploadedVideos = (uploaded_videos) => {
         uploaded_videos: uploaded_videos
     }
 }
+
+export const UPDATE_SEARCHED_USERS = "UPDATE_SEARCHED_USERS";
+
+export const updateSearchedUsers = (searched_users) => {
+    return {
+        type: UPDATE_SEARCHED_USERS,
+        searchedUsers: searched_users,
+    }
+}
