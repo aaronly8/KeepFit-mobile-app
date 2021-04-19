@@ -72,7 +72,14 @@ const CreateVideosScreen = props => {
         }
         const response = await fetch(selectedVideo);
         const blob = await response.blob();
-        console.log(blob.size);
+        
+        // limit if 10 MB size
+        if(blob.size > 10000000) {
+            Alert.alert('Error', 'File must be smaller than 10MB', [
+                { text: 'Dismiss', style: 'cancel' }
+            ]);
+            return;
+        }
 
         var ref = firebase.storage().ref().child(enteredTitle);
         ref.put(blob).then((snapshot) => {
