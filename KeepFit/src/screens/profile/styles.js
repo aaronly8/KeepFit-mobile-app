@@ -39,6 +39,12 @@ export default StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
+    calendar: {
+        width: 40,
+        height: 40,
+        marginRight: '0%',
+        justifyContent: 'center',
+    },
     deleteText: {
         color: 'red',
         fontSize: 20,
@@ -106,6 +112,12 @@ export default StyleSheet.create({
     },
     subheading: {
         fontWeight: 'bold',
+    },
+    mainHeader1: {
+        fontSize: 40,
+        marginTop: "10%",
+        color: "black",
+        fontWeight: "bold"
     },
     editHeadings: {
         flexDirection: 'row',
@@ -196,5 +208,11 @@ export default StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         textAlign: "center"
-    }
+    },
+    calBorder: {
+        flex: 0.2
+    },
+    nameHeadings: {
+        flex: 1
+    },
 });

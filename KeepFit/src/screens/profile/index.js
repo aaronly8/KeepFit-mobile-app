@@ -11,6 +11,7 @@ import {
     View,
     Linking,
     TouchableOpacity,
+    ScrollView
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -33,6 +34,8 @@ import Video from '../../models/video';
 import db from '../../firebase/firebase';
 import WatchedVideo from '../../models/watched_video';
 import Follows from '../../models/follows';
+import CalendarPic from '../../assets/calendar.png';
+
 
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -434,10 +437,25 @@ const ProfileScreen = (props) => {
                             </View>
                         </View>
                         <View style={styles.nameContainer}>
-                            <Text style={styles.fullName}>
-                                {user_profile.full_name}
-                            </Text>
-                            <Text style={styles.bio}>Insert bio here</Text>
+                            <View style={styles.editHeadings}>
+                                <View style={styles.nameHeadings}>
+                                    <Text style={styles.fullName}>
+                                        {user_profile.full_name}
+                                    </Text>
+                                    <Text style={styles.bio}>Insert bio here</Text>
+                                </View>
+                                <View style={styles.calBorder}>
+                                    <TouchableOpacity
+                                        onPress={() => setVisibleScreen('calendar')}
+                                    >
+                                        <Image 
+                                            source={CalendarPic}
+                                            style={styles.calendar}
+                                            
+                                        />
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
                         </View>
                         <View style={styles.editHeadings}>
                             <View style={styles.editBorder}>
@@ -459,18 +477,8 @@ const ProfileScreen = (props) => {
                                     </Text>
                                 </TouchableOpacity>
                             </View>
-                            <View style={styles.spaceBox}></View>
-                            <View style={styles.editBorder}>
-                                <TouchableOpacity
-                                    onPress={() => setVisibleScreen('calendar')}
-                                >
-                                    <Text style={styles.editText}>
-                                        Calendar
-                                    </Text>
-                                </TouchableOpacity>
-                            </View>
                         </View>
-                        <View style={styles.twoHeadings}>
+                        <ScrollView horizontal= {true} decelerationRate={0} snapToInterval={400} snapToAlignment={"center"} marginTop='2%'>
                             <TouchableOpacity
                                 onPress={() => {
                                     setDisplayPane(0);
@@ -483,7 +491,7 @@ const ProfileScreen = (props) => {
                                             : styles.btnPress
                                     }
                                 >
-                                    Workout Hist
+                                    Workout History
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -498,7 +506,7 @@ const ProfileScreen = (props) => {
                                             : styles.btnPress
                                     }
                                 >
-                                    Video Hist
+                                    Video History
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -513,7 +521,7 @@ const ProfileScreen = (props) => {
                                             : styles.btnPress
                                     }
                                 >
-                                    Liked Vids
+                                    Liked Videos
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -528,10 +536,10 @@ const ProfileScreen = (props) => {
                                             : styles.btnPress
                                     }
                                 >
-                                    My Vids
+                                    My Videos
                                 </Text>
                             </TouchableOpacity>
-                        </View>
+                        </ScrollView>
                         <View style={styles.savedContentContainer}>
                             {paneContent}
                         </View>

@@ -122,89 +122,114 @@ const TrackScreen = props => {
 
     return (
         <SafeAreaView>
-            <View style={styles.container}>
-                <Stopwatch
-                    laps
-                    msecs
-                    start={isStopwatchStart}
-                    //To start
-                    reset={resetStopwatch}
-                    //To reset
-                    options={options}
-                    //options for the styling
-                    getTime={(time) => {
-                        //console.log(time);
-                    }}
-                />
-                <TouchableHighlight
-                    onPress={() => {
-                        setIsStopwatchStart(!isStopwatchStart);
-                        lastStartHandler();
-                        if (isStopwatchStart) {
-                            caloriesHandler(enteredWorkoutCategory);
-                        }
-                        setResetStopwatch(false);
-                    }}
-                    testID={!isStopwatchStart ? 'startButton' : 'stopButton'}>
-                    <Text style={styles.buttonText}>
-                        {!isStopwatchStart ? 'START' : 'STOP'}
-                    </Text>
-                </TouchableHighlight>
-                <TouchableHighlight
-                    onPress={() => {
-                        setIsStopwatchStart(false);
-                        setResetStopwatch(true);
-                        setElapsedTime(0);
-                    }}>
-                    <Text style={styles.buttonText}>RESET</Text>
-                </TouchableHighlight>
+            <Container>
+                <Text style={styles.mainHeader}>
+                    Track
+                </Text>
                 <View
                     style={{
-                        marginTop: 40,
                         borderBottomColor: 'black',
                         borderBottomWidth: 1,
-                        width: '100%'
                     }}
                 />
-                <Header style={styles.mainHeader}>
-                    Save Your Workout
-                </Header>
-                <View>
-                    <Text style={styles.inputHeader}>Workout Category:</Text>
-                    <WorkoutCategoryPicker
-                        selectedValue={enteredWorkoutCategory}
-                        onValueChange={workoutCategoryHandler}
-                        style={styles.picker}
+            
+                <Text style={styles.subHeader2}>
+                    1. Start Stopwatch
+                </Text>
+                <View style={styles.container}>
+                    <Stopwatch
+                        laps
+                        msecs
+                        start={isStopwatchStart}
+                        //To start
+                        reset={resetStopwatch}
+                        //To reset
+                        options={options}
+                        //options for the styling
+                        getTime={(time) => {
+                            //console.log(time);
+                        }}
                     />
-                    <Text style={styles.inputHeader}>Muscle Group (Primary):</Text>
-                    <MuscleGroupPicker
-                        selectedValue={enteredMuscleGroup}
-                        onValueChange={muscleGroupHandler}
-                        style={styles.picker}
-                    />
-                    <Text style={styles.inputHeader}>Muscle Group (Secondary):</Text>
-                    <MuscleGroupPicker
-                        selectedValue={enteredSecondaryMuscleGroup}
-                        onValueChange={secondayMuscleGroupHandler}
-                        style={styles.picker}
-                    />
-                    <Text style={styles.caloriesHeader}>Calories Burned: {caloriesBurned}</Text>
+                    <TouchableHighlight
+                        onPress={() => {
+                            setIsStopwatchStart(!isStopwatchStart);
+                            lastStartHandler();
+                            if (isStopwatchStart) {
+                                caloriesHandler(enteredWorkoutCategory);
+                            }
+                            setResetStopwatch(false);
+                        }}
+                        testID={!isStopwatchStart ? 'startButton' : 'stopButton'}>
+                        <Text style={styles.buttonText}>
+                            {!isStopwatchStart ? 'START' : 'STOP'}
+                        </Text>
+                    </TouchableHighlight>
+                    <TouchableHighlight
+                        onPress={() => {
+                            setIsStopwatchStart(false);
+                            setResetStopwatch(true);
+                            setElapsedTime(0);
+                        }}>
+                        <Text style={styles.buttonText}>RESET</Text>
+                    </TouchableHighlight>
+
+                    <Text style={styles.subHeader3}>
+                        2. Save Your Workout
+                    </Text>
+                    <View>
+                        <Text style={styles.inputHeader}>Workout Category:</Text>
+                        <WorkoutCategoryPicker
+                            selectedValue={enteredWorkoutCategory}
+                            onValueChange={workoutCategoryHandler}
+                            style={styles.picker}
+                        />
+                        <Text style={styles.inputHeader}>Muscle Group (Primary):</Text>
+                        <MuscleGroupPicker
+                            selectedValue={enteredMuscleGroup}
+                            onValueChange={muscleGroupHandler}
+                            style={styles.picker}
+                        />
+                        <Text style={styles.inputHeader}>Muscle Group (Secondary):</Text>
+                        <MuscleGroupPicker
+                            selectedValue={enteredSecondaryMuscleGroup}
+                            onValueChange={secondayMuscleGroupHandler}
+                            style={styles.picker}
+                        />
+                        <Text style={styles.caloriesHeader}>Calories Burned: {caloriesBurned}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => saveHandler()} testID="saveButton">
+                        <Text style={styles.saveButton}>SAVE</Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => saveHandler()} testID="saveButton">
-                    <Text style={styles.saveButton}>SAVE</Text>
-                </TouchableOpacity>
-            </View>
+            </Container>
         </SafeAreaView>
     )
 };
 
 const styles = StyleSheet.create({
-    container: {
-        alignItems: 'center'
-    },
     mainHeader: {
+        fontSize: 40,
+        marginTop: "10%",
+        color: "black",
+        fontWeight: "bold"
+    },
+    subHeader: {
+        fontSize: 18,
+        marginTop: 0,
+        textAlign: 'center',
+    },
+    container: {
+        alignItems: 'center',
+    },
+    subHeader2: {
         fontSize: 30,
-        textAlign: "center"
+        fontWeight: 'bold',
+        marginTop: '5%'
+    },
+    subHeader3: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        marginTop: '10%'
     },
     inputHeader: {
         fontWeight: 'bold',

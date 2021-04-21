@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Button } from 'react-native';
+import { SafeAreaView, ScrollView, View, StyleSheet, Image, Button, TouchableOpacity, Text } from 'react-native';
 import Container from '@app/components/container.js'
 import { Header } from '@app/components/text.js';
 import SearchExercisesScreen from '../explore/exercises';
@@ -7,6 +7,8 @@ import SearchWorkoutsScreen from '../explore/workouts';
 import SearchLivestreamsScreen from '../explore/livestreams';
 import SearchUsersScreen from '../explore/users';
 import db from "../../firebase/firebase";
+import LoadingPic from '../../assets/loadingPic.png';
+
 
 const ExploreScreen = props => {
     const [displayedScreen, setDisplayedScreen] = useState('index');
@@ -30,13 +32,158 @@ const ExploreScreen = props => {
         <SafeAreaView>
                 {!visibleContent ? (
                     <Container>
-                        <Header style={styles.mainHeader}>
-                            Welcome to the Explore Screen!
-                        </Header>
-                        <Button onPress={() => changeScreenHandler("exercises")} title="Search Exercises" testID = 'exercisesButton'/>
-                        <Button onPress={() => changeScreenHandler("workouts")} title="Search Workout Videos" testID = 'workoutsButton'/>
-                        <Button onPress={() => changeScreenHandler("livestreams")} title="Search Livestreams" testID = 'livestreamsButton'/>
-                        <Button onPress={() => changeScreenHandler("users")} title="Search Users" testID = 'usersButton'/>
+                        <Text style={styles.mainHeader}>
+                            Explore
+                        </Text>
+                        <View
+                            style={{
+                                borderBottomColor: 'black',
+                                borderBottomWidth: 1,
+                            }}
+                        />
+                        <Text style={styles.subHeader}>
+                            Search for:
+                        </Text>
+                        <ScrollView horizontal= {true} decelerationRate={0} snapToInterval={400} snapToAlignment={"center"} marginTop='2%'>
+                            <View style={styles.editBorder}>
+                                <TouchableOpacity
+                                    onPress={() => changeScreenHandler("exercises")}
+                                    testID = 'exercisesButton'
+                                >
+                                    <Text style={styles.editText}>
+                                        Exercises
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.editBorder}>
+                                <TouchableOpacity
+                                    onPress={() => changeScreenHandler("workouts")}
+                                    testID = 'workoutsButton'
+                                >
+                                    <Text style={styles.editText}>
+                                        Workouts
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.editBorder3}>
+                                <TouchableOpacity
+                                    onPress={() => changeScreenHandler("livestreams")}
+                                    testID = 'livestreamsButton'
+                                >
+                                    <Text style={styles.editText}>
+                                        Livestreams
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.editBorder}>
+                                <TouchableOpacity
+                                    onPress={() => changeScreenHandler("users")}
+                                    testID = 'usersButton'
+                                >
+                                    <Text style={styles.editText}>
+                                        Users
+                                    </Text>
+                                </TouchableOpacity>
+                            </View>
+                        </ScrollView>
+
+
+                        <View style={styles.explorePics}>
+                            <Image 
+                                    source={LoadingPic}
+                                    style={styles.image1}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image1}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image1}
+                            />
+                        </View>
+                        <View style={styles.explorePics}>
+                            <Image 
+                                    source={LoadingPic}
+                                    style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                        </View>
+                        <View style={styles.explorePics}>
+                            <Image 
+                                    source={LoadingPic}
+                                    style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                        </View>
+                        <View style={styles.explorePics}>
+                            <Image 
+                                    source={LoadingPic}
+                                    style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                        </View>
+                        <View style={styles.explorePics}>
+                            <Image 
+                                    source={LoadingPic}
+                                    style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                        </View>
+                        <View style={styles.explorePics}>
+                            <Image 
+                                    source={LoadingPic}
+                                    style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                            <View style={styles.spaceBorder} />
+                            <Image 
+                                source={LoadingPic}
+                                style={styles.image}
+                            />
+                        </View>
                     </Container>
                 ) : (
                     visibleContent)}
@@ -46,9 +193,54 @@ const ExploreScreen = props => {
 
 const styles = StyleSheet.create({
     mainHeader: {
-        fontSize: 50,
-        marginTop: "55%",
-        textAlign: "center"
+        fontSize: 40,
+        marginTop: "10%",
+        color: "black",
+        fontWeight: "bold"
+    },
+    subHeader: {
+        fontSize: 20,
+        marginTop: "5%",
+        color: "black"
+    },
+    editBorder: {
+        borderColor: 'grey',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        flex: 1,
+        height: 30,
+        width: 120
+    },
+    editBorder3: {
+        borderColor: 'grey',
+        justifyContent: 'space-around',
+        borderWidth: 1,
+        flex: 1,
+        height: 30,
+        width: 150
+    },
+    editText: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        justifyContent: 'space-around',
+        flexDirection: 'row'
+    },
+    explorePics: {
+        flexDirection: 'row'
+    },
+    spaceBorder: {
+        flex: 0.9
+    },
+    image1: {
+        marginTop: "5%",
+        width: 100,
+        height: 100,
+    },
+    image: {
+        marginTop: "1%",
+        width: 100,
+        height: 100,
     }
 });
 

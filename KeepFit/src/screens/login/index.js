@@ -1,6 +1,8 @@
 import React from 'react'
-import { Button, SafeAreaView, StyleSheet } from 'react-native'
+import { Button, SafeAreaView, View, StyleSheet, ImageBackground } from 'react-native'
 import { FontAwesome5 } from "@expo/vector-icons";
+import LoadingPic from '../../assets/loadingPic.png';
+
 
 import Container from '@app/components/container.js'
 import Text, { Header, Subheader } from '@app/components/text.js'
@@ -8,45 +10,66 @@ import Text, { Header, Subheader } from '@app/components/text.js'
 
 const LoginScreen = props => {
     return (
-        <SafeAreaView>
-            <Container>
-                <Header style={styles.mainHeader} >
+        <View style={styles.container}>
+            <ImageBackground source={LoadingPic} style={styles.image}>
+            <Header style={styles.mainHeader} >
                     KeepFit
                 </Header>
                 <Subheader style={styles.subHeader}>
-                    An exercise application
+                    A Social Fitness Application
                 </Subheader>
-                <FontAwesome5.Button
-                    style={styles.googleButton}
-                    name="google"
-                    onPress={() => props.loginUser()}
-                >
-                    <Text style={styles.googleText}>Log In With Google</Text>
-                </FontAwesome5.Button>
-            </Container>
-        </SafeAreaView>
+                <View style={styles.googleButtonContainer}>
+                    <FontAwesome5.Button
+                        style={styles.googleButton}
+                        name="google"
+                        onPress={() => props.loginUser()}
+                    >
+                        <Text style={styles.googleText}>Log In With Google</Text>
+                    </FontAwesome5.Button>
+                </View>
+            </ImageBackground>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
     mainHeader: {
-        fontSize: 50,
-        marginTop: "55%",
-        textAlign: "center"
+        fontSize: 70,
+        marginTop: "20%",
+        textAlign: "center",
+        color: "limegreen"
     },
     subHeader: {
         fontSize: 18,
+        fontWeight: 'bold',
         marginTop: 0,
-        textAlign: "center"
+        textAlign: "center",
+        color: "black",
+        backgroundColor: "limegreen"
     },
     googleButton: {
-        height: 60,
-        paddingLeft: 50,
-        paddingRight: 50
+        height: 80,
+        paddingLeft: 35,
+        paddingRight: 35,
+        backgroundColor: "green"
+
     },
     googleText: {
         color: 'white',
         fontWeight: 'bold'
+    },
+    container: {
+        flex: 1,
+        flexDirection: "column"
+    },
+    image: {
+        flex: 1,
+        resizeMode: "cover"
+    },
+    googleButtonContainer: {
+        paddingHorizontal: 120,
+        marginTop: "50%",
+
     }
 });
 
