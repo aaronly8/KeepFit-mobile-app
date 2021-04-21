@@ -12,7 +12,7 @@ const LoginScreen = props => {
     return (
         <View style={styles.container}>
             <ImageBackground source={LoadingPic} style={styles.image}>
-            <Header style={styles.mainHeader} >
+                <Header style={styles.mainHeader} >
                     KeepFit
                 </Header>
                 <Subheader style={styles.subHeader}>
