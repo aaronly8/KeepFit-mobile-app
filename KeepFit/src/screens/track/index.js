@@ -150,28 +150,34 @@ const TrackScreen = props => {
                             //console.log(time);
                         }}
                     />
-                    <TouchableHighlight
-                        onPress={() => {
-                            setIsStopwatchStart(!isStopwatchStart);
-                            lastStartHandler();
-                            if (isStopwatchStart) {
-                                caloriesHandler(enteredWorkoutCategory);
-                            }
-                            setResetStopwatch(false);
-                        }}
-                        testID={!isStopwatchStart ? 'startButton' : 'stopButton'}>
-                        <Text style={styles.buttonText}>
-                            {!isStopwatchStart ? 'START' : 'STOP'}
-                        </Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight
-                        onPress={() => {
-                            setIsStopwatchStart(false);
-                            setResetStopwatch(true);
-                            setElapsedTime(0);
-                        }}>
-                        <Text style={styles.buttonText}>RESET</Text>
-                    </TouchableHighlight>
+                    <View style={styles.rowContainer}>
+                        <View style={styles.rowBorder}>
+                            <TouchableHighlight
+                                onPress={() => {
+                                    setIsStopwatchStart(!isStopwatchStart);
+                                    lastStartHandler();
+                                    if (isStopwatchStart) {
+                                        caloriesHandler(enteredWorkoutCategory);
+                                    }
+                                    setResetStopwatch(false);
+                                }}
+                                testID={!isStopwatchStart ? 'startButton' : 'stopButton'}>
+                                <Text style={styles.buttonText}>
+                                    {!isStopwatchStart ? 'START' : 'STOP'}
+                                </Text>
+                            </TouchableHighlight>
+                        </View>
+                        <View style={styles.rowBorder}>
+                            <TouchableHighlight
+                                onPress={() => {
+                                    setIsStopwatchStart(false);
+                                    setResetStopwatch(true);
+                                    setElapsedTime(0);
+                                }}>
+                                <Text style={styles.buttonText}>RESET</Text>
+                            </TouchableHighlight>
+                        </View>
+                    </View>
 
                     <Text style={styles.subHeader3}>
                         2. Save Your Workout
@@ -215,11 +221,20 @@ const styles = StyleSheet.create({
     },
     subHeader: {
         fontSize: 18,
-        marginTop: 0,
+        marginTop: '0%',
         textAlign: 'center',
     },
     container: {
         alignItems: 'center',
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around'
+    },
+    rowBorder: {
+        borderColor: 'grey',
+        borderWidth: 1,
+        flex: 1,
     },
     subHeader2: {
         fontSize: 30,
@@ -229,7 +244,8 @@ const styles = StyleSheet.create({
     subHeader3: {
         fontSize: 30,
         fontWeight: 'bold',
-        marginTop: '10%'
+        marginTop: '15%',
+        marginBottom: '10%'
     },
     inputHeader: {
         fontWeight: 'bold',
@@ -238,17 +254,18 @@ const styles = StyleSheet.create({
     },
     buttonText: {
         fontSize: 30,
-        marginTop: 10,
+        marginTop: '0%',
+        textAlign: 'center'
     },
     caloriesHeader: {
-        marginTop: 30,
+        marginTop: '10%',
         textAlign: 'center',
         fontSize: 30,
         color: 'blue'
     },
     saveButton: {
         fontSize: 30,
-        marginTop: 35,
+        marginTop: '5%',
         color: 'blue'
     }
 });
@@ -260,8 +277,8 @@ const options = {
         borderRadius: 5,
         width: 200,
         alignItems: 'center',
-        marginTop: 50,
-        marginBottom: 10
+        marginTop: '10%',
+        marginBottom: '10%'
     },
     text: {
         fontSize: 25,
