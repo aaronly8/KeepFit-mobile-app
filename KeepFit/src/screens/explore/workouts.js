@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, ScrollView, Button, TouchableOpacity, Text, Linking, View } from 'react-native';
+import { SafeAreaView, StyleSheet, ScrollView, TouchableHighlight, Button, FlatList, Alert, TouchableOpacity, Text, Linking, View } from 'react-native';
 import { Header } from '@app/components/text.js';
+import Input from '../../components/input';
 import db from "../../firebase/firebase";
 import ListItem from './listitem';
 import { updateLikedVideos, updateWatchedVideos } from "../../redux/actions/auth.js";
@@ -19,10 +20,43 @@ const Tag = props => {
     );
 };
 
+const Comment = props => {
+    return (
+        <View style={styles.singleCommentContainer}>
+            <Text>{props.commentText}</Text>
+        </View>
+    )
+}
+
 export const DetailsScreen = props => {
     const likedVideoData = useSelector(state => state.auth.likedVideos);
     const current_user_id = useSelector(state => state.auth.currentUserId);
     const watchedVideoData = useSelector((state) => state.auth.watchedVideos);
+
+    const [enteredComment, setEnteredComment] = useState('');
+
+    console.log(props);
+
+    const commentInputHandler = inputText => {
+        setEnteredComment(inputText);
+    };
+
+    const submitCommentHandler = () => {
+        if (!enteredComment) {
+            Alert.alert('Error', 'Comment is Empty.', [
+                { text: 'Dismiss', style: 'cancel' }
+            ]);
+            return;
+        }
+        let new_comments = props.workout.comments;
+        new_comments.unshift(enteredComment);
+        db.collection(Video.collection_name).doc(props.workoutID).update({
+            comments: new_comments
+        }).then(function() {
+            setEnteredComment("");
+            props.reSearch();
+        });
+    }
 
     const dispatch = useDispatch();
 
@@ -36,8 +70,8 @@ export const DetailsScreen = props => {
             likedVideoIds.push(doc.data().video_id);
         });
         const video_snapshot = await db.collection(Video.collection_name).get()
-        video_snapshot.forEach(function(doc) {
-            if(likedVideoIds.includes(doc.id)) {
+        video_snapshot.forEach(function (doc) {
+            if (likedVideoIds.includes(doc.id)) {
                 let this_data = doc.data();
                 this_data["id"] = doc.id;
                 likedVideoData.push(this_data);
@@ -45,7 +79,7 @@ export const DetailsScreen = props => {
         })
         dispatch(updateLikedVideos(likedVideoDictionary, likedVideoData));
     }
-    
+
     const getWatchedVideos = async () => {
         const snapshot = await db.collection(WatchedVideo.collection_name).where("user_id", "==", current_user_id).get()
         let watchedVideoDictionary = {}
@@ -56,8 +90,8 @@ export const DetailsScreen = props => {
             watchedVideoIds.push(doc.data().video_id);
         });
         const video_snapshot = await db.collection(Video.collection_name).get()
-        video_snapshot.forEach(function(doc) {
-            if(watchedVideoIds.includes(doc.id)) {
+        video_snapshot.forEach(function (doc) {
+            if (watchedVideoIds.includes(doc.id)) {
                 let this_data = doc.data();
                 this_data["id"] = doc.id;
                 watchedVideoData.push(this_data);
@@ -65,7 +99,7 @@ export const DetailsScreen = props => {
         })
         dispatch(updateWatchedVideos(watchedVideoDictionary, watchedVideoData));
     }
-    
+
 
     const likeVideo = () => {
         db.collection(LikedVideo.collection_name).doc().set({
@@ -79,13 +113,13 @@ export const DetailsScreen = props => {
 
     const unLikeVideo = () => {
         db.collection(LikedVideo.collection_name).where("video_id", "==", props.workoutID)
-        .where("user_id", "==", current_user_id).get().then(function (snapshot) {
-            snapshot.forEach(function(doc) {
-                doc.ref.delete().then(function () {
-                    getLikedVideos();
-                });
-            })
-        });
+            .where("user_id", "==", current_user_id).get().then(function (snapshot) {
+                snapshot.forEach(function (doc) {
+                    doc.ref.delete().then(function () {
+                        getLikedVideos();
+                    });
+                })
+            });
     }
 
     const watchVideo = () => {
@@ -96,6 +130,34 @@ export const DetailsScreen = props => {
         }).then(function () {
             getWatchedVideos();
         });
+    }
+
+    let commentsContent;
+    if (props.workout.comments_enabled) {
+        commentsContent = <View style={styles.commentsContainer}>
+            <Input style={styles.input}
+                blurOnSubmit
+                autoCapitalize='none'
+                autoCorrect={false}
+                maxLength={255}
+                keyboardType="default"
+                onChangeText={commentInputHandler}
+                value={enteredComment}
+                testID="commentInput"
+            />
+            <Button title="Submit Comment" onPress={submitCommentHandler} />
+            <Text style={styles.commentsHeader}>Comments</Text>
+            <FlatList
+                style={styles.commentsFlatList}
+                data={props.workout.comments}
+                renderItem={({ item }) => (
+                    <TouchableHighlight>
+                        <Comment commentText={item} />
+                    </TouchableHighlight>
+                )}
+                keyExtractor={(item) => item}
+            />
+        </View>;
     }
 
     let likeBtn;
@@ -111,7 +173,7 @@ export const DetailsScreen = props => {
 
     return (
         <SafeAreaView>
-            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton'/>
+            <Button title="<< Back" onPress={() => props.detailsBackHandler()} testID='backButton' />
             <Header style={styles.workoutName}>
                 {props.workout.title}
             </Header>
@@ -133,6 +195,7 @@ export const DetailsScreen = props => {
             <View style={styles.likeBtnContainer}>
                 {likeBtn}
             </View>
+            {commentsContent}
         </SafeAreaView>
     );
 };
@@ -161,19 +224,29 @@ const SearchWorkoutsScreen = props => {
         });
     }, []);
 
+    const reSearchVideos = () => {
+        var fetchedWorkoutDictionary = {};
+        db.collection(Video.collection_name).get().then(snapshot => {
+            snapshot.forEach(doc => {
+                fetchedWorkoutDictionary[doc.id] = doc.data();
+            });
+            sortVideosByLikes(fetchedWorkoutDictionary);
+        });
+    }
+
     const sortVideosByLikes = async (fetchedWorkoutDictionary) => {
         var likeCountDictionary = {};
         var sortedMap = {};
         db.collection(LikedVideo.collection_name).get().then(snapshot => {
             snapshot.forEach(doc => {
-                if(likeCountDictionary[doc.data().video_id]) {
+                if (likeCountDictionary[doc.data().video_id]) {
                     likeCountDictionary[doc.data().video_id]++;
                 } else {
                     likeCountDictionary[doc.data().video_id] = 1;
                 }
             });
 
-            var sortedArray = Object.keys(likeCountDictionary).sort(function(a, b) {
+            var sortedArray = Object.keys(likeCountDictionary).sort(function (a, b) {
                 return likeCountDictionary[b] - likeCountDictionary[a];
             });
 
@@ -182,8 +255,8 @@ const SearchWorkoutsScreen = props => {
                 console.log(fetchedWorkoutDictionary[element])
                 sortedMap[element] = fetchedWorkoutDictionary[element];
             });
-            for(var key in fetchedWorkoutDictionary) {
-                if(!(key in sortedMap)) {
+            for (var key in fetchedWorkoutDictionary) {
+                if (!(key in sortedMap)) {
                     sortedMap[key] = fetchedWorkoutDictionary[key];
                 }
             }
@@ -205,8 +278,8 @@ const SearchWorkoutsScreen = props => {
             likedVideoIds.push(doc.data().video_id);
         });
         const video_snapshot = await db.collection(Video.collection_name).get()
-        video_snapshot.forEach(function(doc) {
-            if(likedVideoIds.includes(doc.id)) {
+        video_snapshot.forEach(function (doc) {
+            if (likedVideoIds.includes(doc.id)) {
                 let this_data = doc.data();
                 this_data["id"] = doc.id;
                 likedVideoData.push(this_data);
@@ -268,10 +341,11 @@ const SearchWorkoutsScreen = props => {
                     workoutID={displayedDetails[0]}
                     workout={filteredWorkoutDictionary[displayedDetails[0]]}
                     detailsBackHandler={detailsBackHandler}
+                    reSearch={reSearchVideos}
                 />
             ) : (
                     <View style={styles.listView}>
-                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton'/>
+                        <Button title="<< Back" onPress={() => props.changeScreenHandler("index")} testID='backButton' />
                         <View style={styles.filterContainer}>
                             <MuscleGroupPicker onValueChange={value => {
                                 setMuscleGroupFilter1(value);
@@ -343,7 +417,7 @@ const styles = StyleSheet.create({
     },
     likeBtn: {
         backgroundColor: "lightblue",
-        marginTop: 100
+        marginTop: 50
     },
     likedBtn: {
         backgroundColor: "lightgreen",
@@ -354,8 +428,22 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center"
     },
-
-
+    commentsFlatList: {
+        marginTop: 20,
+        height: "37%"
+    },
+    commentsHeader: {
+        marginTop: 5,
+        textAlign: "center",
+        fontWeight: "bold",
+        textDecorationLine: "underline",
+        fontSize: 25
+    },
+    singleCommentContainer: {
+        paddingVertical: 5,
+        borderBottomColor: "black",
+        borderBottomWidth: 1
+    },
     //STYLES FOR TAG START
     tag: {
         width: 110,
