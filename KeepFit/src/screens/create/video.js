@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, Alert, View, Button } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, Switch, TouchableOpacity, Alert, View, Button } from 'react-native';
 import Input from '../../components/input';
 import { Header } from '@app/components/text.js';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
@@ -17,6 +17,7 @@ const CreateVideosScreen = props => {
 
     const [enteredTitle, setTitle] = useState('');
     const [enteredDescription, setDescription] = useState('');
+    const [commentsEnabled, setCommentsEnabled] = useState(true);
     const [enteredWorkoutCategory, setWorkoutCategory] = useState(null);
     const [enteredMuscleGroup, setMuscleGroup] = useState(null);
     const [enteredSecondaryMuscleGroup, setSecondaryMuscleGroup] = useState(null);
@@ -31,6 +32,8 @@ const CreateVideosScreen = props => {
     const descriptionInputHandler = inputText => {
         setDescription(inputText);
     };
+
+    const toggleComments = () => setCommentsEnabled(previousState => !previousState);
 
     const workoutCategoryHandler = inputText => {
         setWorkoutCategory(inputText);
@@ -72,9 +75,9 @@ const CreateVideosScreen = props => {
         }
         const response = await fetch(selectedVideo);
         const blob = await response.blob();
-        
+
         // limit if 10 MB size
-        if(blob.size > 10000000) {
+        if (blob.size > 10000000) {
             Alert.alert('Error', 'File must be smaller than 10MB', [
                 { text: 'Dismiss', style: 'cancel' }
             ]);
@@ -90,6 +93,8 @@ const CreateVideosScreen = props => {
                     user_id: current_user_id,
                     title: enteredTitle,
                     description: enteredDescription,
+                    comments_enabled: commentsEnabled,
+                    comments: [],
                     category: enteredWorkoutCategory,
                     muscle_group: enteredMuscleGroup,
                     secondary_muscle_group: enteredSecondaryMuscleGroup || null,
@@ -162,6 +167,14 @@ const CreateVideosScreen = props => {
                     onChangeText={descriptionInputHandler}
                     value={enteredDescription}
                     testID="descriptionInput"
+                />
+                <Text style={styles.inputHeader}>Enable Comments?</Text>
+                <Switch
+                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    thumbColor={commentsEnabled ? "#f5dd4b" : "#f4f3f4"}
+                    ios_backgroundColor="#3e3e3e"
+                    onValueChange={toggleComments}
+                    value={commentsEnabled}
                 />
                 <View>
                     <Text style={styles.inputHeader}>Workout Category:</Text>
