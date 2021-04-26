@@ -74,58 +74,58 @@ const ProfileScreen = (props) => {
         getWatchedVideos();
         getNumFollowers();
         getNumFollowing();
-        suggestWorkout();
     }, []);
 
+    useEffect(() => {
+        suggestWorkout();
+
+    }, []);
     const suggestWorkout = async () => {
-        console.log("suggesting...");
         // Recommendations cycle through muscle groups.
         const nextMuscleGroup = {
-            "Triceps" : "Chest",
-            "Chest" : "Shoulders",
-            "Shoulders" : "Biceps",
-            "Biceps" : "Forearms",
-            "Forearms" : "Legs",
-            "Legs" : "Core",
-            "Core" : "Back",
-            "Back" : "Full Body",
-            "Full Body" : "Triceps",
+            "triceps" : "Chest",
+            "chest" : "Shoulders",
+            "shoulders" : "Biceps",
+            "biceps" : "Forearms",
+            "forearms" : "Legs",
+            "legs" : "Core",
+            "core" : "Back",
+            "back" : "Full Body",
+            "full Body" : "Triceps",
         }
 
         // Each muscle group has 2 associated exercises to be suggested. 
         const workouts = {
-            "Triceps" : "dips & diamond push-ups.",
-            "Chest" : "push-ups & bench press.",
-            "Shoulders" : "lateral dumbell raise & shoulder press.",
-            "Biceps" : "dumbell curls & chin-ups",
-            "Forearms" : "wrist curls & bar hangs",
-            "Legs" : "squats & deadlifts",
-            "Core" : "ab rollers & leg lifts",
-            "Back" : "back rows & pull-ups",
-            "Full Body" : "deadlifts & pull-ups",
+            "triceps" : "dips & diamond push-ups.",
+            "chest" : "push-ups & bench press.",
+            "shoulders" : "lateral dumbell raise & shoulder press.",
+            "biceps" : "dumbell curls & chin-ups",
+            "forearms" : "wrist curls & bar hangs",
+            "legs" : "squats & deadlifts",
+            "core" : "ab rollers & leg lifts",
+            "back" : "back rows & pull-ups",
+            "full Body" : "deadlifts & pull-ups",
         }
 
-
         // Find the previously worked muscle group from workout history.
-        console.log("filteredWorkoutHist");
+        console.log("filteredWorkoutHist:");
         console.log(filteredWorkoutHistory);
         var prevMuscleGroup = null;
         if (filteredWorkoutHistory?.length > 0){
-            prevMuscleGroup = filteredWorkoutHistory[0].data.muscle_group;
+            prevMuscleGroup = filteredWorkoutHistory[0].muscle_group;
             console.log("prev musc group:")
             console.log(prevMuscleGroup)
         }
-
         // Compose the alert message.
         var message;
         if (prevMuscleGroup){
-            var muscleGroup = nextMuscleGroup[prevMuscleGroup]; 
+            var muscleGroup = nextMuscleGroup[prevMuscleGroup.toLowerCase()]; 
             message = "Since you last worked " + prevMuscleGroup.toLowerCase()
                         +  ", you should work " + muscleGroup.toLowerCase()
-                        +  " next. Try these exercises: " + workouts[muscleGroup];
+                        +  " next. Try these exercises: " + workouts[muscleGroup.toLowerCase()];
         }
         else{
-            message = "Welcome back! We recommend you get back into the groove by working biceps. Try these exercises: "  + workouts["Biceps"]; 
+            message = "Welcome back! We recommend you get back into the groove by working biceps. Try these exercises: "  + workouts["biceps"]; 
             console.log("default suggestion.");
         }
 
