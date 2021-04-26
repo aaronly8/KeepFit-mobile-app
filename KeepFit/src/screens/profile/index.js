@@ -365,12 +365,13 @@ const ProfileScreen = (props) => {
             break;
     }
 
-    if (!isLoggedIn)
+    if (!isLoggedIn) {
         return (
             <SafeAreaView>
                 <Text>Logging Out.</Text>
             </SafeAreaView>
         );
+    }
 
     switch (visibleScreen) {
         case 'edit':

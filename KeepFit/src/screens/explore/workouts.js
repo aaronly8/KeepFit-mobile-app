@@ -35,8 +35,6 @@ export const DetailsScreen = props => {
 
     const [enteredComment, setEnteredComment] = useState('');
 
-    console.log(props);
-
     const commentInputHandler = inputText => {
         setEnteredComment(inputText);
     };
@@ -251,8 +249,6 @@ const SearchWorkoutsScreen = props => {
             });
 
             sortedArray.forEach(element => {
-                console.log(element);
-                console.log(fetchedWorkoutDictionary[element])
                 sortedMap[element] = fetchedWorkoutDictionary[element];
             });
             for (var key in fetchedWorkoutDictionary) {
@@ -260,8 +256,6 @@ const SearchWorkoutsScreen = props => {
                     sortedMap[key] = fetchedWorkoutDictionary[key];
                 }
             }
-            console.log(JSON.stringify(sortedMap));
-
 
             setWorkoutDictionary(sortedMap);
             setFilteredWorkoutDictionary(sortedMap);

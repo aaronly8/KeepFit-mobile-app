@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 const HomeScreen = (props) => {
     const [posts, setPosts] = useState([]);
+    const isLoggedIn = useSelector((state) => state.auth.loggedIn);
     const user_profile = useSelector((state) => state.auth.currentUser);
 
 
@@ -20,7 +21,15 @@ const HomeScreen = (props) => {
             <View></View>
         </Container>;
     };
-    
+
+    if (!isLoggedIn) {
+        console.log("not logged in");
+        return (
+            <SafeAreaView>
+                <Text>Logging Out.</Text>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView>

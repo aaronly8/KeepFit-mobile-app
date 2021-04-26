@@ -180,7 +180,7 @@ const TrackScreen = props => {
                     </View>
 
                     <Text style={styles.subHeader3}>
-                        2. Save Your Workout
+                        2. Save Workout
                     </Text>
                     <View>
                         <Text style={styles.inputHeader}>Workout Category:</Text>
