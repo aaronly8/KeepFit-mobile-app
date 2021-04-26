@@ -68,6 +68,7 @@ const ProfileScreen = (props) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        getSavedExercises();
         suggestWorkout();
         getLikedVideos();
         getUserVideos();
