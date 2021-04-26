@@ -65,18 +65,91 @@ const ProfileScreen = (props) => {
     const watchedVideoDataArray = useSelector((state) => state.auth.w_videoDatas);
     const userVideos = useSelector((state) => state.auth.uploadedVideos);
 
-    console.log(userVideos);
-
     const dispatch = useDispatch();
 
     useEffect(() => {
-        getSavedExercises();
+        suggestWorkout();
         getLikedVideos();
         getUserVideos();
         getWatchedVideos();
         getNumFollowers();
         getNumFollowing();
     }, []);
+
+    const suggestWorkout = async () => {
+            const snapshot = await db
+                .collection(SavedExercise.collection_name)
+                .where('user_id', '==', current_user_id)
+                .get();
+            let workoutHist = [];
+            snapshot.forEach((doc) => {
+                let this_data = doc.data();
+                this_data['id'] = doc.id;
+                workoutHist.push(this_data);
+            });
+        dispatch(updateSavedExercises(workoutHist));
+        // Recommendations cycle through muscle groups.
+        const nextMuscleGroup = {
+            "triceps" : "Chest",
+            "chest" : "Shoulders",
+            "shoulders" : "Biceps",
+            "biceps" : "Forearms",
+            "forearms" : "Legs",
+            "legs" : "Core",
+            "core" : "Back",
+            "back" : "Full Body",
+            "full Body" : "Triceps",
+        }
+
+        // Each muscle group has 2 associated exercises to be suggested. 
+        const workouts = {
+            "triceps" : "dips & diamond push-ups.",
+            "chest" : "push-ups & bench press.",
+            "shoulders" : "lateral dumbell raise & shoulder press.",
+            "biceps" : "dumbell curls & chin-ups",
+            "forearms" : "wrist curls & bar hangs",
+            "legs" : "squats & deadlifts",
+            "core" : "ab rollers & leg lifts",
+            "back" : "back rows & pull-ups",
+            "full Body" : "deadlifts & pull-ups",
+        }
+
+        // Find the previously worked muscle group from workout history.
+        console.log("filteredWorkoutHist:");
+        console.log(workoutHist);
+        var prevMuscleGroup = null;
+        if (workoutHist?.length > 0){
+            prevMuscleGroup = workoutHist[0].muscle_group;
+            console.log("prev musc group:")
+            console.log(prevMuscleGroup)
+        }
+        // Compose the alert message.
+        var message;
+        if (prevMuscleGroup){
+            var muscleGroup = nextMuscleGroup[prevMuscleGroup.toLowerCase()]; 
+            message = "Since you last worked " + prevMuscleGroup.toLowerCase()
+                        +  ", you should work " + muscleGroup.toLowerCase()
+                        +  " next. Try these exercises: " + workouts[muscleGroup.toLowerCase()];
+        }
+        else{
+            message = "Welcome back! We recommend you get back into the groove by working biceps. Try these exercises: "  + workouts["biceps"]; 
+        }
+
+        // Notify using an Alert.
+        Alert.alert(
+            "Suggested Workout",
+            message,
+            [
+                {
+                    text: "Noted!",
+                    onPress: () => console.log("Closed suggested workout Alert message."),
+                }
+
+            ]
+        );
+
+
+    };
 
     const logoutHandler = () => {
         dispatch(logoutUser());
@@ -164,7 +237,6 @@ const ProfileScreen = (props) => {
         })
         setNumFollowers(myNumFollowers);
     }
-    console.log(numFollowers);
 
     const getNumFollowing = async () => {
         const snapshot = await db
@@ -177,7 +249,6 @@ const ProfileScreen = (props) => {
         })
         setNumFollowing(myNumFollowing);
     }
-    console.log(numFollowing);
 
 
     const unlikeVideoHandler = async (video_id) => {
