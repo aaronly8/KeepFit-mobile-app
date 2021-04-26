@@ -215,7 +215,7 @@ const TrackScreen = props => {
 const styles = StyleSheet.create({
     mainHeader: {
         fontSize: 40,
-        marginTop: "10%",
+        marginTop: "0%",
         color: "black",
         fontWeight: "bold"
     },
@@ -239,13 +239,13 @@ const styles = StyleSheet.create({
     subHeader2: {
         fontSize: 30,
         fontWeight: 'bold',
-        marginTop: '5%'
+        marginTop: '0%'
     },
     subHeader3: {
         fontSize: 30,
         fontWeight: 'bold',
-        marginTop: '15%',
-        marginBottom: '10%'
+        marginTop: '5%',
+        marginBottom: '0%'
     },
     inputHeader: {
         fontWeight: 'bold',
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         fontSize: 30,
-        marginTop: '5%',
+        marginTop: '0%',
         color: 'blue'
     }
 });

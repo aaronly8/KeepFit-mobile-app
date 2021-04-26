@@ -65,8 +65,6 @@ const ProfileScreen = (props) => {
     const watchedVideoDataArray = useSelector((state) => state.auth.w_videoDatas);
     const userVideos = useSelector((state) => state.auth.uploadedVideos);
 
-    console.log(userVideos);
-
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -76,8 +74,74 @@ const ProfileScreen = (props) => {
         getWatchedVideos();
         getNumFollowers();
         getNumFollowing();
+        suggestWorkout();
     }, []);
 
+    const suggestWorkout = async () => {
+        console.log("suggesting...");
+        // Recommendations cycle through muscle groups.
+        const nextMuscleGroup = {
+            "Triceps" : "Chest",
+            "Chest" : "Shoulders",
+            "Shoulders" : "Biceps",
+            "Biceps" : "Forearms",
+            "Forearms" : "Legs",
+            "Legs" : "Core",
+            "Core" : "Back",
+            "Back" : "Full Body",
+            "Full Body" : "Triceps",
+        }
+
+        // Each muscle group has 2 associated exercises to be suggested. 
+        const workouts = {
+            "Triceps" : "dips & diamond push-ups.",
+            "Chest" : "push-ups & bench press.",
+            "Shoulders" : "lateral dumbell raise & shoulder press.",
+            "Biceps" : "dumbell curls & chin-ups",
+            "Forearms" : "wrist curls & bar hangs",
+            "Legs" : "squats & deadlifts",
+            "Core" : "ab rollers & leg lifts",
+            "Back" : "back rows & pull-ups",
+            "Full Body" : "deadlifts & pull-ups",
+        }
+
+
+        // Find the previously worked muscle group from workout history.
+        console.log("filteredWorkoutHist");
+        console.log(filteredWorkoutHistory);
+        var prevMuscleGroup = null;
+        if (filteredWorkoutHistory?.length > 0){
+            prevMuscleGroup = filteredWorkoutHistory[0].data.muscle_group;
+            console.log("prev musc group:")
+            console.log(prevMuscleGroup)
+        }
+
+        // Compose the alert message.
+        var message;
+        if (prevMuscleGroup){
+            var muscleGroup = nextMuscleGroup[prevMuscleGroup]; 
+            message = "Since you last worked " + prevMuscleGroup.toLowerCase()
+                        +  ", you should work " + muscleGroup.toLowerCase()
+                        +  " next. Try these exercises: " + workouts[muscleGroup];
+        }
+        else{
+            message = "Welcome back! We recommend you get back into the groove by working biceps. Try these exercises: "  + workouts["Biceps"]; 
+            console.log("default suggestion.");
+        }
+
+        // Notify using an Alert.
+        Alert.alert(
+            "Suggested Workout",
+            message,
+            [
+                {
+                    text: "Noted!",
+                    onPress: () => console.log("Closed suggested workout Alert message."),
+                }
+
+            ]
+        );
+    };
     const logoutHandler = () => {
         dispatch(logoutUser());
         console.log('logged out');
@@ -164,7 +228,6 @@ const ProfileScreen = (props) => {
         })
         setNumFollowers(myNumFollowers);
     }
-    console.log(numFollowers);
 
     const getNumFollowing = async () => {
         const snapshot = await db
@@ -177,7 +240,6 @@ const ProfileScreen = (props) => {
         })
         setNumFollowing(myNumFollowing);
     }
-    console.log(numFollowing);
 
 
     const unlikeVideoHandler = async (video_id) => {
