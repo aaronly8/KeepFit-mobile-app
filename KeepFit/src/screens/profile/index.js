@@ -77,9 +77,17 @@ const ProfileScreen = (props) => {
     }, []);
 
     const suggestWorkout = async () => {
-        getSavedExercises().then(function () {
-
-        console.log("got exercises.")
+            const snapshot = await db
+                .collection(SavedExercise.collection_name)
+                .where('user_id', '==', current_user_id)
+                .get();
+            let workoutHist = [];
+            snapshot.forEach((doc) => {
+                let this_data = doc.data();
+                this_data['id'] = doc.id;
+                workoutHist.push(this_data);
+            });
+        dispatch(updateSavedExercises(workoutHist));
         // Recommendations cycle through muscle groups.
         const nextMuscleGroup = {
             "triceps" : "Chest",
@@ -108,10 +116,10 @@ const ProfileScreen = (props) => {
 
         // Find the previously worked muscle group from workout history.
         console.log("filteredWorkoutHist:");
-        console.log(filteredWorkoutHistory);
+        console.log(workoutHist);
         var prevMuscleGroup = null;
-        if (filteredWorkoutHistory?.length > 0){
-            prevMuscleGroup = filteredWorkoutHistory[0].muscle_group;
+        if (workoutHist?.length > 0){
+            prevMuscleGroup = workoutHist[0].muscle_group;
             console.log("prev musc group:")
             console.log(prevMuscleGroup)
         }
@@ -141,7 +149,6 @@ const ProfileScreen = (props) => {
         );
 
 
-        });
     };
 
     const logoutHandler = () => {
