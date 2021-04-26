@@ -68,7 +68,7 @@ const ProfileScreen = (props) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        getSavedExercises();
+        suggestWorkout();
         getLikedVideos();
         getUserVideos();
         getWatchedVideos();
@@ -76,11 +76,10 @@ const ProfileScreen = (props) => {
         getNumFollowing();
     }, []);
 
-    useEffect(() => {
-        suggestWorkout();
-
-    }, []);
     const suggestWorkout = async () => {
+        getSavedExercises().then(function () {
+
+        console.log("got exercises.")
         // Recommendations cycle through muscle groups.
         const nextMuscleGroup = {
             "triceps" : "Chest",
@@ -126,7 +125,6 @@ const ProfileScreen = (props) => {
         }
         else{
             message = "Welcome back! We recommend you get back into the groove by working biceps. Try these exercises: "  + workouts["biceps"]; 
-            console.log("default suggestion.");
         }
 
         // Notify using an Alert.
@@ -141,7 +139,11 @@ const ProfileScreen = (props) => {
 
             ]
         );
+
+
+        });
     };
+
     const logoutHandler = () => {
         dispatch(logoutUser());
         console.log('logged out');
