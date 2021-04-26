@@ -77,28 +77,30 @@ const ProfileScreen = (props) => {
     }, []);
 
     const suggestWorkout = async () => {
-            const snapshot = await db
-                .collection(SavedExercise.collection_name)
-                .where('user_id', '==', current_user_id)
-                .get();
-            let workoutHist = [];
-            snapshot.forEach((doc) => {
-                let this_data = doc.data();
-                this_data['id'] = doc.id;
-                workoutHist.push(this_data);
-            });
+        // Get workout history from db
+        const snapshot = await db
+            .collection(SavedExercise.collection_name)
+            .where('user_id', '==', current_user_id)
+            .get();
+        let workoutHist = [];
+        snapshot.forEach((doc) => {
+            let this_data = doc.data();
+            this_data['id'] = doc.id;
+            workoutHist.push(this_data);
+        });
         dispatch(updateSavedExercises(workoutHist));
+
         // Recommendations cycle through muscle groups.
         const nextMuscleGroup = {
-            "triceps" : "Chest",
-            "chest" : "Shoulders",
-            "shoulders" : "Biceps",
-            "biceps" : "Forearms",
-            "forearms" : "Legs",
-            "legs" : "Core",
-            "core" : "Back",
-            "back" : "Full Body",
-            "full Body" : "Triceps",
+            "triceps" : "chest",
+            "chest" : "shoulders",
+            "shoulders" : "biceps",
+            "biceps" : "forearms",
+            "forearms" : "legs",
+            "legs" : "core",
+            "core" : "back",
+            "back" : "full Body",
+            "full Body" : "triceps",
         }
 
         // Each muscle group has 2 associated exercises to be suggested. 
@@ -106,23 +108,20 @@ const ProfileScreen = (props) => {
             "triceps" : "dips & diamond push-ups.",
             "chest" : "push-ups & bench press.",
             "shoulders" : "lateral dumbell raise & shoulder press.",
-            "biceps" : "dumbell curls & chin-ups",
-            "forearms" : "wrist curls & bar hangs",
-            "legs" : "squats & deadlifts",
-            "core" : "ab rollers & leg lifts",
-            "back" : "back rows & pull-ups",
-            "full Body" : "deadlifts & pull-ups",
+            "biceps" : "dumbell curls & chin-ups.",
+            "forearms" : "wrist curls & bar hangs.",
+            "legs" : "squats & deadlifts.",
+            "core" : "ab rollers & leg lifts.",
+            "back" : "back rows & pull-ups.",
+            "full Body" : "deadlifts & pull-ups.",
         }
 
         // Find the previously worked muscle group from workout history.
-        console.log("filteredWorkoutHist:");
-        console.log(workoutHist);
         var prevMuscleGroup = null;
         if (workoutHist?.length > 0){
             prevMuscleGroup = workoutHist[0].muscle_group;
-            console.log("prev musc group:")
-            console.log(prevMuscleGroup)
         }
+        
         // Compose the alert message.
         var message;
         if (prevMuscleGroup){
@@ -144,11 +143,8 @@ const ProfileScreen = (props) => {
                     text: "Noted!",
                     onPress: () => console.log("Closed suggested workout Alert message."),
                 }
-
             ]
         );
-
-
     };
 
     const logoutHandler = () => {
