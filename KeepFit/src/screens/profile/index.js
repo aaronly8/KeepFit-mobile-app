@@ -37,6 +37,8 @@ import WatchedVideo from '../../models/watched_video';
 import Follows from '../../models/follows';
 import CalendarPic from '../../assets/calendar.png';
 
+import UserList from "./userList";
+
 
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -96,46 +98,46 @@ const ProfileScreen = (props) => {
 
         // Recommendations cycle through muscle groups.
         const nextMuscleGroup = {
-            "triceps" : "chest",
-            "chest" : "shoulders",
-            "shoulders" : "biceps",
-            "biceps" : "forearms",
-            "forearms" : "legs",
-            "legs" : "core",
-            "core" : "back",
-            "back" : "full Body",
-            "full Body" : "triceps",
+            "triceps": "chest",
+            "chest": "shoulders",
+            "shoulders": "biceps",
+            "biceps": "forearms",
+            "forearms": "legs",
+            "legs": "core",
+            "core": "back",
+            "back": "full Body",
+            "full Body": "triceps",
         }
 
         // Each muscle group has 2 associated exercises to be suggested. 
         const workouts = {
-            "triceps" : "dips & diamond push-ups.",
-            "chest" : "push-ups & bench press.",
-            "shoulders" : "lateral dumbell raise & shoulder press.",
-            "biceps" : "dumbell curls & chin-ups.",
-            "forearms" : "wrist curls & bar hangs.",
-            "legs" : "squats & deadlifts.",
-            "core" : "ab rollers & leg lifts.",
-            "back" : "back rows & pull-ups.",
-            "full Body" : "deadlifts & pull-ups.",
+            "triceps": "dips & diamond push-ups.",
+            "chest": "push-ups & bench press.",
+            "shoulders": "lateral dumbell raise & shoulder press.",
+            "biceps": "dumbell curls & chin-ups.",
+            "forearms": "wrist curls & bar hangs.",
+            "legs": "squats & deadlifts.",
+            "core": "ab rollers & leg lifts.",
+            "back": "back rows & pull-ups.",
+            "full Body": "deadlifts & pull-ups.",
         }
 
         // Find the previously worked muscle group from workout history.
         var prevMuscleGroup = null;
-        if (workoutHist?.length > 0){
+        if (workoutHist?.length > 0) {
             prevMuscleGroup = workoutHist[0].muscle_group;
         }
-        
+
         // Compose the alert message.
         var message;
-        if (prevMuscleGroup){
-            var muscleGroup = nextMuscleGroup[prevMuscleGroup.toLowerCase()]; 
+        if (prevMuscleGroup) {
+            var muscleGroup = nextMuscleGroup[prevMuscleGroup.toLowerCase()];
             message = "Since you last worked " + prevMuscleGroup.toLowerCase()
-                        +  ", you should work " + muscleGroup.toLowerCase()
-                        +  " next. Try these exercises: " + workouts[muscleGroup.toLowerCase()];
+                + ", you should work " + muscleGroup.toLowerCase()
+                + " next. Try these exercises: " + workouts[muscleGroup.toLowerCase()];
         }
-        else{
-            message = "Welcome back! We recommend you get back into the groove by working biceps. Try these exercises: "  + workouts["biceps"]; 
+        else {
+            message = "Welcome back! We recommend you get back into the groove by working biceps. Try these exercises: " + workouts["biceps"];
         }
 
         // Notify using an Alert.
@@ -204,8 +206,8 @@ const ProfileScreen = (props) => {
             watchedVideoIds.push(doc.data().video_id);
         });
         const video_snapshot = await db.collection(Video.collection_name).get()
-        video_snapshot.forEach(function(doc) {
-            if(watchedVideoIds.includes(doc.id)) {
+        video_snapshot.forEach(function (doc) {
+            if (watchedVideoIds.includes(doc.id)) {
                 let this_data = doc.data();
                 this_data["id"] = doc.id;
                 watchedVideoData.push(this_data);
@@ -465,12 +467,12 @@ const ProfileScreen = (props) => {
 
     switch (visibleScreen) {
         case 'edit':
-            return(
-            <SafeAreaView>
-                <EditProfileScreen
-                    cancelEdit={setVisibleScreen.bind(this, null)}
-                />
-            </SafeAreaView>);
+            return (
+                <SafeAreaView>
+                    <EditProfileScreen
+                        cancelEdit={setVisibleScreen.bind(this, null)}
+                    />
+                </SafeAreaView>);
         case 'details':
             return (
                 <SafeAreaView>
@@ -483,11 +485,23 @@ const ProfileScreen = (props) => {
         case 'calendar':
             return (
                 <SafeAreaView>
-                    <UserCalendarScreen 
+                    <UserCalendarScreen
                         cancelCalendar={setVisibleScreen.bind(this, null)}
                         deleteSavedExerciseHandler={deleteSavedExerciseHandler}
                     />
                 </SafeAreaView>
+            )
+        case 'following':
+            return (
+                <View>
+                    <UserList userData={following} headerText="Following" cancelDetails={setVisibleScreen.bind(this, null)}/>
+                </View>
+            )
+        case 'followers':
+            return (
+                <View>
+                    <UserList userData={followers} headerText="Followers" cancelDetails={setVisibleScreen.bind(this, null)}/>
+                </View>
             )
         default:
             return (
@@ -517,14 +531,18 @@ const ProfileScreen = (props) => {
                                 source={{ uri: user_profile.profile_picture }}
                             />
                             <View style={styles.followHeadings}>
-                                <View style={styles.followBox}>
-                                    <Text style={styles.numFollow}>{followers.length}</Text>
-                                    <Text style={styles.follow}>Followers</Text>
-                                </View>
-                                <View style={styles.followBox}>
-                                    <Text style={styles.numFollow}>{following.length}</Text>
-                                    <Text style={styles.follow}>Following</Text>
-                                </View>
+                                <TouchableOpacity onPress={() => setVisibleScreen("followers")}>
+                                    <View style={styles.followBox}>
+                                        <Text style={styles.numFollow}>{followers.length}</Text>
+                                        <Text style={styles.follow}>Followers</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setVisibleScreen("following")}>
+                                    <View style={styles.followBox}>
+                                        <Text style={styles.numFollow}>{following.length}</Text>
+                                        <Text style={styles.follow}>Following</Text>
+                                    </View>
+                                </TouchableOpacity>
                             </View>
                         </View>
                         <View style={styles.nameContainer}>
@@ -539,10 +557,10 @@ const ProfileScreen = (props) => {
                                     <TouchableOpacity
                                         onPress={() => setVisibleScreen('calendar')}
                                     >
-                                        <Image 
+                                        <Image
                                             source={CalendarPic}
                                             style={styles.calendar}
-                                            
+
                                         />
                                     </TouchableOpacity>
                                 </View>
@@ -569,7 +587,7 @@ const ProfileScreen = (props) => {
                                 </TouchableOpacity>
                             </View>
                         </View>
-                        <ScrollView horizontal= {true} decelerationRate={0} snapToInterval={400} snapToAlignment={"center"} marginTop='2%'>
+                        <ScrollView horizontal={true} decelerationRate={0} snapToInterval={400} snapToAlignment={"center"} marginTop='2%'>
                             <TouchableOpacity
                                 onPress={() => {
                                     setDisplayPane(0);

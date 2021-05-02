@@ -215,4 +215,22 @@ export default StyleSheet.create({
     nameHeadings: {
         flex: 1
     },
+    userItemContainer: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: 20,
+        paddingHorizontal: 30,
+        borderBottomWidth: 1,
+        borderBottomColor: "black",
+        paddingBottom: 20
+    },
+    bigHeading: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 20,
+        marginBottom: 20
+    }
 });
