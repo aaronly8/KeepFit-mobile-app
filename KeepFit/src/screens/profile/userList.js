@@ -26,7 +26,7 @@ const UserList = (props) => {
 
     if (displayedDetails) {
         return (
-            <SafeAreaView style={styles.detailsContainer}>
+            <SafeAreaView>
                 <UserDetailsScreen user={displayedDetails} detailsBackHandler={cancelListDetails}/>
             </SafeAreaView>
         )
