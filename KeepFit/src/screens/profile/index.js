@@ -43,7 +43,9 @@ import {
     updateSavedExercises,
     updateLikedVideos,
     updateWatchedVideos,
-    updateUploadedVideos
+    updateUploadedVideos,
+    updateFollowers,
+    updateFollowing
 } from '../../redux/actions/auth.js';
 
 import * as Notifications from 'expo-notifications';
@@ -54,8 +56,6 @@ const ProfileScreen = (props) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [day, setDay] = useState(new Date());
     const [date, setDate] = useState(new Date());
-    const [numFollowers, setNumFollowers] = useState(0);
-    const [numFollowing, setNumFollowing] = useState(0);
 
     const isLoggedIn = useSelector((state) => state.auth.loggedIn);
     const current_user_id = useSelector((state) => state.auth.currentUserId);
@@ -64,6 +64,8 @@ const ProfileScreen = (props) => {
     const likedVideoDataArray = useSelector((state) => state.auth.videoDatas);
     const watchedVideoDataArray = useSelector((state) => state.auth.w_videoDatas);
     const userVideos = useSelector((state) => state.auth.uploadedVideos);
+    const followers = useSelector((state) => state.auth.followers);
+    const following = useSelector((state) => state.auth.following);
 
     const dispatch = useDispatch();
 
@@ -73,8 +75,8 @@ const ProfileScreen = (props) => {
         getLikedVideos();
         getUserVideos();
         getWatchedVideos();
-        getNumFollowers();
-        getNumFollowing();
+        getFollowers();
+        getFollowing();
     }, []);
 
     const suggestWorkout = async () => {
@@ -223,28 +225,32 @@ const ProfileScreen = (props) => {
         dispatch(updateUploadedVideos(data));
     };
 
-    const getNumFollowers = async () => {
+    const getFollowers = async () => {
+        let followers = [];
         const snapshot = await db
             .collection(Follows.collection_name)
             .where('followee_id', '==', current_user_id)
             .get()
-        let myNumFollowers = 0;
         snapshot.forEach(function (doc) {
-            myNumFollowers++;
+            let doc_data = doc.data();
+            doc_data["id"] = doc.id;
+            followers.push(doc_data);
         })
-        setNumFollowers(myNumFollowers);
+        dispatch(updateFollowers((followers)));
     }
 
-    const getNumFollowing = async () => {
+    const getFollowing = async () => {
+        let following = [];
         const snapshot = await db
             .collection(Follows.collection_name)
             .where('follower_id', '==', current_user_id)
             .get()
-        let myNumFollowing = 0;
         snapshot.forEach(function (doc) {
-            myNumFollowing++;
+            let doc_data = doc.data();
+            doc_data["id"] = doc.id;
+            following.push(doc_data);
         })
-        setNumFollowing(myNumFollowing);
+        dispatch(updateFollowing((following)));
     }
 
 
@@ -496,11 +502,11 @@ const ProfileScreen = (props) => {
                             />
                             <View style={styles.followHeadings}>
                                 <View style={styles.followBox}>
-                                    <Text style={styles.numFollow}>{numFollowers}</Text>
+                                    <Text style={styles.numFollow}>{followers.length}</Text>
                                     <Text style={styles.follow}>Followers</Text>
                                 </View>
                                 <View style={styles.followBox}>
-                                    <Text style={styles.numFollow}>{numFollowing}</Text>
+                                    <Text style={styles.numFollow}>{following.length}</Text>
                                     <Text style={styles.follow}>Following</Text>
                                 </View>
                             </View>
