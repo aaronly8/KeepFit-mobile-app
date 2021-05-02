@@ -30,6 +30,7 @@ import UserCalendarScreen from './Calendar';
 
 import SavedExercise from '../../models/saved_exercise';
 import LikedVideo from '../../models/liked_video';
+import User from '../../models/user';
 import Video from '../../models/video';
 import db from '../../firebase/firebase';
 import WatchedVideo from '../../models/watched_video';
@@ -162,6 +163,7 @@ const ProfileScreen = (props) => {
             .get();
         let workoutHist = [];
         snapshot.forEach((doc) => {
+
             let this_data = doc.data();
             this_data['id'] = doc.id;
             workoutHist.push(this_data);
@@ -227,29 +229,43 @@ const ProfileScreen = (props) => {
 
     const getFollowers = async () => {
         let followers = [];
+        let followerIds = [];
         const snapshot = await db
             .collection(Follows.collection_name)
             .where('followee_id', '==', current_user_id)
             .get()
         snapshot.forEach(function (doc) {
-            let doc_data = doc.data();
-            doc_data["id"] = doc.id;
-            followers.push(doc_data);
+            followerIds.push(doc.data().follower_id);
         })
+        const user_snapshot = await db.collection(User.collection_name).get();
+        user_snapshot.forEach(function (doc) {
+            if (followerIds.includes(doc.id)) {
+                let this_data = doc.data();
+                this_data['id'] = doc.id;
+                followers.push(this_data);
+            }
+        });
         dispatch(updateFollowers((followers)));
     }
 
     const getFollowing = async () => {
         let following = [];
+        let followingIds = [];
         const snapshot = await db
             .collection(Follows.collection_name)
             .where('follower_id', '==', current_user_id)
             .get()
         snapshot.forEach(function (doc) {
-            let doc_data = doc.data();
-            doc_data["id"] = doc.id;
-            following.push(doc_data);
+            followingIds.push(doc.data().followee_id);
         })
+        const user_snapshot = await db.collection(User.collection_name).get();
+        user_snapshot.forEach(function (doc) {
+            if (followingIds.includes(doc.id)) {
+                let this_data = doc.data();
+                this_data['id'] = doc.id;
+                following.push(this_data);
+            }
+        });
         dispatch(updateFollowing((following)));
     }
 

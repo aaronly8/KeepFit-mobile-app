@@ -151,15 +151,22 @@ const SearchUsersScreen = props => {
 
     const getFollowing = async () => {
         let following = [];
+        let followingIds = [];
         const snapshot = await db
             .collection(Follows.collection_name)
             .where('follower_id', '==', current_user_id)
             .get()
         snapshot.forEach(function (doc) {
-            let doc_data = doc.data();
-            doc_data["id"] = doc.id;
-            following.push(doc_data);
+            followingIds.push(doc.data().followee_id);
         })
+        const user_snapshot = await db.collection(User.collection_name).get();
+        user_snapshot.forEach(function (doc) {
+            if (followingIds.includes(doc.id)) {
+                let this_data = doc.data();
+                this_data['id'] = doc.id;
+                following.push(this_data);
+            }
+        });
         dispatch(updateFollowing((following)));
     }
 
