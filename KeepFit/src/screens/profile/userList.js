@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { SafeAreaView, View, FlatList, Button, TouchableOpacity, Image, Text } from 'react-native';
 import styles from './styles';
+import UserDetailsScreen from "./userDetails";
 
 const UserItem = (props) => {
     return (
@@ -17,22 +18,36 @@ const UserItem = (props) => {
 }
 
 const UserList = (props) => {
-    return (
-        <SafeAreaView style={styles.UserListContainer}>
-            <Button title="<< Back" onPress={() => props.cancelDetails()} />
-            <Text style={styles.bigHeading}>{props.headerText}</Text>
-            <FlatList
-                style={styles.addFlex}
-                data={props.userData}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => console.log("pressed")}>
-                        <UserItem UserProfile={item} />
-                    </TouchableOpacity>
-                )}
-                keyExtractor={(item) => item.id}
-            />
-        </SafeAreaView>
-    )
+    const [displayedDetails, setDisplayedDetails] = useState(null);
+
+    const cancelListDetails = () => {
+        setDisplayedDetails(null);
+    }
+
+    if (displayedDetails) {
+        return (
+            <SafeAreaView style={styles.detailsContainer}>
+                <UserDetailsScreen user={displayedDetails} detailsBackHandler={cancelListDetails}/>
+            </SafeAreaView>
+        )
+    } else {
+        return (
+            <SafeAreaView style={styles.UserListContainer}>
+                <Button title="<< Back" onPress={() => props.cancelDetails()} />
+                <Text style={styles.bigHeading}>{props.headerText}</Text>
+                <FlatList
+                    style={styles.addFlex}
+                    data={props.userData}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => setDisplayedDetails(item)}>
+                            <UserItem UserProfile={item} />
+                        </TouchableOpacity>
+                    )}
+                    keyExtractor={(item) => item.id}
+                />
+            </SafeAreaView>
+        )
+    }
 }
 
 export default UserList;

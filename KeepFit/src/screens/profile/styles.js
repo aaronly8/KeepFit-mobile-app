@@ -232,5 +232,8 @@ export default StyleSheet.create({
         textAlign: 'center',
         marginTop: 20,
         marginBottom: 20
+    },
+    detailsContainer: {
+        paddingHorizontal: 35
     }
 });
