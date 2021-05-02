@@ -1,10 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, FlatList, Button, TouchableHighlight, Image, View, Linking, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import Text from '@app/components/text.js';
 
+import Follows from '../../models/follows';
+
+import db from '../../firebase/firebase';
+
 const UserDetailsScreen = props => {
     const user_profile = props.user;
+    const current_user_id = user_profile.id;
+
+    const [numFollowers, setNumFollowers] = useState(0);
+    const [numFollowing, setNumFollowing] = useState(0);
+
+    useEffect(() => {
+        getNumFollowers();
+        getNumFollowing();
+    }, []);
+
+    const getNumFollowers = async () => {
+        const snapshot = await db
+            .collection(Follows.collection_name)
+            .where('followee_id', '==', current_user_id)
+            .get()
+        let myNumFollowers = 0;
+        snapshot.forEach(function (doc) {
+            myNumFollowers++;
+        })
+        setNumFollowers(myNumFollowers);
+    }
+
+    const getNumFollowing = async () => {
+        const snapshot = await db
+            .collection(Follows.collection_name)
+            .where('follower_id', '==', current_user_id)
+            .get()
+        let myNumFollowing = 0;
+        snapshot.forEach(function (doc) {
+            myNumFollowing++;
+        })
+        setNumFollowing(myNumFollowing);
+    }
 
     return (
         <SafeAreaView style={styles.detailsContainer}>
@@ -26,7 +63,7 @@ const UserDetailsScreen = props => {
                 <View style={styles.followHeadings}>
                     <View style={styles.followBox}>
                         <Text style={styles.numFollow}>
-                            15
+                            {numFollowers}
                             </Text>
                         <Text style={styles.follow}>
                             Followers
@@ -34,7 +71,7 @@ const UserDetailsScreen = props => {
                     </View>
                     <View style={styles.followBox}>
                         <Text style={styles.numFollow}>
-                            5
+                            {numFollowing}
                             </Text>
                         <Text style={styles.follow}>
                             Following

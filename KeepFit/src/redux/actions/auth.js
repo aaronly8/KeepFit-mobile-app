@@ -72,3 +72,21 @@ export const updateSearchedUsers = (searched_users) => {
         searchedUsers: searched_users,
     }
 }
+
+export const UPDATE_FOLLOWERS = "UPDATE_FOLLOWERS";
+
+export const updateFollowers = (follower_users) => {
+    return {
+        type: UPDATE_FOLLOWERS,
+        followers: follower_users,
+    }
+}
+
+export const UPDATE_FOLLOWING = "UPDATE_FOLLOWING";
+
+export const updateFollowing = (following_users) => {
+    return {
+        type: UPDATE_FOLLOWING,
+        following: following_users,
+    }
+}

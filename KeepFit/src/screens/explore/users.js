@@ -10,7 +10,7 @@ import Follows from '../../models/follows';
 import { useScrollToTop } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import UserDetailsScreen from "./userDetails";
-import { updateSearchedUsers } from '../../redux/actions/auth.js';
+import { updateSearchedUsers, updateFollowing } from '../../redux/actions/auth.js';
 
 const DetailsScreen = props => {
     return (
@@ -133,6 +133,7 @@ const SearchUsersScreen = props => {
         }).then(() => {
             followedUserIds.push(followee_user_id);
             setFollowedUserIds([...followedUserIds]);
+            getFollowing();
         });
     }
 
@@ -144,7 +145,22 @@ const SearchUsersScreen = props => {
                 });
                 followedUserIds.splice(followedUserIds.indexOf(followee_user_id, 1));
                 setFollowedUserIds([...followedUserIds]);
+                getFollowing();
             });
+    }
+
+    const getFollowing = async () => {
+        let following = [];
+        const snapshot = await db
+            .collection(Follows.collection_name)
+            .where('follower_id', '==', current_user_id)
+            .get()
+        snapshot.forEach(function (doc) {
+            let doc_data = doc.data();
+            doc_data["id"] = doc.id;
+            following.push(doc_data);
+        })
+        dispatch(updateFollowing((following)));
     }
 
 
