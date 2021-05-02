@@ -2,10 +2,42 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, FlatList, Button, TouchableHighlight, Image, View, Linking, TouchableOpacity } from 'react-native';
 import Container from '@app/components/container.js'
 import Text from '@app/components/text.js';
+import SavedExercise from '../../models/saved_exercise';
+import whichImage from '../profile/workout-image';
 
 import Follows from '../../models/follows';
 
 import db from '../../firebase/firebase';
+
+const Workout = (props) => {
+    const { CompletedWorkout, deleteSavedExerciseHandler } = props;
+    return (
+        <View style={styles.unpaddedHorizontalContainer}>
+            {whichImage({ CompletedWorkout })}
+            <View style={styles.addFlex}>
+                <View style={styles.horizontalItemContainer}>
+                    <Text style={styles.workoutHistName}>
+                        {CompletedWorkout.category}
+                    </Text>
+                </View>
+                <Text style={styles.workoutHistSub}>
+                    {CompletedWorkout.completed_on}
+                </Text>
+                <Text style={styles.workoutHistLastSub}>
+                    {CompletedWorkout.caloriesBurned} cals. burned
+                </Text>
+                <View style={styles.unpaddedTagsHorizontalContainer}>
+                    <Text style={styles.workoutTagName}>
+                        {CompletedWorkout.muscle_group}
+                    </Text>
+                    <Text style={styles.workoutTagName}>
+                        {CompletedWorkout.secondary_muscle_group}
+                    </Text>
+                </View>
+            </View>
+        </View>
+    );
+}
 
 const UserDetailsScreen = props => {
     const user_profile = props.user;
@@ -13,10 +45,13 @@ const UserDetailsScreen = props => {
 
     const [numFollowers, setNumFollowers] = useState(0);
     const [numFollowing, setNumFollowing] = useState(0);
+    const [savedExercises, setSavedExercises] = useState([]);
+    const [visibleScreen, setVisibleScreen] = useState("data");
 
     useEffect(() => {
         getNumFollowers();
         getNumFollowing();
+        getSavedExercises();
     }, []);
 
     const getNumFollowers = async () => {
@@ -43,55 +78,23 @@ const UserDetailsScreen = props => {
         setNumFollowing(myNumFollowing);
     }
 
-    return (
-        <SafeAreaView style={styles.detailsContainer}>
-            <View style={styles.userHeadings}>
-                <Text style={styles.userName}>
-                    {user_profile.username}
-                </Text>
-                {
-                    <View style={styles.googleButtonContainer}>
-                        <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
-                    </View>
-                }
-            </View>
-            <View style={styles.horizontalContainer}>
-                <Image
-                    style={styles.profilePic}
-                    source={{ uri: user_profile.profile_picture }}
-                />
-                <View style={styles.followHeadings}>
-                    <View style={styles.followBox}>
-                        <Text style={styles.numFollow}>
-                            {numFollowers}
-                            </Text>
-                        <Text style={styles.follow}>
-                            Followers
-                            </Text>
-                    </View>
-                    <View style={styles.followBox}>
-                        <Text style={styles.numFollow}>
-                            {numFollowing}
-                            </Text>
-                        <Text style={styles.follow}>
-                            Following
-                            </Text>
-                    </View>
-                </View>
-            </View>
-            <View style={styles.nameContainer}>
-                <Text style={styles.fullName}>
-                    {user_profile.full_name}
-                </Text>
-                <Text style={styles.bio}>
-                    Insert bio here
-                    </Text>
-            </View>
-            <View>
-                <Text style={styles.bigHeading}>
-                    User Data
-                    </Text>
-            </View>
+    const getSavedExercises = async () => {
+        const snapshot = await db
+            .collection(SavedExercise.collection_name)
+            .where('user_id', '==', current_user_id)
+            .get();
+        let workoutHist = [];
+        snapshot.forEach((doc) => {
+            let this_data = doc.data();
+            this_data['id'] = doc.id;
+            workoutHist.push(this_data);
+        });
+        setSavedExercises((workoutHist));
+    };
+
+    let paneContent;
+    if (visibleScreen == "data") {
+        paneContent = <View>
             <View style={styles.tagName}>
                 <Text style={styles.subheading}>
                     Birthday:
@@ -132,6 +135,89 @@ const UserDetailsScreen = props => {
                     {user_profile.fitness_level}
                 </Text>
             </View>
+        </View>;
+    } else {
+        paneContent = (
+            <>
+                <FlatList
+                    style={styles.addFlex}
+                    data={savedExercises}
+                    renderItem={({ item }) => (
+                        <TouchableHighlight>
+                            <Workout CompletedWorkout={item} />
+                        </TouchableHighlight>
+                    )}
+                    keyExtractor={(item) => item.id}
+                />
+            </>
+        );
+    }
+
+    console.log(savedExercises);
+
+    return (
+        <SafeAreaView style={styles.detailsContainer}>
+            <View style={styles.userHeadings}>
+                <Text style={styles.userName}>
+                    {user_profile.username}
+                </Text>
+                {
+                    <View style={styles.googleButtonContainer}>
+                        <Button title="<< Back" onPress={() => props.detailsBackHandler()} />
+                    </View>
+                }
+            </View>
+            <View style={styles.horizontalContainer}>
+                <Image
+                    style={styles.profilePic}
+                    source={{ uri: user_profile.profile_picture }}
+                />
+                <View style={styles.followHeadings}>
+                    <View style={styles.followBox}>
+                        <Text style={styles.numFollow}>
+                            {numFollowers}
+                        </Text>
+                        <Text style={styles.follow}>
+                            Followers
+                            </Text>
+                    </View>
+                    <View style={styles.followBox}>
+                        <Text style={styles.numFollow}>
+                            {numFollowing}
+                        </Text>
+                        <Text style={styles.follow}>
+                            Following
+                            </Text>
+                    </View>
+                </View>
+            </View>
+            <View style={styles.nameContainer}>
+                <Text style={styles.fullName}>
+                    {user_profile.full_name}
+                </Text>
+            </View>
+            <View style={styles.editHeadings}>
+                <View style={styles.editBorder}>
+                    <TouchableOpacity
+                        onPress={() => setVisibleScreen('data')}
+                    >
+                        <Text style={styles.editText}>
+                            View Data
+                                    </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.spaceBox}></View>
+                <View style={styles.editBorder}>
+                    <TouchableOpacity
+                        onPress={() => setVisibleScreen('hsitory')}
+                    >
+                        <Text style={styles.editText}>
+                            Workout History
+                                    </Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+            {paneContent}
         </SafeAreaView>
     )
 }
@@ -234,7 +320,9 @@ const styles = StyleSheet.create({
     },
     editHeadings: {
         flexDirection: "row",
-        justifyContent: 'space-around'
+        justifyContent: 'space-around',
+        marginTop: 20,
+        marginBottom: 20
     },
     spaceBox: {
         flex: 0.01
@@ -311,6 +399,13 @@ const styles = StyleSheet.create({
     },
     detailsContainer: {
         marginTop: 40
+    },
+    workoutTagName: {
+        fontSize: 15,
+        marginTop: '8%',
+        color: 'skyblue',
+        fontWeight: 'bold',
+        paddingRight: '8%',
     },
     bigHeading: {
         fontSize: 25,
