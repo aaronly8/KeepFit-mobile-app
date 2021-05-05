@@ -48,6 +48,7 @@ const CreateLivestreamsScreen = (props) => {
 
     const [enteredTitle, setTitle] = useState('');
     const [enteredDescription, setDescription] = useState('');
+    const [enteredLimit, setLimit] = useState(0);
     const [enteredWorkoutCategory, setWorkoutCategory] = useState(null);
     const [enteredMuscleGroup, setMuscleGroup] = useState(null);
     const [enteredSecondaryMuscleGroup, setSecondaryMuscleGroup] = useState(
@@ -60,6 +61,10 @@ const CreateLivestreamsScreen = (props) => {
 
     const descriptionInputHandler = (inputText) => {
         setDescription(inputText);
+    };
+
+    const limitInputHandler = (inputText) => {
+        setLimit(inputText);
     };
 
     const workoutCategoryHandler = (inputText) => {
@@ -150,6 +155,8 @@ const CreateLivestreamsScreen = (props) => {
                 user_id: current_user_id,
                 title: enteredTitle,
                 description: enteredDescription,
+                max_limit: enteredList,
+                num_participants: 0,
                 category: enteredWorkoutCategory,
                 muscle_group: enteredMuscleGroup,
                 secondary_muscle_group: enteredSecondaryMuscleGroup || null,
@@ -158,6 +165,8 @@ const CreateLivestreamsScreen = (props) => {
 
         setTitle('');
         setDescription('');
+        setLimit(0);
+
         props.changeScreenHandler('index');
 
         Linking.openURL(meeting.start_url);
@@ -172,11 +181,20 @@ const CreateLivestreamsScreen = (props) => {
     }, [response]);
 
     const submit = () => {
+        if (isNaN(enteredLimit)) {
+            Alert.alert(
+                'Error',
+                'Participant Limit must be a number.',
+                [{ text: 'Dismiss', style: 'cancel' }]
+            );
+            return;
+        }
         if (
             !enteredTitle ||
             !enteredWorkoutCategory ||
             !enteredMuscleGroup ||
-            !enteredDescription
+            !enteredDescription ||
+            !enteredLimit
         ) {
             Alert.alert(
                 'Error',
@@ -185,6 +203,7 @@ const CreateLivestreamsScreen = (props) => {
             );
             return;
         }
+        
         promptAsync({ useProxy: true });
     };
 
@@ -221,6 +240,20 @@ const CreateLivestreamsScreen = (props) => {
                     onChangeText={descriptionInputHandler}
                     value={enteredDescription}
                     testID="descriptionInput"
+                />
+                <Text style={styles.inputHeader}>
+                    Participant Limit (100 max):
+                </Text>
+                <Input
+                    style={styles.input}
+                    blurOnSubmit
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    maxLength={3}
+                    keyboardType="number-pad"
+                    onChangeText={limitInputHandler}
+                    value={enteredLimit}
+                    testID="limitInput"
                 />
                 <View>
                     <Text style={styles.inputHeader}>Workout Category:</Text>

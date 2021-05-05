@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, ScrollView, Button, Text, Linking, View } from 'react-native';
+import { SafeAreaView, StyleSheet, ScrollView, Button, Text, Alert, Linking, View } from 'react-native';
 import { Header } from '@app/components/text.js';
-import db from "../../firebase/firebase";
+import db, { firebase } from "../../firebase/firebase";
 import Livestream from '../../models/livestream';
 import ListItem from './listitem';
 import { MuscleGroupPicker, WorkoutCategoryPicker } from '../../components/pickers';
@@ -14,6 +14,14 @@ const Tag = props => {
     );
 };
 
+const incrementCounter = props => {
+
+   const increment = firebase.firestore.FieldValue.increment(1)
+   const myLivestream = db.collection(Livestream.collection_name).doc(props.livestreamID);
+
+    myLivestream.update({num_participants: increment});
+    Linking.openURL(props.livestream.video_link)
+}
 export const DetailsScreen = props => {
     return (
         <SafeAreaView>
@@ -22,11 +30,29 @@ export const DetailsScreen = props => {
                 {props.livestream.title}
             </Header>
             <Text style={styles.videoLink}
-             onPress={() => Linking.openURL(props.livestream.video_link)}>
-            Watch Livestream on Zoom
+            onPress={() => {
+                (props.livestream.max_limit > props.livestream.num_participants) ?
+                incrementCounter(props)
+                  : 
+                 Alert.alert(
+                    'Error',
+                    'Participant limit has been reached.',
+                    [{ text: 'Dismiss', style: 'cancel' }]
+                 );
+                
+                 
+                }}>
+                Watch Livestream on Zoom
             </Text>
             <Text>
-                {props.livestream.description}
+                Max Participants: {props.livestream.max_limit}   |   Current Participants: {props.livestream.num_participants}
+                
+            </Text>
+            <Text>
+                
+            </Text>
+            <Text>
+                Description: {props.livestream.description}
             </Text>
             <View style={styles.tagsContainer}>
                 <Tag value={props.livestream.category}></Tag>
